@@ -1,5 +1,5 @@
 from models import *
-from ours import *
+from sgformer import *
 from nodeformer import *
 from difformer import *
 from graphormer import *
@@ -101,7 +101,7 @@ def parse_method(method, args, c, d, device):
                           alpha=args.alpha,
                           dropout=args.dropout,
                           num_heads=args.num_heads).to(device)
-    elif method == 'ours':
+    elif method == 'sgformer':
         if args.use_graph:
             gnn=parse_method(args.backbone, args, args.hidden_channels, d, device)
             model = SGFormer(d, args.hidden_channels, c, num_layers=args.ours_layers, alpha=args.alpha, dropout=args.ours_dropout, num_heads=args.num_heads,
@@ -214,7 +214,7 @@ def parser_add_main_args(parser):
 
 
 def parser_add_default_args(args):
-    if args.method=='ours':
+    if args.method=='sgformer':
         if args.ours_weight_decay is None:
             args.ours_weight_decay=args.weight_decay
         if args.ours_dropout is None:
