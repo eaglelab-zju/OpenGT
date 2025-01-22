@@ -1,0 +1,5 @@
+train_prop:0.5, valid_prop:0.25method: ours hidden: 64 ours_layers:1 lr:0.005 use_graph:True aggregate:add graph_weight:0.7 alpha:0.5 ours_decay:0.01 ours_dropout:0.3 epochs:500 use_feat_norm:False use_bn:False use_residual:False use_act:False
+backbone:gcn, layers:4 hidden: 64 lr:0.005 decay:0.01 dropout:0.5
+1 runs: Highest Train: -12.83 ± nan Highest val epoch:198
+Highest Test: -30.36 ± nan Final Test: -30.36 ± nan run_time: 92.95545491360826
+

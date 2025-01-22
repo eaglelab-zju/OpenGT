@@ -1,0 +1,5 @@
+label per class:20, valid:500,test:1000
+method: graphtrans hidden: 64 lr:0.005
+5 runs: Highest Train: 100.00 ± 0.00 Highest val epoch:30
+Highest Test: 64.04 ± 2.06 Final Test: 62.70 ± 1.96 run_time: 10.526453682849047
+
