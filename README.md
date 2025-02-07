@@ -16,6 +16,9 @@
 ## Quick Start:
 
 ### Method:
-`SGFormer`, `GraphGPS`, `graphtransformer`, `Difformer`, `Nodeformer`, `graphormer`, `Specformer`, `Exphormer`, `ViT/MLP-Mixer`
+`SGFormer`, `graphtransformer`, 
+(TODO: verify) `GraphGPS`, `Difformer`, `Nodeformer`, `graphormer`, 
+(TODO: code) `Specformer`, `Exphormer`, `ViT/MLP-Mixer`
 ### Dataset:
-`cora`, `citeseer`, `pubmed`, `actor`, `deezer`, `squirrel`, `chameleon`, `ogbn-arxiv`, `ogbn-proteins`
+`cora`, `citeseer`, `pubmed`, `actor`, 
+(TODO: verify) `deezer`, `squirrel`, `chameleon`, `ogbn-arxiv`, `ogbn-proteins`
