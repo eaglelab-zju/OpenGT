@@ -17,8 +17,11 @@
 
 ### Method:
 `SGFormer`, `graphtransformer`, 
+
 (TODO: verify) `GraphGPS`, `Difformer`, `Nodeformer`, `graphormer`, 
+
 (TODO: code) `Specformer`, `Exphormer`, `ViT/MLP-Mixer`
 ### Dataset:
 `cora`, `citeseer`, `pubmed`, `actor`, 
+
 (TODO: verify) `deezer`, `squirrel`, `chameleon`, `ogbn-arxiv`, `ogbn-proteins`
