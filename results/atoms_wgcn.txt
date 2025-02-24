@@ -1,4 +1,0 @@
-train_prop:0.5, valid_prop:0.25method: wgcn hidden: 64 lr:0.005
-1 runs: Highest Train: -12.83 ± nan Highest val epoch:199
-Highest Test: -30.36 ± nan Final Test: -30.36 ± nan run_time: 62.344367201731075
-

@@ -1,253 +1,179 @@
-import argparse
-import copy
+import datetime
 import os
-import random
-import sys
-import warnings
-import time, subprocess
-
-import numpy as np
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from data_utils import class_rand_splits, eval_acc, eval_rocauc, evaluate, load_fixed_splits, class_rand_splits, to_sparse_tensor
-from dataset import load_nc_dataset
-from logger import Logger
-from parse import parse_method, parser_add_default_args, parser_add_main_args
-from torch_geometric.utils import (add_self_loops, remove_self_loops,
-                                   to_undirected)
+import logging
 
-warnings.filterwarnings('ignore')
+import graphgps  # noqa, register custom modules
+from graphgps.agg_runs import agg_runs
+from graphgps.optimizer.extra_optimizers import ExtendedSchedulerConfig
 
-# NOTE: for consistent data splits, see data_utils.rand_train_test_idx
-def get_gpu_memory_map():
-    """Get the current gpu usage.
-    Returns
-    -------
-    usage: dict
-        Keys are device ids as integers.
-        Values are memory usage as integers in MB.
+from torch_geometric.graphgym.cmd_args import parse_args
+from torch_geometric.graphgym.config import (cfg, dump_cfg,
+                                             set_cfg, load_cfg,
+                                             makedirs_rm_exist)
+from torch_geometric.graphgym.loader import create_loader
+from torch_geometric.graphgym.logger import set_printing
+from torch_geometric.graphgym.optim import create_optimizer, \
+    create_scheduler, OptimizerConfig
+from torch_geometric.graphgym.model_builder import create_model
+from torch_geometric.graphgym.train import GraphGymDataModule, train
+from torch_geometric.graphgym.utils.comp_budget import params_count
+from torch_geometric.graphgym.utils.device import auto_select_device
+from torch_geometric.graphgym.register import train_dict
+from torch_geometric import seed_everything
+
+from graphgps.finetuning import load_pretrained_model_cfg, \
+    init_model_from_pretrained
+from graphgps.logger import create_logger
+
+
+torch.backends.cuda.matmul.allow_tf32 = True  # Default False in PyTorch 1.12+
+torch.backends.cudnn.allow_tf32 = True  # Default True
+
+
+def new_optimizer_config(cfg):
+    return OptimizerConfig(optimizer=cfg.optim.optimizer,
+                           base_lr=cfg.optim.base_lr,
+                           weight_decay=cfg.optim.weight_decay,
+                           momentum=cfg.optim.momentum)
+
+
+def new_scheduler_config(cfg):
+    return ExtendedSchedulerConfig(
+        scheduler=cfg.optim.scheduler,
+        steps=cfg.optim.steps, lr_decay=cfg.optim.lr_decay,
+        max_epoch=cfg.optim.max_epoch, reduce_factor=cfg.optim.reduce_factor,
+        schedule_patience=cfg.optim.schedule_patience, min_lr=cfg.optim.min_lr,
+        num_warmup_epochs=cfg.optim.num_warmup_epochs,
+        train_mode=cfg.train.mode, eval_period=cfg.train.eval_period)
+
+
+def custom_set_out_dir(cfg, cfg_fname, name_tag):
+    """Set custom main output directory path to cfg.
+    Include the config filename and name_tag in the new :obj:`cfg.out_dir`.
+
+    Args:
+        cfg (CfgNode): Configuration node
+        cfg_fname (string): Filename for the yaml format configuration file
+        name_tag (string): Additional name tag to identify this execution of the
+            configuration file, specified in :obj:`cfg.name_tag`
     """
-    result = subprocess.check_output(
-        [
-            'nvidia-smi', '--query-gpu=memory.used',
-            '--format=csv,nounits,noheader'
-        ], encoding='utf-8')
-    # Convert lines into a dictionary
-    gpu_memory = np.array([int(x) for x in result.strip().split('\n')])
-    # gpu_memory_map = dict(zip(range(len(gpu_memory)), gpu_memory))
-    return gpu_memory
-
-def fix_seed(seed):
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.backends.cudnn.deterministic = True
+    run_name = os.path.splitext(os.path.basename(cfg_fname))[0]
+    run_name += f"-{name_tag}" if name_tag else ""
+    cfg.out_dir = os.path.join(cfg.out_dir, run_name)
 
 
-### Parse args ###
-parser = argparse.ArgumentParser(description='General Training Pipeline')
-parser_add_main_args(parser)
-args = parser.parse_args()
-parser_add_default_args(args)
-print(args)
+def custom_set_run_dir(cfg, run_id):
+    """Custom output directory naming for each experiment run.
 
-fix_seed(args.seed)
-
-if args.cpu:
-    device = torch.device("cpu")
-else:
-    device = torch.device("cuda:" + str(args.device)
-                          ) if torch.cuda.is_available() else torch.device("cpu")
-
-### Load and preprocess data ###
-dataset = load_nc_dataset(args)
-
-if len(dataset.label.shape) == 1 and args.dataset not in ('atoms'):
-    dataset.label = dataset.label.unsqueeze(1)
-
-dataset_name = args.dataset
-
-if args.rand_split:
-    split_idx_lst = [dataset.get_idx_split(train_prop=args.train_prop, valid_prop=args.valid_prop)
-                     for _ in range(args.runs)]
-elif args.rand_split_class:
-    split_idx_lst = [class_rand_splits(
-        dataset.label, args.label_num_per_class, args.valid_num, args.test_num)]
-else:
-    split_idx_lst = load_fixed_splits(
-        dataset, name=args.dataset, protocol=args.protocol)
-
-dataset.label = dataset.label.to(device)
-
-n = dataset.graph['num_nodes']
-# infer the number of classes for non one-hot and one-hot labels
-if dataset_name in ['atoms']:
-    c=1
-else:
-    c = max(dataset.label.max().item() + 1, dataset.label.shape[1])
-d = dataset.graph['node_feat'].shape[1]
-
-_shape = dataset.graph['node_feat'].shape
-print(f'features shape={_shape}')
-
-# whether or not to symmetrize
-if args.dataset not in {'deezer-europe','atoms'}:
-    dataset.graph['edge_index'] = to_undirected(dataset.graph['edge_index'])
-
-dataset.graph['edge_index'], dataset.graph['node_feat'] = \
-    dataset.graph['edge_index'].to(
-        device), dataset.graph['node_feat'].to(device)
-
-if args.method == 'graphormer':
-    dataset.graph['x'] = dataset.graph['x'].to(device)
-    dataset.graph['in_degree'] = dataset.graph['in_degree'].to(device)
-    dataset.graph['out_degree'] = dataset.graph['out_degree'].to(device)
-    dataset.graph['spatial_pos'] = dataset.graph['spatial_pos'].to(device)
-    dataset.graph['attn_bias'] = dataset.graph['attn_bias'].to(device)
-
-print(f"Dataset Loaded: num nodes {n} | num edges {dataset.graph['edge_index'].shape[1]} | num classes {c} | num node feats {d}")
-
-### Load method ###
-model = parse_method(args.method, args, c, d, device)
-
-# using rocauc as the eval function
-if args.dataset in ('atoms'):
-    criterion = nn.MSELoss()
-    eval_func = nn.MSELoss()
-elif args.dataset in ('deezer-europe'):
-    criterion = nn.BCEWithLogitsLoss()
-    eval_func = eval_acc
-else:
-    criterion = nn.NLLLoss()
-    eval_func = eval_acc
-
-
-logger = Logger(args.runs, args)
-
-model.train()
-
-### Training loop ###
-patience = 0
-if args.method == 'sgformer' and args.use_graph:
-    optimizer = torch.optim.Adam([
-        {'params': model.params1, 'weight_decay': args.ours_weight_decay},
-        {'params': model.params2, 'weight_decay': args.weight_decay}
-    ],
-        lr=args.lr)
-else:
-    optimizer = torch.optim.Adam(
-        model.parameters(), weight_decay=args.weight_decay, lr=args.lr)
-
-run_time_list = []
-
-for run in range(args.runs):
-    if args.dataset in ['cora', 'citeseer', 'pubmed'] and args.protocol == 'semi':
-        split_idx = split_idx_lst[0]
+    Args:
+        cfg (CfgNode): Configuration node
+        run_id (int): Main for-loop iter id (the random seed or dataset split)
+    """
+    cfg.run_dir = os.path.join(cfg.out_dir, str(run_id))
+    # Make output directory
+    if cfg.train.auto_resume:
+        os.makedirs(cfg.run_dir, exist_ok=True)
     else:
-        split_idx = split_idx_lst[run]
-    train_idx = split_idx['train'].to(device)
-    model.reset_parameters()
+        makedirs_rm_exist(cfg.run_dir)
 
-    best_val = float('-inf')
-    patience = 0
-    for epoch in range(args.epochs):
-        start_time = time.perf_counter()
-        model.train()
-        optimizer.zero_grad()
-        emb = None
-        if args.method == 'nodeformer':
-            out, link_loss_ = model(dataset)
-        else:
-            out = model(dataset)
-        
-        if args.dataset in ('atoms'):
- #           print('###########################################',out.shape,dataset.label.shape)
-            loss = criterion(out[train_idx],dataset.label[train_idx])
-        elif args.dataset in ('deezer-europe'):
-            if dataset.label.shape[1] == 1:
-                true_label = F.one_hot(
-                    dataset.label, dataset.label.max() + 1).squeeze(1)
-            else:
-                true_label = dataset.label
-            loss = criterion(out[train_idx], true_label.squeeze(1)[
-                train_idx].to(torch.float))
-        else:
-            if args.method == 'graphormer':
-                out = out.squeeze(0)
-            out = F.log_softmax(out, dim=1)
-            loss = criterion(
-                out[train_idx], dataset.label.squeeze(1)[train_idx])
-                
-        if args.method == 'nodeformer':
-            loss -= args.lamda * sum(link_loss_) / len(link_loss_)
-        loss.backward()
-        optimizer.step()
-        end_time = time.perf_counter()
-        run_time = 1000 * (end_time - start_time)
-        run_time_list.append(run_time)
 
-        result = evaluate(model, dataset, split_idx,
-                          eval_func, criterion, args)
-        logger.add_result(run, result[:-1])
+def run_loop_settings():
+    """Create main loop execution settings based on the current cfg.
 
-        if result[1] < best_val: # modified
-            best_val = result[1]
-            patience = 0
-        else:
-            patience += 1
-            if patience >= args.patience:
-                break
+    Configures the main execution loop to run in one of two modes:
+    1. 'multi-seed' - Reproduces default behaviour of GraphGym when
+        args.repeats controls how many times the experiment run is repeated.
+        Each iteration is executed with a random seed set to an increment from
+        the previous one, starting at initial cfg.seed.
+    2. 'multi-split' - Executes the experiment run over multiple dataset splits,
+        these can be multiple CV splits or multiple standard splits. The random
+        seed is reset to the initial cfg.seed value for each run iteration.
 
-        if epoch % args.display_step == 0:
-            print(f'Epoch: {epoch:02d}, '
-                  f'Loss: {loss:.4f}, '
-                  f'Train: {result[0]:.4f}, '
-                  f'Valid: {result[1]:.4f}, '
-                  f'Test: {result[2]:.4f}')
-            '''
-            print(f'Epoch: {epoch:02d}, '
-                  f'Loss: {loss:.4f}, '
-                  f'Train: {100 * result[0]:.2f}%, '
-                  f'Valid: {100 * result[1]:.2f}%, '
-                  f'Test: {100 * result[2]:.2f}%')
-            '''
-    logger.print_statistics(run)
-
-run_time = sum(run_time_list) / len(run_time_list)
-results = logger.print_statistics()
-print(results)
-out_folder = 'results'
-if not os.path.exists(out_folder):
-    os.mkdir(out_folder)
-
-def make_print(method):
-    print_str = ''
-    if args.rand_split_class:
-        print_str += f'label per class:{args.label_num_per_class}, valid:{args.valid_num},test:{args.test_num}\n'
+    Returns:
+        List of run IDs for each loop iteration
+        List of rng seeds to loop over
+        List of dataset split indices to loop over
+    """
+    if len(cfg.run_multiple_splits) == 0:
+        # 'multi-seed' run mode
+        num_iterations = args.repeat
+        seeds = [cfg.seed + x for x in range(num_iterations)]
+        split_indices = [cfg.dataset.split_index] * num_iterations
+        run_ids = seeds
     else:
-        print_str += f'train_prop:{args.train_prop}, valid_prop:{args.valid_prop}'
-    if method == 'sgformer':
-        use_weight=' ours_use_weight' if args.ours_use_weight else ''
-        print_str += f'method: {args.method} hidden: {args.hidden_channels} ours_layers:{args.ours_layers} lr:{args.lr} use_graph:{args.use_graph} aggregate:{args.aggregate} graph_weight:{args.graph_weight} alpha:{args.alpha} ours_decay:{args.ours_weight_decay} ours_dropout:{args.ours_dropout} epochs:{args.epochs} use_feat_norm:{not args.no_feat_norm} use_bn:{args.use_bn} use_residual:{args.ours_use_residual} use_act:{args.ours_use_act}{use_weight}\n'
-        if not args.use_graph:
-            return print_str
-        if args.backbone == 'gcn':
-            print_str += f'backbone:{args.backbone}, layers:{args.num_layers} hidden: {args.hidden_channels} lr:{args.lr} decay:{args.weight_decay} dropout:{args.dropout}\n'
-    else:
-        print_str += f'method: {args.method} hidden: {args.hidden_channels} lr:{args.lr}\n'
-    return print_str
+        # 'multi-split' run mode
+        if args.repeat != 1:
+            raise NotImplementedError("Running multiple repeats of multiple "
+                                      "splits in one run is not supported.")
+        num_iterations = len(cfg.run_multiple_splits)
+        seeds = [cfg.seed] * num_iterations
+        split_indices = cfg.run_multiple_splits
+        run_ids = split_indices
+    return run_ids, seeds, split_indices
 
 
-file_name = f'{args.dataset}_{args.method}'
-if args.method == 'sgformer' and args.use_graph:
-    file_name += '_' + args.backbone
-file_name += '.txt'
-out_path = os.path.join(out_folder, file_name)
-with open(out_path, 'a+') as f:
-    print_str = make_print(args.method)
-    f.write(print_str)
-    f.write(results)
-    f.write(f' run_time: { run_time }')
-    f.write('\n\n')
+if __name__ == '__main__':
+    # Load cmd line args
+    args = parse_args()
+    # Load config file
+    set_cfg(cfg)
+    load_cfg(cfg, args)
+    custom_set_out_dir(cfg, args.cfg_file, cfg.name_tag)
+    dump_cfg(cfg)
+    # Set Pytorch environment
+    torch.set_num_threads(cfg.num_threads)
+    # Repeat for multiple experiment runs
+    for run_id, seed, split_index in zip(*run_loop_settings()):
+        # Set configurations for each run
+        custom_set_run_dir(cfg, run_id)
+        set_printing()
+        cfg.dataset.split_index = split_index
+        cfg.seed = seed
+        cfg.run_id = run_id
+        seed_everything(cfg.seed)
+        auto_select_device()
+        if cfg.pretrained.dir:
+            cfg = load_pretrained_model_cfg(cfg)
+        logging.info(f"[*] Run ID {run_id}: seed={cfg.seed}, "
+                     f"split_index={cfg.dataset.split_index}")
+        logging.info(f"    Starting now: {datetime.datetime.now()}")
+        # Set machine learning pipeline
+        logging.info(f"   Create Loader: {datetime.datetime.now()}")
+        loaders = create_loader()
+        logging.info(f"   Create Logger: {datetime.datetime.now()}")
+        loggers = create_logger()
+        logging.info(f"   Create Model: {datetime.datetime.now()}")
+        model = create_model()
+        if cfg.pretrained.dir:
+            model = init_model_from_pretrained(
+                model, cfg.pretrained.dir, cfg.pretrained.freeze_main,
+                cfg.pretrained.reset_prediction_head, seed=cfg.seed
+            )
+        optimizer = create_optimizer(model.parameters(),
+                                     new_optimizer_config(cfg))
+        scheduler = create_scheduler(optimizer, new_scheduler_config(cfg))
+        # Print model info
+        logging.info(model)
+        logging.info(cfg)
+        cfg.params = params_count(model)
+        logging.info('Num parameters: %s', cfg.params)
+        # Start training
+        if cfg.train.mode == 'standard':
+            if cfg.wandb.use:
+                logging.warning("[W] WandB logging is not supported with the "
+                                "default train.mode, set it to `custom`")
+            datamodule = GraphGymDataModule()
+            train(model, datamodule, logger=True)
+        else:
+            train_dict[cfg.train.mode](loggers, loaders, model, optimizer,
+                                       scheduler)
+    # Aggregate results from different seeds
+    try:
+        agg_runs(cfg.out_dir, cfg.metric_best)
+    except Exception as e:
+        logging.info(f"Failed when trying to aggregate multiple runs: {e}")
+    # When being launched in batch mode, mark a yaml as done
+    if args.mark_done:
+        os.rename(args.cfg_file, f'{args.cfg_file}_done')
+    logging.info(f"[*] All done: {datetime.datetime.now()}")
