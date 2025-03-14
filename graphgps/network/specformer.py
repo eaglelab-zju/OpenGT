@@ -1,0 +1,63 @@
+import torch
+import torch.nn as nn
+from graphgps.layer.spec_layer import SpecLayer
+from graphgps.layer.multi_head_attention import MultiHeadAttention
+from graphgps.encoder.sine_encoder import SineEncoder
+from graphgps.layer.layer_norm import LayerNorm
+
+from torch_geometric.nn import Sequential
+import torch_geometric.graphgym.register as register
+from torch_geometric.graphgym.models.layer import new_layer_config , MLP, GCNConv, Linear
+from torch_geometric.graphgym.config import cfg
+from torch_geometric.graphgym.register import register_network
+
+
+class swapex(nn.Module):
+    def __init__(self):
+        super().__init__()
+    def forward(self, batch):
+        batch.x, batch.EigVal = batch.EigVal, batch.x
+        return batch
+    
+
+@register_network("SpecFormer")
+class SpecFormer(nn.Module):
+    def __init__(self, dim_in, dim_out):
+        super().__init__()
+
+        self.pre_mp = MLP(new_layer_config(dim_in = dim_in, dim_out = cfg.gt.dim_hidden, num_layers = 2, has_act = True, has_bias = True, cfg = cfg))
+
+        ### dirty hack
+        self.swap1 = swapex()
+        ### eig v
+        self.eig_encoder = SineEncoder(cfg.gt.dim_hidden)
+
+        self.mha_eig=Sequential('x',[
+            (LayerNorm(cfg.gt.dim_hidden), 'x -> x1'), 
+            (MultiHeadAttention(cfg.gt.dim_hidden, cfg.gt.n_heads, cfg.gt.attn_dropout), 'x1 -> x1'),
+            (lambda x1, x2: self.aggregate_batches_add(x1, x2), 'x, x1 -> x')
+        ])
+
+        self.ffn_eig=Sequential('x',[
+            (LayerNorm(cfg.gt.dim_hidden), 'x -> x1'), 
+            (MLP(new_layer_config(dim_in = cfg.gt.dim_hidden, dim_out = cfg.gt.dim_hidden, num_layers = 2, has_act = True, has_bias = True, cfg = cfg)), 'x1-> x1'),
+            (lambda x1, x2: self.aggregate_batches_add(x1, x2), 'x, x1 -> x')
+        ])
+
+        self.decoder=Linear(new_layer_config(dim_in = cfg.gt.dim_hidden, dim_out = cfg.gt.n_heads, num_layers = 0, has_act = True, has_bias = True, cfg = cfg))
+        ### eig ^
+        ### dirty hack
+        self.swap2 = swapex()
+
+        GNNHead = register.head_dict[cfg.gnn.head]
+        self.post_mp = GNNHead(dim_in=cfg.gt.dim_hidden, dim_out=dim_out)
+
+    def aggregate_batches_add(self, x1, x2):
+        new_batch = x1.clone()
+        new_batch.x = x1.x + x2.x
+        return new_batch
+
+    def forward(self, batch):
+        for module in self.children():
+            batch = module(batch)
+        return batch

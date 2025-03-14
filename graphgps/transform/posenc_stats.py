@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from numpy.linalg import eigvals
+from torch.linalg import eigh
 from torch_geometric.utils import (get_laplacian, to_scipy_sparse_matrix,
                                    to_undirected, to_dense_adj, scatter)
 from torch_geometric.utils.num_nodes import maybe_num_nodes
@@ -34,7 +35,7 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
     # Verify PE types.
     for t in pe_types:
         if t not in ['LapPE', 'EquivStableLapPE', 'SignNet', 'RWSE', 'HKdiagSE',
-                     'HKfullPE', 'ElstaticSE', 'GraphormerBias']:
+                     'HKfullPE', 'ElstaticSE', 'GraphormerBias', 'LapRaw']:
             raise ValueError(f"Unexpected PE stats selection {t} in {pe_types}")
 
     # Basic preprocessing of the input graph.
@@ -141,6 +142,34 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
             data,
             cfg.posenc_GraphormerBias.num_spatial_types
         )
+    
+    if 'LapRaw' in pe_types:
+        def normalize_graph(g):
+            g = g + g.T
+            g[g > 0.] = 1.0
+            deg = g.sum(axis=1).reshape(-1)
+            print(deg.shape)
+            deg[deg == 0.] = 1.0
+            deg = torch.diag(deg ** -0.5)
+            adj = deg @ g @ deg
+            L = torch.eye(g.shape[0],device=g.device) - adj
+            return L
+
+
+        def eigen_decompositon(g):
+            "The normalized (unit “length”) eigenvectors, "
+            "such that the column v[:,i] is the eigenvector corresponding to the eigenvalue w[i]."
+            g = normalize_graph(g)
+            e, u = eigh(g)
+            return e, u
+
+        def feature_normalize(x):
+            rowsum = x.sum(axis=1, keepdims=True)
+            rowsum = torch.clip(rowsum, 1, 1e10)
+            return x / rowsum
+        
+        data.EigVal, data.EigVec = eigen_decompositon (to_dense_adj(undir_edge_index)[0])
+        # dataset.graph['node_feat'] = feature_normalize(dataset.graph['node_feat']).to(device)
 
     return data
 

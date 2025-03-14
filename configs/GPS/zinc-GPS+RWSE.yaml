@@ -1,3 +1,4 @@
+accelerator: cuda:5
 out_dir: results
 metric_best: mae
 metric_agg: argmin
@@ -30,6 +31,7 @@ train:
   batch_size: 32
   eval_period: 1
   ckpt_period: 100
+  auto_resume: True
 model:
   type: GPSModel
   loss_fun: l1

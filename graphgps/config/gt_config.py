@@ -70,3 +70,17 @@ def set_cfg_gt(cfg):
     cfg.gt.bigbird.block_size = 3
 
     cfg.gt.bigbird.layer_norm_eps = 1e-6
+
+    # SGFormer
+    cfg.gt.use_weight = True
+
+    cfg.gt.use_residual = True
+
+    cfg.gt.use_act = True
+
+    cfg.gt.use_graph = True
+
+    cfg.gt.graph_weight = 0.8
+
+    cfg.gt.aggregate = "add"
+

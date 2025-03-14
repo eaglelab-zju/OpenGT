@@ -10,6 +10,7 @@ scripts/pcqm4m/**/*.tsv
 scripts/pcqm4m/pcqm4m-v2/
 slurm_history/
 datasets/
+grids/
 pretrained/
 results/
 vocprep/benchmark_RELEASE/
@@ -25,6 +26,8 @@ __pycache__/
 .idea
 *.log
 *.bak
+*.out
+*_grid_*/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
