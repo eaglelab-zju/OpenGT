@@ -34,7 +34,7 @@ class SpecFormer(nn.Module):
 
         self.mha_eig=Sequential('x',[
             (LayerNorm(cfg.gt.dim_hidden), 'x -> x1'), 
-            (MultiHeadAttention(cfg.gt.dim_hidden, cfg.gt.n_heads, cfg.gt.attn_dropout), 'x1 -> x1'),
+            (MultiHeadAttention(dim_hidden = cfg.gt.dim_hidden, n_heads = cfg.gt.n_heads, dropout = cfg.gt.attn_dropout), 'x1 -> x1'),
             (lambda x1, x2: self.aggregate_batches_add(x1, x2), 'x, x1 -> x')
         ])
 
@@ -49,6 +49,15 @@ class SpecFormer(nn.Module):
         ### dirty hack
         self.swap2 = swapex()
 
+        if cfg.gt.layer_norm:
+            norm = 'layer'
+        elif cfg.gt.batch_norm:
+            norm = 'batch'
+        else:
+            norm = 'none'
+        
+        self.spec_layers = SpecLayer(dim_out = cfg.gt.dim_hidden, n_heads = cfg.gt.n_heads, dropout = cfg.gt.dropout, norm = norm)
+        
         GNNHead = register.head_dict[cfg.gnn.head]
         self.post_mp = GNNHead(dim_in=cfg.gt.dim_hidden, dim_out=dim_out)
 

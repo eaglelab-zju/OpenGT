@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-MODEL=SpecFormer
-CONFIG=wn-chameleon-SpecFormer
+MODEL=NodeFormer
+CONFIG=webkb-cor-NodeFormer
 
 python main.py --cfg configs/${MODEL}/${CONFIG}.yaml
 

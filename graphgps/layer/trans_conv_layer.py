@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch_geometric.graphgym.register import register_layer
 
-def full_attention_conv(qs, ks, vs, output_attn=False):
+def full_attention_conv(qs, ks, vs, kernel='simple', output_attn=False):
     # normalize input
     qs = qs / torch.norm(qs, p=2)  # [N, H, M]
     ks = ks / torch.norm(ks, p=2)  # [L, H, M]

@@ -29,6 +29,8 @@ class SpecLayer(nn.Module):
             self.norm = nn.BatchNorm1d(dim_out)
         else:                  # Others
             self.norm = None 
+        
+        self.n_heads = n_heads
 
     def forward(self, batch):
         basic_feats = [batch.x]
@@ -38,6 +40,9 @@ class SpecLayer(nn.Module):
         basic_feats = torch.stack(basic_feats, axis=1)                # [N, m, d]
         # h = conv(basic_feats) # [SpecLayer(nheads+1, nclass, prop_dropout, norm=norm) for i in range(nlayer)]
         ######## done: rewrite logic
+
+        print(basic_feats.shape, self.weight.shape)
+        
         basic_feats = self.prop_dropout(basic_feats) * self.weight      # [N, m, d] * [1, m, d]
         basic_feats = torch.sum(basic_feats, dim=1)
 

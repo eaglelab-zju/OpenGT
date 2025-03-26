@@ -16,10 +16,15 @@ def set_cfg_posenc(cfg):
     cfg.posenc_EquivStableLapPE = CN()
     cfg.posenc_LapRaw = CN()
 
+    # Effective Resistance Embeddings
+    cfg.posenc_ERN = CN() #Effective Resistance for Nodes
+    cfg.posenc_ERE = CN() #Effective Resistance for Edges
+
     # Common arguments to all PE types.
     for name in ['posenc_LapPE', 'posenc_SignNet',
                  'posenc_RWSE', 'posenc_HKdiagSE', 'posenc_ElstaticSE', 
-                 'posenc_LapRaw' ]:
+                 'posenc_LapRaw' ,
+                 'posenc_ERN', 'posenc_ERE']:
         pecfg = getattr(cfg, name)
 
         # Use extended positional encodings
@@ -87,3 +92,10 @@ def set_cfg_posenc(cfg):
 
     # Override default, electrostatic kernel has fixed set of 10 measures.
     cfg.posenc_ElstaticSE.kernel.times_func = 'range(10)'
+
+    # Setting accuracy for Effective Resistance Calculations:
+    cfg.posenc_ERN.accuracy = 0.1
+    cfg.posenc_ERE.accuracy = 0.1
+
+    # To be set during the calculations:
+    cfg.posenc_ERN.er_dim = 'none'

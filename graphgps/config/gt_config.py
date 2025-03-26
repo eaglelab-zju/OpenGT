@@ -84,3 +84,30 @@ def set_cfg_gt(cfg):
 
     cfg.gt.aggregate = "add"
 
+    # DIFFormer
+    cfg.gt.kernel = "simple"
+
+    cfg.gt.alpha = 0.1
+
+    cfg.gt.use_source = True
+
+    # NodeFormer
+    cfg.gt.use_jk = False
+
+    cfg.gt.kernel_trans = "softmax"
+
+    cfg.gt.nb_random_features = 30
+
+    cfg.gt.use_gumbel = True
+
+    cfg.gt.nb_gumbel_sample = 10
+
+    cfg.gt.rb_order = 2
+
+    cfg.gt.rb_trans = "sigmoid"
+
+    cfg.gt.projection_matrix_type = 'a'
+
+    cfg.gt.use_edge_loss = False
+
+    cfg.gt.tau = 1.0

@@ -52,22 +52,23 @@ train:
   enable_ckpt: False
 #  ckpt_period: 100
 model:
-  type: SGFormer
+  type: DIFFormer
   loss_fun: cross_entropy
   edge_decoding: dot
 gt:
   layer_type: GCN+Transformer
   layers: 2
   n_heads: 2
-  use_weight: True
-  use_residual: True
-  use_act: True
+  use_weight: True  # DIFFormer Special
+  use_residual: True  # DIFFormer Special
+  kernel: 'simple'  # DIFFormer Special
   dim_hidden: 96  # `gt.dim_hidden` must match `gnn.dim_inner`
   dropout: 0.5
   attn_dropout: 0.5
-  use_graph: True
-  graph_weight: 0.8
-  aggregate: add
+  use_graph: True  # DIFFormer Special
+  graph_weight: 0.8  # DIFFormer Special
+  use_source: True  # DIFFormer Special
+  alpha: 0.5  # DIFFormer Special
   layer_norm: False
   batch_norm: False
 gnn:
