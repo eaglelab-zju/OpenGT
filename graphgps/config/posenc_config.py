@@ -15,6 +15,7 @@ def set_cfg_posenc(cfg):
     cfg.posenc_ElstaticSE = CN()
     cfg.posenc_EquivStableLapPE = CN()
     cfg.posenc_LapRaw = CN()
+    cfg.posenc_RRWP = CN()
 
     # Effective Resistance Embeddings
     cfg.posenc_ERN = CN() #Effective Resistance for Nodes
@@ -24,7 +25,9 @@ def set_cfg_posenc(cfg):
     for name in ['posenc_LapPE', 'posenc_SignNet',
                  'posenc_RWSE', 'posenc_HKdiagSE', 'posenc_ElstaticSE', 
                  'posenc_LapRaw' ,
-                 'posenc_ERN', 'posenc_ERE']:
+                 'posenc_ERN', 'posenc_ERE',
+                 'posenc_RRWP',
+                 ]:
         pecfg = getattr(cfg, name)
 
         # Use extended positional encodings
@@ -99,3 +102,11 @@ def set_cfg_posenc(cfg):
 
     # To be set during the calculations:
     cfg.posenc_ERN.er_dim = 'none'
+
+    # ----------------- Note: RRWP --------------
+    cfg.posenc_RRWP.enable = False
+    cfg.posenc_RRWP.ksteps = 21
+    cfg.posenc_RRWP.add_identity = True
+    cfg.posenc_RRWP.spd = False
+    cfg.posenc_RRWP.add_node_attr = False
+    cfg.posenc_RRWP.add_inverse = False

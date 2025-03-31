@@ -10,8 +10,8 @@ dataset:
   task_type: classification
   transductive: True
   split_mode: standard
-  node_encoder: True
-  node_encoder_name: LapPE
+  node_encoder: False
+  node_encoder_name: None
 #  node_encoder_name: LinearNode+GraphormerBias
   node_encoder_bn: False
   edge_encoder: False
@@ -52,25 +52,27 @@ train:
   enable_ckpt: False
 #  ckpt_period: 100
 model:
-  type: DIFFormer
+  type: NodeFormer
   loss_fun: cross_entropy
   edge_decoding: dot
+prep:
+  rb_order: 2 # NodeFormer Special, must match `gt.rb_order`
 gt:
   layer_type: GCN+Transformer
   layers: 2
   n_heads: 2
-  use_weight: True  # DIFFormer Special
-  use_residual: True  # DIFFormer Special
-  kernel: 'simple'  # DIFFormer Special
+  use_residual: True  # NodeFormer Special
+  use_act: True  # NodeFormer Special
   dim_hidden: 96  # `gt.dim_hidden` must match `gnn.dim_inner`
   dropout: 0.5
   attn_dropout: 0.5
-  use_graph: True  # DIFFormer Special
-  graph_weight: 0.8  # DIFFormer Special
-  use_source: True  # DIFFormer Special
-  alpha: 0.5  # DIFFormer Special
   layer_norm: False
-  batch_norm: False
+  batch_norm: True
+  nb_random_features: 30 # NodeFormer Special
+  use_gumbel: True # NodeFormer Special
+  kernel_trans: 'softmax' # NodeFormer Special
+  rb_order: 2 # NodeFormer Special, must match `prep.rb_order`
+  rb_trans: 'sigmoid' # NodeFormer Special
 gnn:
   head: node
   layers_pre_mp: 0

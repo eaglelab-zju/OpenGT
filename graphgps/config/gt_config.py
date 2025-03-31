@@ -111,3 +111,35 @@ def set_cfg_gt(cfg):
     cfg.gt.use_edge_loss = False
 
     cfg.gt.tau = 1.0
+
+    # GRIT
+
+    cfg.gt.bn_momentum = 0.1
+
+    cfg.gt.bn_no_runner = False
+
+    cfg.gt.update_e = True
+
+    cfg.gt.attn = CN()
+
+    cfg.gt.attn.use = False
+
+    cfg.gt.attn.sparse = False
+
+    cfg.gt.attn.deg_scaler = True
+
+    cfg.gt.attn.use_bias = False
+    
+    cfg.gt.attn.clamp = 5.
+
+    cfg.gt.attn.act = "relu"
+
+    cfg.gt.attn.full_attn = True
+
+    cfg.gt.attn.norm_e = True
+
+    cfg.gt.attn.O_e = True
+
+    cfg.gt.attn.edge_enhance = True
+
+    cfg.gt.attn.fwl = False

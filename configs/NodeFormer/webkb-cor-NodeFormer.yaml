@@ -73,7 +73,6 @@ gt:
   kernel_trans: 'softmax' # NodeFormer Special
   rb_order: 2 # NodeFormer Special, must match `prep.rb_order`
   rb_trans: 'sigmoid' # NodeFormer Special
-
 gnn:
   head: node
   layers_pre_mp: 0

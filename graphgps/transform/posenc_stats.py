@@ -3,12 +3,13 @@ from copy import deepcopy
 import numpy as np
 import torch
 import torch.nn.functional as F
-from numpy.linalg import eigvals
 from torch.linalg import eigh
 from torch_geometric.utils import (get_laplacian, to_scipy_sparse_matrix,
                                    to_undirected, to_dense_adj, scatter)
 from torch_geometric.utils.num_nodes import maybe_num_nodes
+from functools import partial
 from graphgps.encoder.graphormer_encoder import graphormer_pre_processing
+from .rrwp import add_full_rrwp
 
 
 def compute_posenc_stats(data, pe_types, is_undirected, cfg):
@@ -21,6 +22,8 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
     'HKdiagSE': Diagonals of heat kernel diffusion.
     'ElstaticSE': Kernel based on the electrostatic interaction between nodes.
     'Graphormer': Computes spatial types and optionally edges along shortest paths.
+    'LapRaw': Laplacian eigen-decomposition without further processing.
+    'RRWP': Relative Random Walk Probabilities PE (for GRIT)
 
     Args:
         data: PyG graph
@@ -35,7 +38,7 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
     # Verify PE types.
     for t in pe_types:
         if t not in ['LapPE', 'EquivStableLapPE', 'SignNet', 'RWSE', 'HKdiagSE',
-                     'HKfullPE', 'ElstaticSE', 'GraphormerBias', 'LapRaw']:
+                     'HKfullPE', 'ElstaticSE', 'GraphormerBias', 'LapRaw', 'RRWP']:
             raise ValueError(f"Unexpected PE stats selection {t} in {pe_types}")
 
     # Basic preprocessing of the input graph.
@@ -170,6 +173,17 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
         
         data.EigVal, data.EigVec = eigen_decompositon (to_dense_adj(undir_edge_index)[0])
         # dataset.graph['node_feat'] = feature_normalize(dataset.graph['node_feat']).to(device)
+
+    if 'RRWP' in pe_types:
+        param = cfg.posenc_RRWP
+        transform = partial(add_full_rrwp,
+                            walk_length=param.ksteps,
+                            attr_name_abs="rrwp",
+                            attr_name_rel="rrwp",
+                            add_identity=True,
+                            spd=param.spd, # by default False
+                            )
+        data = transform(data)
 
     return data
 
