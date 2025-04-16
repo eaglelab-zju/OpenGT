@@ -11,7 +11,7 @@ dataset:
   transductive: True
   split_mode: standard
   node_encoder: True
-  node_encoder_name: LapPE
+  node_encoder_name: RWSE
 #  node_encoder_name: LinearNode+GraphormerBias
   node_encoder_bn: False
   edge_encoder: False
@@ -26,7 +26,7 @@ posenc_GraphormerBias:
 graphormer:
   use_graph_token: False
 posenc_LapPE:
-  enable: True
+  enable: False
   eigen:
     laplacian_norm: none
     eigvec_norm: L2
@@ -37,7 +37,7 @@ posenc_LapPE:
   n_heads: 4  # Only used when `posenc.model: Transformer`
   raw_norm_type: none
 posenc_RWSE:
-  enable: False
+  enable: True
   kernel:
     times_func: range(1,17)
   model: Linear

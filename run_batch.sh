@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-MODEL=Exphormer
-CONFIG=wn-chameleon-Exphormer
-GRID=wn-chameleon-Exphormer
+MODEL=GPS
+CONFIG=cora-GPS
+GRID=cora-GPS
 REPEAT=3
 MAX_JOBS=8
 

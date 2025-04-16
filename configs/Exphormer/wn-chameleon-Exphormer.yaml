@@ -3,7 +3,7 @@ out_dir: results
 metric_best: accuracy
 wandb:
   use: False
-  project: computers3
+  project: chameleon
   entity: expand-gnns
 dataset:
   format: PyG-WikipediaNetwork

@@ -114,7 +114,7 @@ def load_dataset_master(format, name, dataset_dir):
                 raise ValueError(f"Actor class provides only one dataset.")
             dataset = Actor(dataset_dir)
 
-        if pyg_dataset_id == 'GNNBenchmarkDataset':
+        elif pyg_dataset_id == 'GNNBenchmarkDataset':
             dataset = preformat_GNNBenchmarkDataset(dataset_dir, name)
 
         elif pyg_dataset_id == 'MalNetTiny':

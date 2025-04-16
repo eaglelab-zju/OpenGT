@@ -41,24 +41,29 @@ def graphormer_pre_processing(data, distance):
     data.in_degrees = torch.tensor([d for _, d in graph.in_degree()])
     data.out_degrees = torch.tensor([d for _, d in graph.out_degree()])
 
-    max_in_degree = torch.max(data.in_degrees)
-    max_out_degree = torch.max(data.out_degrees)
+    max_in_degree = torch.max(data.in_degrees).item()
+    max_out_degree = torch.max(data.out_degrees).item()
+
     if max_in_degree >= cfg.posenc_GraphormerBias.num_in_degrees:
-        raise ValueError(
-            f"Encountered in_degree: {max_in_degree}, set posenc_"
+        print(
+            f"Encountered in_degree: {max_in_degree}, setting posenc_"
             f"GraphormerBias.num_in_degrees to at least {max_in_degree + 1}"
         )
     if max_out_degree >= cfg.posenc_GraphormerBias.num_out_degrees:
-        raise ValueError(
-            f"Encountered out_degree: {max_out_degree}, set posenc_"
+        print(
+            f"Encountered out_degree: {max_out_degree}, setting posenc_"
             f"GraphormerBias.num_out_degrees to at least {max_out_degree + 1}"
         )
+
+    cfg.posenc_GraphormerBias.num_in_degrees = max(cfg.posenc_GraphormerBias.num_in_degrees, max_in_degree + 1)
+    cfg.posenc_GraphormerBias.num_out_degrees = max(cfg.posenc_GraphormerBias.num_out_degrees, max_out_degree + 1)
+    
 
     if cfg.posenc_GraphormerBias.node_degrees_only:
         return data
 
     N = len(graph.nodes)
-    shortest_paths = nx.shortest_path(graph)
+    shortest_paths = dict(nx.shortest_path(graph))
 
     spatial_types = torch.empty(N ** 2, dtype=torch.long).fill_(distance)
     graph_index = torch.empty(2, N ** 2, dtype=torch.long)

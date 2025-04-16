@@ -1,11 +1,12 @@
+accelerator: cuda:4
 out_dir: results
 metric_best: accuracy
 wandb:
   use: False
-  project: WN-chameleon
+  project: cora
 dataset:
-  format: PyG-WikipediaNetwork
-  name: chameleon
+  format: PyG-Planetoid
+  name: cora
   task: node
   task_type: classification
   transductive: True
@@ -58,9 +59,9 @@ model:
 gt:
   layer_type: GCN+Transformer
   layers: 3
-  n_heads: 4
+  n_heads: 1
   dim_hidden: 96  # `gt.dim_hidden` must match `gnn.dim_inner`
-  dropout: 0.2
+  dropout: 0.5
   attn_dropout: 0.5
   layer_norm: False
   batch_norm: False
@@ -77,8 +78,8 @@ gnn:
 optim:
   clip_grad_norm: True
   optimizer: adamW
-  weight_decay: 1e-5
-  base_lr: 0.0005
+  weight_decay: 3e-5
+  base_lr: 0.01
   max_epoch: 200
   scheduler: cosine_with_warmup
   num_warmup_epochs: 10

@@ -1,46 +1,40 @@
 out_dir: results
-metric_best: mae
-metric_agg: argmin
+metric_best: accuracy
 wandb:
-  use: False
-  project: ZINC
+  use: True
+  project: malnet
 dataset:
-  format: PyG-ZINC
-  name: subset
+  format: PyG-MalNetTiny
+  name: LocalDegreeProfile
   task: graph
-  task_type: regression
+  task_type: classification
   transductive: False
   node_encoder: True
-  node_encoder_name: TypeDictNode+LapPE
-  node_encoder_num_types: 28
+  node_encoder_name: RWSE
   node_encoder_bn: False
   edge_encoder: True
-  edge_encoder_name: TypeDictEdge
-  edge_encoder_num_types: 4
+  edge_encoder_name: DummyEdge
   edge_encoder_bn: False
-posenc_LapPE:
+posenc_RWSE:
   enable: True
-  eigen:
-    laplacian_norm: none
-    eigvec_norm: L2
-    max_freqs: 8
-  model: DeepSet
-  dim_pe: 8
-  layers: 2
-  raw_norm_type: none
+  kernel:
+    times_func: range(1,17)
+  model: Linear
+  dim_pe: 20
+  raw_norm_type: BatchNorm
 train:
   mode: custom
-  batch_size: 32
+  batch_size: 16
   eval_period: 1
   ckpt_period: 100
 model:
   type: GPSModel
-  loss_fun: l1
+  loss_fun: cross_entropy
   edge_decoding: dot
-  graph_pooling: add
+  graph_pooling: max
 gt:
-  layer_type: GINE+Transformer  # CustomGatedGCN+Performer
-  layers: 10
+  layer_type: CustomGatedGCN+Performer
+  layers: 5
   n_heads: 4
   dim_hidden: 64  # `gt.dim_hidden` must match `gnn.dim_inner`
   dropout: 0.0
@@ -48,7 +42,7 @@ gt:
   layer_norm: False
   batch_norm: True
 gnn:
-  head: san_graph
+  head: default
   layers_pre_mp: 0
   layers_post_mp: 3  # Not used when `gnn.head: san_graph`
   dim_inner: 64  # `gt.dim_hidden` must match `gnn.dim_inner`
@@ -61,7 +55,16 @@ optim:
   clip_grad_norm: True
   optimizer: adamW
   weight_decay: 1e-5
-  base_lr: 0.001
-  max_epoch: 2000
+  base_lr: 0.0005
+  max_epoch: 150
   scheduler: cosine_with_warmup
-  num_warmup_epochs: 50
+  num_warmup_epochs: 10
+#optim:
+#  optimizer: adam
+#  weight_decay: 0.0
+#  base_lr: 0.0005
+#  max_epoch: 500
+#  scheduler: reduce_on_plateau
+#  reduce_factor: 0.5
+#  schedule_patience: 20
+#  min_lr: 1e-5

@@ -2,8 +2,8 @@ dataset:
   edge_encoder: false
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
-  format: PyG-Actor
-  name: none
+  format: PyG-Planetoid
+  name: citeseer
   node_encoder: true
   node_encoder_bn: false
   node_encoder_name: LinearNode+GraphormerBias
@@ -56,5 +56,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: actor
+  project: citeseer
   use: false
