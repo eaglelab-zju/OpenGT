@@ -14,7 +14,7 @@ for folder_name in os.listdir(results_dir):
 	if os.path.isdir(folder_path) and "grid" not in folder_name:
 		# Split folder name into dataset and model
 		try:
-			dataset, model = folder_name.split("-", 1)
+			dataset, model = folder_name.rsplit("-", 1)
 		except ValueError:
 			print(f"Skipping folder with invalid name format: {folder_name}")
 			continue

@@ -1,9 +1,11 @@
 #!/bin/bash
 
 # Define the list of models and datasets
-# models=("DIFFormer" "NodeFormer" "GPS+RWSE" "Graphormer" "GRIT" "SGFormer" "SAN" "SpecFormer")
-models=("Exphormer")
-datasets=("cora" "citeseer" "pubmed" "actor")
+models=("DIFFormer" "NodeFormer" "GPS+RWSE" "Graphormer" "GRIT" "SGFormer" "SAN" "SpecFormer" "Exphormer")
+# models=("Exphormer")
+datasets=("cornell" "texas" "wisconsin" "chameleon" "squirrel")
+#datasets=("cora" "citeseer" "pubmed" "actor")
+
 
 # Loop through each model and dataset
 for model in "${models[@]}"; do

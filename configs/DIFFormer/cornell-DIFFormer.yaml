@@ -1,0 +1,88 @@
+accelerator: cuda:0
+dataset:
+  edge_encoder: false
+  edge_encoder_bn: false
+  edge_encoder_name: DummyEdge
+  format: PyG-WebKB
+  name: cornell
+  node_encoder: true
+  node_encoder_bn: false
+  node_encoder_name: LapPE
+  split_mode: standard
+  task: node
+  task_type: classification
+  transductive: true
+gnn:
+  act: gelu
+  agg: mean
+  batchnorm: true
+  dim_inner: 96
+  dropout: 0.2
+  head: node
+  layers_post_mp: 1
+  layers_pre_mp: 0
+  normalize_adj: false
+graphormer:
+  use_graph_token: false
+gt:
+  alpha: 0.5
+  attn_dropout: 0.5
+  batch_norm: false
+  dim_hidden: 96
+  dropout: 0.5
+  graph_weight: 0.8
+  kernel: simple
+  layer_norm: false
+  layer_type: GCN+Transformer
+  layers: 2
+  n_heads: 2
+  use_graph: true
+  use_residual: true
+  use_source: true
+  use_weight: true
+metric_best: accuracy
+model:
+  edge_decoding: dot
+  loss_fun: cross_entropy
+  type: DIFFormer
+optim:
+  base_lr: 0.0005
+  clip_grad_norm: true
+  max_epoch: 400
+  num_warmup_epochs: 20
+  optimizer: adamW
+  scheduler: cosine_with_warmup
+  weight_decay: 5e-4
+out_dir: results
+posenc_GraphormerBias:
+  enable: false
+  node_degrees_only: true
+  num_in_degrees: 729
+  num_out_degrees: 89
+  num_spatial_types: 20
+posenc_LapPE:
+  dim_pe: 4
+  eigen:
+    eigvec_norm: L2
+    laplacian_norm: none
+    max_freqs: 4
+  enable: false
+  layers: 2
+  model: DeepSet
+  n_heads: 4
+  raw_norm_type: none
+posenc_RWSE:
+  dim_pe: 16
+  enable: false
+  kernel:
+    times_func: range(1,17)
+  model: Linear
+  raw_norm_type: BatchNorm
+train:
+  enable_ckpt: false
+  eval_period: 5
+  mode: custom
+  sampler: full_batch
+wandb:
+  project: cornell
+  use: false

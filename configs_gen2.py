@@ -54,6 +54,7 @@ config_name=f'configs/{args.model}/{args.dataset0}-{args.model}.yaml'
 config = load_config(config_name)
 
 config_out = copy.deepcopy(config)
+config_out['accelerator'] = 'cuda:0'
 config_out['wandb']['use'] = False
 config_out['wandb']['project'] = args.dataset
 config_out['dataset']['name'] = args.dataset
@@ -79,8 +80,12 @@ if args.dataset in ['chameleon', 'squirrel']:
     config_out['dataset']['task_type'] = 'classification'
     config_out['model']['loss_fun'] = 'cross_entropy'
     config_out['gnn']['head'] = 'node'
-
-
+if args.dataset in ['cornell', 'texas', 'wisconsin']:
+    config_out['dataset']['format'] = 'PyG-WebKB'
+    config_out['dataset']['task'] = 'node'
+    config_out['dataset']['task_type'] = 'classification'
+    config_out['model']['loss_fun'] = 'cross_entropy'
+    config_out['gnn']['head'] = 'node'
 
 
 with open(f'configs/{args.model}/{args.dataset}-{args.model}.yaml', 'w') as f:
