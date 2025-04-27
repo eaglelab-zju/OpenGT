@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-MODEL=NodeFormer
-CONFIG=webkb-cor-NodeFormer
+MODEL=GPS+GE
+DATASET=wn-chameleon
 
-python main.py --cfg configs/${MODEL}/${CONFIG}.yaml
+python main.py --cfg configs/${MODEL}/${DATASET}-${MODEL}.yaml --repeat 3
 
-tensorboard --logdir=results/${CONFIG} --port=6006
+tensorboard --logdir=results/${DATASET}-${MODEL} --port=6006

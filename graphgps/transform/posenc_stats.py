@@ -3,13 +3,31 @@ from copy import deepcopy
 import numpy as np
 import torch
 import torch.nn.functional as F
-from torch.linalg import eigh
 from torch_geometric.utils import (get_laplacian, to_scipy_sparse_matrix,
                                    to_undirected, to_dense_adj, scatter)
 from torch_geometric.utils.num_nodes import maybe_num_nodes
 from functools import partial
 from graphgps.encoder.graphormer_encoder import graphormer_pre_processing
 from .rrwp import add_full_rrwp
+
+def custom_eigh(L):
+    """Compute eigenvalues and eigenvectors of a Laplacian matrix.
+    Due to a bug in PyTorch, we use scipy's eigh instead of torch.linalg.eigh when matrix size is large.
+    
+
+    Args:
+        L: Laplacian matrix (Tensor)
+    Returns:
+        EigVals: Eigenvalues
+        EigVecs: Eigenvectors
+    """
+    if L.shape[0] > 1000:
+        # Use scipy's eigh for large matrices
+        EigVals, EigVecs = np.linalg.eigh(L.cpu().numpy())
+        return torch.from_numpy(EigVals).to(L.device), torch.from_numpy(EigVecs).to(L.device)
+    else:
+        # Use PyTorch's eigh for small matrices
+        return torch.linalg.eigh(L)
 
 
 def compute_posenc_stats(data, pe_types, is_undirected, cfg):
@@ -163,7 +181,7 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
             "The normalized (unit “length”) eigenvectors, "
             "such that the column v[:,i] is the eigenvector corresponding to the eigenvalue w[i]."
             g = normalize_graph(g)
-            e, u = eigh(g)
+            e, u = custom_eigh(g)
             return e, u
 
         def feature_normalize(x):

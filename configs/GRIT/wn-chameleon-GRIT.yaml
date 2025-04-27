@@ -44,7 +44,7 @@ gt:
   attn:
     clamp: 5.
     act: 'relu'
-    full_attn: True
+    full_attn: False
     edge_enhance: True
     O_e: True
     norm_e: True

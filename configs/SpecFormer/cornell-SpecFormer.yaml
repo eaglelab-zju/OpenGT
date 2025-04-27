@@ -3,8 +3,8 @@ dataset:
   edge_encoder: false
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
-  format: PyG-Planetoid
-  name: pubmed
+  format: PyG-WebKB
+  name: cornell
   node_encoder: true
   node_encoder_bn: false
   node_encoder_name: LapPE
@@ -28,21 +28,21 @@ gt:
   attn_dropout: 0.5
   batch_norm: false
   dim_hidden: 96
-  dropout: 0.2
+  dropout: 0.5
   layer_norm: false
   layer_type: GCN+Transformer
-  layers: 3
-  n_heads: 4
+  layers: 2
+  n_heads: 3
 metric_best: accuracy
 model:
   edge_decoding: dot
   loss_fun: cross_entropy
-  type: GPSModel
+  type: SpecFormer
 optim:
-  base_lr: 0.0005
+  base_lr: 0.001
   clip_grad_norm: true
-  max_epoch: 200
-  num_warmup_epochs: 10
+  max_epoch: 400
+  num_warmup_epochs: 20
   optimizer: adamW
   scheduler: cosine_with_warmup
   weight_decay: 1e-5
@@ -59,10 +59,15 @@ posenc_LapPE:
     eigvec_norm: L2
     laplacian_norm: none
     max_freqs: 4
-  enable: true
+  enable: false
   layers: 2
   model: DeepSet
   n_heads: 4
+  raw_norm_type: none
+posenc_LapRaw:
+  dim_pe: 16
+  enable: true
+  model: None
   raw_norm_type: none
 posenc_RWSE:
   dim_pe: 16
@@ -77,5 +82,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: pubmed
+  project: cornell
   use: false

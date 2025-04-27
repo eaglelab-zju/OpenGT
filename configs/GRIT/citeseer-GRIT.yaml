@@ -1,3 +1,4 @@
+accelerator: cuda:0
 dataset:
   edge_encoder: true
   edge_encoder_bn: false
@@ -27,7 +28,7 @@ gt:
     act: relu
     clamp: 5.0
     edge_enhance: true
-    full_attn: true
+    full_attn: false
     norm_e: true
   attn_dropout: 0.5
   batch_norm: true

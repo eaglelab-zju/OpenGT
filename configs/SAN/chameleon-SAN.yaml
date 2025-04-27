@@ -3,8 +3,8 @@ dataset:
   edge_encoder: true
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
-  format: PyG-Planetoid
-  name: citeseer
+  format: PyG-WikipediaNetwork
+  name: chameleon
   node_encoder: true
   node_encoder_bn: false
   node_encoder_name: LapPE
@@ -65,5 +65,5 @@ train:
   eval_period: 1
   mode: custom
 wandb:
-  project: citeseer
+  project: chameleon
   use: false

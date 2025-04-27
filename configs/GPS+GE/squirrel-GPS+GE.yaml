@@ -3,11 +3,11 @@ dataset:
   edge_encoder: false
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
-  format: PyG-Planetoid
-  name: pubmed
+  format: PyG-WikipediaNetwork
+  name: squirrel
   node_encoder: true
   node_encoder_bn: false
-  node_encoder_name: LapPE
+  node_encoder_name: LinearNode+GraphormerBias
   split_mode: standard
   task: node
   task_type: classification
@@ -48,8 +48,7 @@ optim:
   weight_decay: 1e-5
 out_dir: results
 posenc_GraphormerBias:
-  enable: false
-  node_degrees_only: true
+  enable: true
   num_in_degrees: 729
   num_out_degrees: 89
   num_spatial_types: 20
@@ -59,7 +58,7 @@ posenc_LapPE:
     eigvec_norm: L2
     laplacian_norm: none
     max_freqs: 4
-  enable: true
+  enable: false
   layers: 2
   model: DeepSet
   n_heads: 4
@@ -77,5 +76,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: pubmed
+  project: squirrel
   use: false

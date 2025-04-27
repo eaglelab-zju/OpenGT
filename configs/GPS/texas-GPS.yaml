@@ -3,8 +3,8 @@ dataset:
   edge_encoder: false
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
-  format: PyG-Planetoid
-  name: pubmed
+  format: PyG-WebKB
+  name: texas
   node_encoder: true
   node_encoder_bn: false
   node_encoder_name: LapPE
@@ -77,5 +77,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: pubmed
+  project: texas
   use: false

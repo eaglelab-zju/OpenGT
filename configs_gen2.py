@@ -33,6 +33,11 @@ def parse_args():
                         help='dataset name',
                         required=True,
                         type=str)
+    parser.add_argument('--accelerator',
+                        dest='accelerator',
+                        help='accelerator name',
+                        default='cuda:0',
+                        type=str)
     return parser.parse_args()
 
 
@@ -54,7 +59,7 @@ config_name=f'configs/{args.model}/{args.dataset0}-{args.model}.yaml'
 config = load_config(config_name)
 
 config_out = copy.deepcopy(config)
-config_out['accelerator'] = 'cuda:0'
+config_out['accelerator'] = args.accelerator
 config_out['wandb']['use'] = False
 config_out['wandb']['project'] = args.dataset
 config_out['dataset']['name'] = args.dataset
