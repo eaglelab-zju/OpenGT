@@ -4,6 +4,7 @@ from graphgps.layer.spec_layer import SpecLayer
 from graphgps.layer.multi_head_attention import MultiHeadAttention
 from graphgps.encoder.sine_encoder import SineEncoder
 from graphgps.layer.layer_norm import LayerNorm
+from graphgps.encoder.feature_encoder import FeatureEncoder
 
 from torch_geometric.nn import Sequential
 import torch_geometric.graphgym.register as register
@@ -24,6 +25,9 @@ class swapex(nn.Module):
 class SpecFormer(nn.Module):
     def __init__(self, dim_in, dim_out):
         super().__init__()
+
+        self.encoder = FeatureEncoder(dim_in)
+        dim_in = self.encoder.dim_in
 
         self.pre_mp = MLP(new_layer_config(dim_in = dim_in, dim_out = cfg.gt.dim_hidden, num_layers = 2, has_act = True, has_bias = True, cfg = cfg))
 

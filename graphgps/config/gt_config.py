@@ -143,3 +143,11 @@ def set_cfg_gt(cfg):
     cfg.gt.attn.edge_enhance = True
 
     cfg.gt.attn.fwl = False
+
+    # MLPMixer
+
+    cfg.gt.mlpmixer_dropout = 0.
+
+    cfg.gt.mlpmixer_layers = 4
+
+    cfg.gt.pooling = 'mean'

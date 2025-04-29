@@ -1,13 +1,13 @@
-accelerator: cuda:0
+accelerator: cuda:5
 dataset:
   edge_encoder: false
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
   format: PyG-WebKB
   name: cornell
-  node_encoder: true
+  node_encoder: false
   node_encoder_bn: false
-  node_encoder_name: LapPE
+  node_encoder_name: DummyNode
   split_mode: standard
   task: node
   task_type: classification
@@ -65,7 +65,7 @@ posenc_LapPE:
     eigvec_norm: L2
     laplacian_norm: none
     max_freqs: 4
-  enable: false
+  enable: true
   layers: 2
   model: DeepSet
   n_heads: 4

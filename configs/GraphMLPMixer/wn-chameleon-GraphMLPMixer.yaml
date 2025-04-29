@@ -10,9 +10,8 @@ dataset:
   task_type: classification
   transductive: True
   split_mode: standard
-  node_encoder: False
-  node_encoder_name: DummyNode
-#  node_encoder_name: LinearNode+GraphormerBias
+  node_encoder: True
+  node_encoder_name: LinearNode
   node_encoder_bn: False
   edge_encoder: False
   edge_encoder_name: DummyEdge
@@ -26,7 +25,7 @@ posenc_GraphormerBias:
 graphormer:
   use_graph_token: False
 posenc_LapPE:
-  enable: True
+  enable: False
   eigen:
     laplacian_norm: none
     eigvec_norm: L2
@@ -52,24 +51,29 @@ train:
   enable_ckpt: False
 #  ckpt_period: 100
 model:
-  type: SGFormer
+  type: GraphMLPMixer
   loss_fun: cross_entropy
   edge_decoding: dot
+metis:
+  enable: True
+  online: True
+  patch_rw_dim: 0
+  patches: 32
+  patch_num_diff: -1
+  drop_rate: 0.3
+  num_hops: 1
 gt:
   layer_type: GCN+Transformer
-  layers: 2
-  n_heads: 2
-  use_weight: True
-  use_residual: True
-  use_act: True
+  layers: 3
+  n_heads: 4
   dim_hidden: 96  # `gt.dim_hidden` must match `gnn.dim_inner`
-  dropout: 0.5
+  dropout: 0.2
   attn_dropout: 0.5
-  use_graph: True
-  graph_weight: 0.8
-  aggregate: add
   layer_norm: False
   batch_norm: False
+  mlpmixer_dropout: 0.0
+  mlpmixer_layers: 4
+  pooling: mean
 gnn:
   head: node
   layers_pre_mp: 0
@@ -83,8 +87,8 @@ gnn:
 optim:
   clip_grad_norm: True
   optimizer: adamW
-  weight_decay: 5e-4
+  weight_decay: 1e-5
   base_lr: 0.0005
-  max_epoch: 400
+  max_epoch: 200
   scheduler: cosine_with_warmup
-  num_warmup_epochs: 20
+  num_warmup_epochs: 10

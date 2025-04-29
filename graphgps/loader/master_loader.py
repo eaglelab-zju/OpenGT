@@ -33,6 +33,7 @@ from graphgps.transform.dist_transforms import (add_dist_features, add_reverse_e
                                                  effective_resistance_embedding,
                                                  effective_resistances_from_embedding)
 from graphgps.transform.multihop_prep import generate_multihop_adj
+from graphgps.transform.graph_partition import GraphPartitionTransform
 
 
 def log_loaded_dataset(dataset, format, name):
@@ -329,6 +330,25 @@ def load_dataset_master(format, name, dataset_dir):
                   + f'{elapsed:.2f}'[-3:]
         logging.info(f"Done! Took {timestr}")
 
+    # graph partition transform
+
+    if cfg.metis.patches > 0:
+        start = time.perf_counter()
+        logging.info(f"Precomputing graph partition transform ...")
+
+        pre_transform_in_memory(dataset, GraphPartitionTransform(n_patches=cfg.metis.patches,
+                                                                 metis=cfg.metis.enable,
+                                                                 drop_rate=cfg.metis.drop_rate,
+                                                                 num_hops=cfg.metis.num_hops,
+                                                                 is_directed=False,
+                                                                 patch_rw_dim=cfg.metis.patch_rw_dim,
+                                                                 patch_num_diff=cfg.metis.patch_num_diff),
+                                show_progress=True)
+        
+        elapsed = time.perf_counter() - start
+        timestr = time.strftime('%H:%M:%S', time.gmtime(elapsed)) \
+                  + f'{elapsed:.2f}'[-3:]
+        logging.info(f"Done! Took {timestr}")
 
     # This could not be done earlier because the training wants 'train_mask' etc.
     # Now after using gnn.head: inductive_node this is ok.

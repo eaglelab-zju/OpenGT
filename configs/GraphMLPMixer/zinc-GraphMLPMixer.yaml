@@ -1,24 +1,26 @@
-accelerator: cuda:5
+accelerator: cuda:6
 dataset:
-  edge_encoder: false
+  edge_encoder: true
   edge_encoder_bn: false
-  edge_encoder_name: DummyEdge
-  format: PyG-WebKB
-  name: cornell
+  edge_encoder_name: TypeDictEdge
+  edge_encoder_num_types: 4
+  format: PyG-ZINC
+  name: subset
   node_encoder: true
   node_encoder_bn: false
-  node_encoder_name: RWSE
+  node_encoder_name: TypeDictNode
+  node_encoder_num_types: 28
   split_mode: standard
-  task: node
-  task_type: classification
-  transductive: true
+  task: graph
+  task_type: regression
+  transductive: false
 gnn:
   act: gelu
   agg: mean
   batchnorm: true
-  dim_inner: 96
+  dim_inner: 64
   dropout: 0.2
-  head: node
+  head: mlp_mixer_graph
   layers_post_mp: 1
   layers_pre_mp: 0
   normalize_adj: false
@@ -26,26 +28,39 @@ graphormer:
   use_graph_token: false
 gt:
   attn_dropout: 0.5
-  batch_norm: false
-  dim_hidden: 96
-  dropout: 0.2
+  batch_norm: true
+  dim_hidden: 64
+  dropout: 0.5
   layer_norm: false
-  layer_type: GCN+Transformer
-  layers: 3
+  layer_type: GINE+Transformer
+  layers: 8
+  mlpmixer_dropout: 0.2
+  mlpmixer_layers: 4
   n_heads: 4
-metric_best: accuracy
+  pooling: mean
+metis:
+  drop_rate: 0.3
+  enable: true
+  num_hops: 1
+  online: true
+  patch_num_diff: -1
+  patch_rw_dim: 0
+  patches: 32
+metric_agg: argmin
+metric_best: mae
 model:
   edge_decoding: dot
-  loss_fun: cross_entropy
-  type: GPSModel
+  graph_pooling: add
+  loss_fun: l1
+  type: GraphMLPMixer
 optim:
-  base_lr: 0.0005
+  base_lr: 0.001
   clip_grad_norm: true
-  max_epoch: 200
-  num_warmup_epochs: 10
+  max_epoch: 2000
+  num_warmup_epochs: 50
   optimizer: adamW
   scheduler: cosine_with_warmup
-  weight_decay: 1e-5
+  weight_decay: 1e-4
 out_dir: results
 posenc_GraphormerBias:
   enable: false
@@ -66,16 +81,18 @@ posenc_LapPE:
   raw_norm_type: none
 posenc_RWSE:
   dim_pe: 16
-  enable: true
+  enable: false
   kernel:
     times_func: range(1,17)
   model: Linear
   raw_norm_type: BatchNorm
 train:
+  batch_size: 32
+  ckpt_period: 100
   enable_ckpt: false
-  eval_period: 5
+  eval_period: 1
   mode: custom
   sampler: full_batch
 wandb:
-  project: cornell
+  project: zinc
   use: false

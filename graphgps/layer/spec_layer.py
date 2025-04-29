@@ -41,8 +41,6 @@ class SpecLayer(nn.Module):
         # h = conv(basic_feats) # [SpecLayer(nheads+1, nclass, prop_dropout, norm=norm) for i in range(nlayer)]
         ######## done: rewrite logic
 
-        print(basic_feats.shape, self.weight.shape)
-        
         basic_feats = self.prop_dropout(basic_feats) * self.weight      # [N, m, d] * [1, m, d]
         basic_feats = torch.sum(basic_feats, dim=1)
 

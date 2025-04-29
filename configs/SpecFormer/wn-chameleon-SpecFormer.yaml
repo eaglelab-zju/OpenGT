@@ -10,8 +10,7 @@ dataset:
   task_type: classification
   transductive: True
   split_mode: standard
-  node_encoder: True
-  node_encoder_name: LapPE
+  node_encoder: False
 #  node_encoder_name: LinearNode+GraphormerBias
   node_encoder_bn: False
   edge_encoder: False

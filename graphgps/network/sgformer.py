@@ -8,12 +8,17 @@ import torch_geometric.graphgym.register as register
 from torch_geometric.graphgym.models.layer import new_layer_config, GCNConv, Linear
 from torch_geometric.graphgym.config import cfg
 from torch_geometric.graphgym.register import register_network
+from graphgps.encoder.feature_encoder import FeatureEncoder
+
 
 @register_network("SGFormer")
 class SGFormer(nn.Module):
     def __init__(self, dim_in, dim_out):
         super().__init__()
 
+        self.encoder = FeatureEncoder(dim_in)
+        dim_in = self.encoder.dim_in
+        
         if cfg.gt.use_graph:
             if cfg.gt.aggregate == 'add':
                 self.model=Sequential('x',[
@@ -33,7 +38,7 @@ class SGFormer(nn.Module):
                 raise ValueError(f'Invalid aggregate type:{cfg.gt.aggregate}')
         else:
             self.model=Sequential('x',[
-                (TransConv(dim_in, cfg.gt.dim_hidden), 'x -> x1'),
+                (TransConv(dim_in, cfg.gt.dim_hidden), 'x -> x'),
             ])
             dim_mid=cfg.gt.dim_hidden
         

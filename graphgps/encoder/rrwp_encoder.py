@@ -1,5 +1,5 @@
 '''
-    The RRWP encoder for GRIT (ours)
+    The RRWP encoder for GRIT
 '''
 import torch
 from torch import nn
