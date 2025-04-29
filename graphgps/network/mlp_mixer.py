@@ -25,12 +25,6 @@ class GraphMLPMixer(nn.Module):
 
         self.pre_mp = GeneralLayer('linear', new_layer_config(dim_in = dim_in, dim_out = cfg.gt.dim_hidden, num_layers = 1, has_act = True, has_bias = True, cfg = cfg))
 
-        # patch PE
-        self.patch_rw_dim = cfg.metis.patch_rw_dim
-
-        if self.patch_rw_dim > 0:
-            self.patch_rw_encoder = MLP(new_layer_config(dim_in=cfg.metis.patch_rw_dim, dim_out=cfg.gt.dim_hidden, num_layers=1, has_act=True, has_bias=True, cfg=cfg))
-
         '''
         # Patch Encoder
         x = x[data.subgraphs_nodes_mapper]
@@ -50,28 +44,40 @@ class GraphMLPMixer(nn.Module):
 
         convs=[]
         for i in range(cfg.gt.layers):
-            convs.append((GCNConv(new_layer_config(dim_in=cfg.gt.dim_hidden, dim_out=cfg.gt.dim_hidden, num_layers=1, has_act=True, has_bias=True, cfg=cfg)), 'x -> x'))
-            if(i < cfg.gt.layers-1):
-                # needs scatter & residual connection
+            if(i > 0):
                 convs.append((lambda x: self.pre_layer_scatter(x), 'x -> x1'))
                 convs.append((MLP(new_layer_config(dim_in=cfg.gt.dim_hidden, dim_out=cfg.gt.dim_hidden, num_layers=1, has_act=True, has_bias=True, cfg=cfg)), 'x1 -> x1'))
                 convs.append((lambda x, x1: self.aggregate_batches_add(x, x1), 'x, x1 -> x'))
                 convs.append((lambda x: self.post_layer_scatter(x), 'x -> x'))
+            convs.append((GCNConv(new_layer_config(dim_in=cfg.gt.dim_hidden, dim_out=cfg.gt.dim_hidden, num_layers=1, has_act=True, has_bias=True, cfg=cfg)), 'x -> x'))
+            
 
         convs.append((lambda x: self.final_scatter(x), 'x -> x'))
 
         self.convs = Sequential('x', convs)
         # needs scatter & patch rw encoder residual
-        self.reshape_layer = Sequential('x',[(lambda x: self.reshape(x), 'x -> x')])
 
-        self.transformer_encoder = MLPMixer(
-            dim_hidden=cfg.gt.dim_hidden, dropout=cfg.gt.mlpmixer_dropout, layers=cfg.gt.mlpmixer_layers, patches=cfg.metis.patches)
+        # patch PE
+        if cfg.metis.patch_rw_dim > 0:
+            self.patch_rw_encoder = Sequential('x', [(lambda x: self.copy_patch_pe(x), 'x -> x1'),
+                                                     (MLP(new_layer_config(dim_in=cfg.metis.patch_rw_dim, dim_out=cfg.gt.dim_hidden, num_layers=2, has_act=True, has_bias=True, cfg=cfg)), 'x1 -> x1'),
+                                                     (lambda x, x1: self.aggregate_batches_add(x, x1), 'x, x1 -> x')])
+
+        self.reshape_layer = Sequential('x', [(lambda x: self.reshape(x), 'x -> x')])
+
+        self.transformer_encoder = MLPMixer(dim_hidden=cfg.gt.dim_hidden, dropout=cfg.gt.mlpmixer_dropout, layers=cfg.gt.mlpmixer_layers, patches=cfg.metis.patches)
 
         # global pooling
         self.pooling_layer = Sequential('x',[(lambda x: self.global_pooling(x), 'x -> x')])
 
         GNNHead = register.head_dict['mlp_mixer_graph']
         self.post_mp = GNNHead(dim_in=cfg.gt.dim_hidden, dim_out=dim_out)
+
+    def copy_patch_pe(self, batch):
+        # Copy the patch PE to batch.x
+        new_batch = batch.clone()
+        new_batch.x = batch.patch_pe
+        return new_batch
 
     def aggregate_batches_add(self, x, x1):
         new_batch = x.clone()
@@ -92,7 +98,7 @@ class GraphMLPMixer(nn.Module):
     def final_scatter(self, batch):
         x = batch.x[batch.subgraphs_nodes_mapper]
         batch_x = batch.subgraphs_batch
-        batch.x = scatter(x, batch_x, dim=0,reduce=self.pooling)
+        batch.x = scatter(x, batch_x, dim=0, reduce=self.pooling)
         return batch
 
     def reshape(self, batch):
@@ -100,7 +106,7 @@ class GraphMLPMixer(nn.Module):
         batch.x = Rearrange(batch.x,'(B P) D -> B P D', P=cfg.metis.patches)
         return batch
 
-    def global_pooling(self,batch):
+    def global_pooling(self, batch):
         batch.x = (batch.x * batch.mask.unsqueeze(-1)).sum(1) / batch.mask.sum(1, keepdim=True)
         return batch
 

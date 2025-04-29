@@ -8,7 +8,7 @@ dataset:
   name: subset
   node_encoder: true
   node_encoder_bn: false
-  node_encoder_name: TypeDictNode
+  node_encoder_name: TypeDictNode+RWSE
   node_encoder_num_types: 28
   split_mode: standard
   task: graph
@@ -33,7 +33,7 @@ gt:
   dropout: 0.5
   layer_norm: false
   layer_type: GINE+Transformer
-  layers: 8
+  layers: 4
   mlpmixer_dropout: 0.2
   mlpmixer_layers: 4
   n_heads: 4
@@ -44,7 +44,7 @@ metis:
   num_hops: 1
   online: true
   patch_num_diff: -1
-  patch_rw_dim: 0
+  patch_rw_dim: 8
   patches: 32
 metric_agg: argmin
 metric_best: mae
@@ -54,7 +54,7 @@ model:
   loss_fun: l1
   type: GraphMLPMixer
 optim:
-  base_lr: 0.001
+  base_lr: 0.0005
   clip_grad_norm: true
   max_epoch: 2000
   num_warmup_epochs: 50
@@ -80,8 +80,8 @@ posenc_LapPE:
   n_heads: 4
   raw_norm_type: none
 posenc_RWSE:
-  dim_pe: 16
-  enable: false
+  dim_pe: 20
+  enable: True
   kernel:
     times_func: range(1,17)
   model: Linear

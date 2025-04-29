@@ -1,3 +1,4 @@
+accelerator: cuda:6
 out_dir: results
 metric_best: accuracy
 wandb:
@@ -10,8 +11,8 @@ dataset:
   task_type: classification
   transductive: True
   split_mode: standard
-  node_encoder: False
-  node_encoder_name: DummyNode
+  node_encoder: True
+  node_encoder_name: LinearNode+LapPE
 #  node_encoder_name: LinearNode+GraphormerBias
   node_encoder_bn: False
   edge_encoder: False
@@ -26,7 +27,7 @@ posenc_GraphormerBias:
 graphormer:
   use_graph_token: False
 posenc_LapPE:
-  enable: False
+  enable: True
   eigen:
     laplacian_norm: none
     eigvec_norm: L2
@@ -52,22 +53,16 @@ train:
   enable_ckpt: False
 #  ckpt_period: 100
 model:
-  type: SGFormer
+  type: Graphtransformer
   loss_fun: cross_entropy
   edge_decoding: dot
 gt:
   layer_type: GCN+Transformer
   layers: 2
   n_heads: 2
-  use_weight: True
-  use_residual: True
-  use_act: True
   dim_hidden: 96  # `gt.dim_hidden` must match `gnn.dim_inner`
   dropout: 0.5
   attn_dropout: 0.5
-  use_graph: True
-  graph_weight: 0.8
-  aggregate: add
   layer_norm: False
   batch_norm: False
 gnn:

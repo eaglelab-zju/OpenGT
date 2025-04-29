@@ -20,7 +20,6 @@ class MLPMixerGraphHead(nn.Module):
 
     def __init__(self, dim_in, dim_out, L=2):
         super().__init__()
-        self.pooling_fun = register.pooling_dict[cfg.model.graph_pooling]
         list_FC_layers = [
             nn.Linear(dim_in // 2 ** l, dim_in // 2 ** (l + 1), bias=True)
             for l in range(L)]

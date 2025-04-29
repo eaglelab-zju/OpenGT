@@ -31,7 +31,6 @@ class MixerBlock(nn.Module):
 
     def __init__(self, dim, num_patch, token_dim, channel_dim, dropout=0.):
         super().__init__()
-        cfg.gnn.dropout = dropout
         self.token_mix = Sequential('x',[
             (nn.LayerNorm(dim), 'x -> x'),
             lambda x:self.rearrange(x),
