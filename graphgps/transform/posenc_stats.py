@@ -1,10 +1,11 @@
 from copy import deepcopy
 
 import numpy as np
+import networkx as nx
 import torch
 import torch.nn.functional as F
 from torch_geometric.utils import (get_laplacian, to_scipy_sparse_matrix,
-                                   to_undirected, to_dense_adj, scatter)
+                                   to_undirected, to_dense_adj, scatter, to_networkx)
 from torch_geometric.utils.num_nodes import maybe_num_nodes
 from functools import partial
 from graphgps.encoder.graphormer_encoder import graphormer_pre_processing
@@ -42,6 +43,7 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
     'Graphormer': Computes spatial types and optionally edges along shortest paths.
     'LapRaw': Laplacian eigen-decomposition without further processing.
     'RRWP': Relative Random Walk Probabilities PE (for GRIT)
+    'WLPE': Weisfeiler-Lehman positional encoding.
 
     Args:
         data: PyG graph
@@ -56,7 +58,7 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
     # Verify PE types.
     for t in pe_types:
         if t not in ['LapPE', 'EquivStableLapPE', 'SignNet', 'RWSE', 'HKdiagSE',
-                     'HKfullPE', 'ElstaticSE', 'GraphormerBias', 'LapRaw', 'RRWP']:
+                     'HKfullPE', 'ElstaticSE', 'GraphormerBias', 'LapRaw', 'RRWP', 'WLPE']:
             raise ValueError(f"Unexpected PE stats selection {t} in {pe_types}")
 
     # Basic preprocessing of the input graph.
@@ -202,6 +204,25 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
                             spd=param.spd, # by default False
                             )
         data = transform(data)
+    
+    if 'WLPE' in pe_types:
+        # Add the WLPE encoding to the graph
+        pecfg = cfg.posenc_WLPE
+        G = to_networkx(data, to_undirected=True)
+        edge_attr = data.edge_attr if hasattr(data, 'edge_attr') else None
+        hashlist = nx.weisfeiler_lehman_subgraph_hashes(G, edge_attr=edge_attr, iterations = pecfg.iterations)
+
+        # Create a mapping from the hashes to the node types
+        hash_to_type = {}
+        for i, h in enumerate(hashlist):
+            if h not in hash_to_type:
+                hash_to_type[h] = len(hash_to_type)
+
+        data.WLTag = torch.tensor([hash_to_type[h] for h in hashlist], dtype=torch.long)
+
+        data.WLTag = data.WLTag.view(-1, 1)
+
+        pecfg.num_types = len(hash_to_type)
 
     return data
 

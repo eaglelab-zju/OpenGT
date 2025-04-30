@@ -16,6 +16,7 @@ def set_cfg_posenc(cfg):
     cfg.posenc_EquivStableLapPE = CN()
     cfg.posenc_LapRaw = CN()
     cfg.posenc_RRWP = CN()
+    cfg.posenc_WLPE = CN()
 
     # Effective Resistance Embeddings
     cfg.posenc_ERN = CN() #Effective Resistance for Nodes
@@ -26,7 +27,7 @@ def set_cfg_posenc(cfg):
                  'posenc_RWSE', 'posenc_HKdiagSE', 'posenc_ElstaticSE', 
                  'posenc_LapRaw' ,
                  'posenc_ERN', 'posenc_ERE',
-                 'posenc_RRWP',
+                 'posenc_RRWP', 'posenc_WLPE'
                  ]:
         pecfg = getattr(cfg, name)
 
@@ -110,3 +111,7 @@ def set_cfg_posenc(cfg):
     cfg.posenc_RRWP.spd = False
     cfg.posenc_RRWP.add_node_attr = False
     cfg.posenc_RRWP.add_inverse = False
+
+    # WLPE
+    cfg.posenc_WLPE.iterations = 5
+    cfg.posenc_WLPE.num_types = 0 # Will be updated in preprocessing
