@@ -20,7 +20,11 @@ def train_epoch(logger, loader, model, optimizer, scheduler, batch_accumulation)
     for iter, batch in enumerate(loader):
         batch.split = 'train'
         batch.to(torch.device(cfg.accelerator))
-        pred, true = model(batch)
+        
+        if cfg.model.type == 'NodeFormer' and cfg.gt.use_edge_loss:
+            pred, true, extra_loss = model(batch)
+        else:
+            pred, true = model(batch)
         if cfg.dataset.name == 'ogbg-code2':
             loss, pred_score = subtoken_cross_entropy(pred, true)
             _true = true
@@ -29,6 +33,9 @@ def train_epoch(logger, loader, model, optimizer, scheduler, batch_accumulation)
             loss, pred_score = compute_loss(pred, true)
             _true = true.detach().to('cpu', non_blocking=True)
             _pred = pred_score.detach().to('cpu', non_blocking=True)
+        
+        if cfg.model.type == 'NodeFormer' and cfg.gt.use_edge_loss:
+            loss -= extra_loss
         loss.backward()
         # Parameters update after accumulating gradients for given num. batches.
         if ((iter + 1) % batch_accumulation == 0) or (iter + 1 == len(loader)):
@@ -56,6 +63,9 @@ def eval_epoch(logger, loader, model, split='val'):
         batch.to(torch.device(cfg.accelerator))
         if cfg.gnn.head == 'inductive_edge':
             pred, true, extra_stats = model(batch)
+        elif cfg.model.type == 'NodeFormer' and cfg.gt.use_edge_loss:
+            pred, true, extra_loss = model(batch)
+            extra_stats = {}
         else:
             pred, true = model(batch)
             extra_stats = {}
@@ -67,6 +77,10 @@ def eval_epoch(logger, loader, model, split='val'):
             loss, pred_score = compute_loss(pred, true)
             _true = true.detach().to('cpu', non_blocking=True)
             _pred = pred_score.detach().to('cpu', non_blocking=True)
+        
+        if cfg.model.type == 'NodeFormer' and cfg.gt.use_edge_loss:
+            loss -= extra_loss
+            
         logger.update_stats(true=_true,
                             pred=_pred,
                             loss=loss.detach().cpu().item(),

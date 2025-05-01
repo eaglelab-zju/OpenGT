@@ -25,9 +25,6 @@ class NodeFormer(nn.Module):
         self.encoder = FeatureEncoder(dim_in)
         dim_in = self.encoder.dim_in
 
-        if cfg.gt.use_edge_loss:
-            raise NotImplementedError("Edge loss is not supported")
-
         self.pre_mp = GeneralLayer('linear', new_layer_config(dim_in = dim_in, dim_out = cfg.gt.dim_hidden, num_layers = 1, has_act = True, has_bias = True, cfg = cfg))
 
         if cfg.gt.use_jk:
@@ -51,5 +48,11 @@ class NodeFormer(nn.Module):
 
     def forward(self, batch):
         for module in self.children():
+            if module is self.post_mp and cfg.gt.use_edge_loss:
+                # If edge loss is used, we need to save the link loss before passing it to the post_mp layer
+                rec_link_loss = cfg.gt.edge_loss_weight * batch.extra_loss / cfg.gt.layers
             batch = module(batch)
-        return batch
+        if cfg.gt.use_edge_loss:
+            return batch[0], batch[1], rec_link_loss[0]
+        else:
+            return batch

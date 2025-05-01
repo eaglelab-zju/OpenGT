@@ -1,3 +1,4 @@
+accelerator: cuda:4
 out_dir: results
 metric_best: accuracy
 wandb:
@@ -73,6 +74,8 @@ gt:
   kernel_trans: 'softmax' # NodeFormer Special
   rb_order: 2 # NodeFormer Special, must match `prep.rb_order`
   rb_trans: 'sigmoid' # NodeFormer Special
+  use_edge_loss: True # NodeFormer Special
+  edge_loss_weight: 0.1 # NodeFormer Special
 gnn:
   head: node
   layers_pre_mp: 0

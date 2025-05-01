@@ -108,7 +108,9 @@ def set_cfg_gt(cfg):
 
     cfg.gt.projection_matrix_type = 'a'
 
-    cfg.gt.use_edge_loss = False
+    cfg.gt.use_edge_loss = True
+
+    cfg.gt.edge_loss_weight = 0.1
 
     cfg.gt.tau = 1.0
 

@@ -291,11 +291,11 @@ class NodeFormerConv(nn.Module):
 
 		# compute all-pair message passing update and attn weight on input edges, requires O(N) or O(N + E)
 		if self.use_gumbel and self.training:  # only using Gumbel noise for training
-			z_next = kernelized_gumbel_softmax(query,key,value,self.kernel_transformation,projection_matrix,adjs[0],
-												  self.nb_gumbel_sample, self.tau, False)
+			z_next, weight = kernelized_gumbel_softmax(query,key,value,self.kernel_transformation,projection_matrix,adjs[0],
+												  self.nb_gumbel_sample, self.tau, True)
 		else:
-			z_next = kernelized_softmax(query, key, value, self.kernel_transformation, projection_matrix, adjs[0],
-												self.tau, False)
+			z_next, weight = kernelized_softmax(query, key, value, self.kernel_transformation, projection_matrix, adjs[0],
+												self.tau, True)
 
 		# compute update by relational bias of input adjacency, requires O(E)
 		for i in range(self.rb_order):
@@ -313,8 +313,7 @@ class NodeFormerConv(nn.Module):
 		z_next = F.dropout(z_next, p=self.dropout, training=self.training)
 
 		batch.x = z_next.squeeze(0)
-		return batch
-'''
+		
 		if self.use_edge_loss: # compute edge regularization loss on input adjacency
 			row, col = adjs[0]
 			d_in = degree(col, query.shape[1]).float()
@@ -322,8 +321,7 @@ class NodeFormerConv(nn.Module):
 			d_norm_ = d_norm.reshape(1, -1, 1).repeat(1, 1, weight.shape[-1])
 			link_loss = torch.mean(weight.log() * d_norm_)
 
-			return z_next, link_loss
+			batch.extra_loss += link_loss
 
-		else:
-			return z_next'
-'''
+
+		return batch
