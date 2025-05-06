@@ -1,0 +1,71 @@
+accelerator: cuda:5
+dataset:
+  edge_encoder: true
+  edge_encoder_bn: false
+  edge_encoder_name: Bond
+  format: OGB
+  name: ogbg-molhiv
+  node_encoder: true
+  node_encoder_bn: false
+  node_encoder_name: Atom
+  split_mode: standard
+  task: graph
+  task_type: classification
+  transductive: false
+gnn:
+  act: relu
+  agg: mean
+  batchnorm: true
+  dim_inner: 48
+  dropout: 0.0
+  head: san_graph
+  layers_post_mp: 2
+  layers_pre_mp: 0
+  normalize_adj: false
+gt:
+  attn:
+    O_e: true
+    act: relu
+    clamp: 5.0
+    edge_enhance: true
+    full_attn: false
+    norm_e: true
+  attn_dropout: 0.5
+  batch_norm: true
+  dim_hidden: 48
+  dropout: 0.5
+  layer_norm: false
+  layer_type: GritTransformer
+  layers: 8
+  n_heads: 4
+metric_best: auc
+model:
+  edge_decoding: dot
+  graph_pooling: mean
+  loss_fun: cross_entropy
+  type: GritTransformer
+optim:
+  base_lr: 0.001
+  clip_grad_norm: true
+  max_epoch: 100
+  num_warmup_epochs: 5
+  optimizer: adamW
+  scheduler: cosine_with_warmup
+  weight_decay: 1e-5
+out_dir: results
+posenc_RRWP:
+  add_identity: true
+  add_inverse: false
+  add_node_attr: false
+  enable: true
+  ksteps: 16
+train:
+  batch_size: 32
+  ckpt_period: 100
+  enable_ckpt: false
+  eval_period: 1
+  mode: custom
+  sampler: full_batch
+wandb:
+  project: molhiv
+  use: false

@@ -3,11 +3,11 @@ dataset:
   edge_encoder: false
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
-  format: PyG-WebKB
-  name: cornell
-  node_encoder: false
+  format: PyG-Planetoid
+  name: citeseer
+  node_encoder: true
   node_encoder_bn: false
-  node_encoder_name: DummyNode
+  node_encoder_name: LinearNode+LapPE
   split_mode: standard
   task: node
   task_type: classification
@@ -25,25 +25,19 @@ gnn:
 graphormer:
   use_graph_token: false
 gt:
-  aggregate: add
   attn_dropout: 0.5
   batch_norm: false
   dim_hidden: 96
   dropout: 0.5
-  graph_weight: 0.8
   layer_norm: false
   layer_type: GCN+Transformer
   layers: 2
   n_heads: 2
-  use_act: true
-  use_graph: true
-  use_residual: true
-  use_weight: true
 metric_best: accuracy
 model:
   edge_decoding: dot
   loss_fun: cross_entropy
-  type: SGFormer
+  type: Graphtransformer
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
@@ -65,7 +59,7 @@ posenc_LapPE:
     eigvec_norm: L2
     laplacian_norm: none
     max_freqs: 4
-  enable: false
+  enable: true
   layers: 2
   model: DeepSet
   n_heads: 4
@@ -83,5 +77,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: cornell
+  project: citeseer
   use: false

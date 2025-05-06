@@ -1,61 +1,58 @@
-accelerator: cuda:5
+accelerator: cuda:2
 dataset:
-  edge_encoder: false
+  edge_encoder: true
   edge_encoder_bn: false
-  edge_encoder_name: DummyEdge
-  format: PyG-WebKB
-  name: cornell
-  node_encoder: false
+  edge_encoder_name: TypeDictEdge
+  edge_encoder_num_types: 4
+  format: PyG-ZINC
+  name: subset
+  node_encoder: true
   node_encoder_bn: false
-  node_encoder_name: DummyNode
+  node_encoder_name: TypeDictNode+GraphormerBias
+  node_encoder_num_types: 28
   split_mode: standard
-  task: node
-  task_type: classification
-  transductive: true
+  task: graph
+  task_type: regression
+  transductive: false
 gnn:
   act: gelu
   agg: mean
   batchnorm: true
   dim_inner: 96
   dropout: 0.2
-  head: node
+  head: san_graph
   layers_post_mp: 1
   layers_pre_mp: 0
   normalize_adj: false
 graphormer:
   use_graph_token: false
 gt:
-  aggregate: add
   attn_dropout: 0.5
-  batch_norm: false
+  batch_norm: true
   dim_hidden: 96
-  dropout: 0.5
-  graph_weight: 0.8
+  dropout: 0.2
   layer_norm: false
   layer_type: GCN+Transformer
-  layers: 2
-  n_heads: 2
-  use_act: true
-  use_graph: true
-  use_residual: true
-  use_weight: true
-metric_best: accuracy
+  layers: 8
+  n_heads: 4
+metric_agg: argmin
+metric_best: mae
 model:
   edge_decoding: dot
-  loss_fun: cross_entropy
-  type: SGFormer
+  graph_pooling: add
+  loss_fun: l1
+  type: GPSModel
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
-  max_epoch: 400
-  num_warmup_epochs: 20
+  max_epoch: 2000
+  num_warmup_epochs: 50
   optimizer: adamW
   scheduler: cosine_with_warmup
-  weight_decay: 5e-4
+  weight_decay: 1e-5
 out_dir: results
 posenc_GraphormerBias:
-  enable: false
-  node_degrees_only: true
+  enable: true
   num_in_degrees: 729
   num_out_degrees: 89
   num_spatial_types: 20
@@ -78,10 +75,12 @@ posenc_RWSE:
   model: Linear
   raw_norm_type: BatchNorm
 train:
+  batch_size: 32
+  ckpt_period: 100
   enable_ckpt: false
-  eval_period: 5
+  eval_period: 1
   mode: custom
   sampler: full_batch
 wandb:
-  project: cornell
+  project: zinc
   use: false
