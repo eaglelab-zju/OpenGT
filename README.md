@@ -18,6 +18,7 @@ pip install performer-pytorch
 pip install tensorboardX
 pip install ogb
 pip install wandb
+pip install pymetis
 
 conda clean --all
 ```
