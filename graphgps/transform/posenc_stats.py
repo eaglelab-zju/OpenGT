@@ -171,7 +171,6 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
             g = g + g.T
             g[g > 0.] = 1.0
             deg = g.sum(axis=1).reshape(-1)
-            print(deg.shape)
             deg[deg == 0.] = 1.0
             deg = torch.diag(deg ** -0.5)
             adj = deg @ g @ deg
@@ -191,7 +190,7 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
             rowsum = torch.clip(rowsum, 1, 1e10)
             return x / rowsum
         
-        data.EigVal, data.EigVec = eigen_decompositon (to_dense_adj(undir_edge_index)[0])
+        data.EigVals, data.EigVecs = eigen_decompositon (to_dense_adj(undir_edge_index)[0])
         # dataset.graph['node_feat'] = feature_normalize(dataset.graph['node_feat']).to(device)
 
     if 'RRWP' in pe_types:

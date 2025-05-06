@@ -34,9 +34,9 @@ class SpecLayer(nn.Module):
 
     def forward(self, batch):
         basic_feats = [batch.x]
-        utx = batch.EigVec.permute(1,0) @ batch.x
+        utx = batch.EigVecs.permute(1,0) @ batch.x
         for i in range(self.n_heads):
-            basic_feats.append(batch.EigVec @ (batch.EigVal[:, i].unsqueeze(1) * utx))  # [N, d]
+            basic_feats.append(batch.EigVecs @ (batch.EigVals[:, i].unsqueeze(1) * utx))  # [N, d]
         basic_feats = torch.stack(basic_feats, axis=1)                # [N, m, d]
         # h = conv(basic_feats) # [SpecLayer(nheads+1, nclass, prop_dropout, norm=norm) for i in range(nlayer)]
         ######## done: rewrite logic

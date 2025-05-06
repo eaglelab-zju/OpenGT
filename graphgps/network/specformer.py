@@ -17,7 +17,7 @@ class swapex(nn.Module):
     def __init__(self):
         super().__init__()
     def forward(self, batch):
-        batch.x, batch.EigVal = batch.EigVal, batch.x
+        batch.x, batch.EigVals = batch.EigVals, batch.x
         return batch
     
 

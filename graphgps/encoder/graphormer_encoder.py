@@ -63,15 +63,19 @@ def graphormer_pre_processing(data, distance):
         return data
 
     N = len(graph.nodes)
-    shortest_paths = dict(nx.shortest_path(graph))
+    shortest_paths = dict(nx.shortest_path(graph)) # returns dict{S:dict{T:list[nodes on ST]}}, SSSP for each starting node
 
     spatial_types = torch.empty(N ** 2, dtype=torch.long).fill_(distance)
     graph_index = torch.empty(2, N ** 2, dtype=torch.long)
 
     if hasattr(data, "edge_attr") and data.edge_attr is not None:
         shortest_path_types = torch.zeros(N ** 2, distance, dtype=torch.long)
+        
         edge_attr = torch.zeros(N, N, dtype=torch.long)
-        edge_attr[data.edge_index[0], data.edge_index[1]] = data.edge_attr
+        if len(data.edge_attr.shape) == 1:
+            edge_attr[data.edge_index[0], data.edge_index[1]] = data.edge_attr
+        else:
+            edge_attr[data.edge_index[0], data.edge_index[1]] = data.edge_attr[:, 0]
 
     for i in range(N):
         for j in range(N):
@@ -91,6 +95,7 @@ def graphormer_pre_processing(data, distance):
                     edge_attr[path[k], path[k + 1]] for k in
                     range(len(path) - 1)  # len(path) * (num_edge_types)
                 ]
+                # list of edge_attr for each edge in the path
 
                 # We map each edge-encoding-distance pair to a distinct value
                 # and so obtain dist * num_edge_features many encodings
