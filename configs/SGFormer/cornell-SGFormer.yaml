@@ -1,4 +1,4 @@
-accelerator: cuda:5
+accelerator: cuda:1
 dataset:
   edge_encoder: false
   edge_encoder_bn: false
@@ -7,7 +7,6 @@ dataset:
   name: cornell
   node_encoder: false
   node_encoder_bn: false
-  node_encoder_name: DummyNode
   split_mode: standard
   task: node
   task_type: classification
@@ -65,7 +64,7 @@ posenc_LapPE:
     eigvec_norm: L2
     laplacian_norm: none
     max_freqs: 4
-  enable: true
+  enable: false
   layers: 2
   model: DeepSet
   n_heads: 4

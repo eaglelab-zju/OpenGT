@@ -48,6 +48,7 @@ class SpecLayer(nn.Module):
             basic_feats = self.norm(basic_feats)
             basic_feats = F.relu(basic_feats)
         
-        batch.x = basic_feats
+        ret = batch.clone()
+        ret.x = basic_feats
 
-        return batch
+        return ret

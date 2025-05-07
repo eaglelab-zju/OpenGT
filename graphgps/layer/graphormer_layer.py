@@ -45,5 +45,6 @@ class GraphormerLayer(torch.nn.Module):
         else:
             x = self.attention(x, x, x, ~real_nodes)[0][real_nodes]
         x = self.dropout(x) + data.x
-        data.x = self.mlp(x) + x
-        return data
+        ret = data.clone()
+        ret.x = self.mlp(x) + x
+        return ret

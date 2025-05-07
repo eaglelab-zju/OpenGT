@@ -312,7 +312,8 @@ class NodeFormerConv(nn.Module):
 			z_next = F.elu(z_next)
 		z_next = F.dropout(z_next, p=self.dropout, training=self.training)
 
-		batch.x = z_next.squeeze(0)
+		ret = batch.clone()
+		ret.x = z_next.squeeze(0)
 		
 		if self.use_edge_loss: # compute edge regularization loss on input adjacency
 			row, col = adjs[0]
@@ -321,7 +322,7 @@ class NodeFormerConv(nn.Module):
 			d_norm_ = d_norm.reshape(1, -1, 1).repeat(1, 1, weight.shape[-1])
 			link_loss = torch.mean(weight.log() * d_norm_)
 
-			batch.extra_loss += link_loss
+			ret.extra_loss += link_loss
 
 
-		return batch
+		return ret
