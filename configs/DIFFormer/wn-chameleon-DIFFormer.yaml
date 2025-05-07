@@ -11,7 +11,6 @@ dataset:
   transductive: True
   split_mode: standard
   node_encoder: False
-  node_encoder_name: DummyNode
 #  node_encoder_name: LinearNode+GraphormerBias
   node_encoder_bn: False
   edge_encoder: False

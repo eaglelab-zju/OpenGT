@@ -1,4 +1,4 @@
-accelerator: cuda:3
+accelerator: cuda:6
 out_dir: results
 metric_best: auc
 wandb:
@@ -11,13 +11,13 @@ dataset:
   task_type: classification
   transductive: False
   node_encoder: True
-  node_encoder_name: Atom+LapPE
+  node_encoder_name: Atom+GE
   node_encoder_bn: False
   edge_encoder: True
   edge_encoder_name: Bond
   edge_encoder_bn: False
 posenc_LapPE:
-  enable: True
+  enable: False
   eigen:
     laplacian_norm: none
     eigvec_norm: L2
@@ -27,6 +27,11 @@ posenc_LapPE:
   layers: 2
   n_heads: 4  # Only used when `posenc.model: Transformer`
   raw_norm_type: none
+posenc_GraphormerBias:
+  enable: true
+  num_in_degrees: 729
+  num_out_degrees: 89
+  num_spatial_types: 20
 train:
   mode: custom
   batch_size: 32

@@ -1,7 +1,8 @@
+accelerator: cuda:5
 out_dir: results
 metric_best: ap
 wandb:
-  use: True
+  use: False
   project: gtblueprint
 dataset:
   format: OGB
@@ -28,7 +29,7 @@ posenc_LapPE:
   raw_norm_type: none
 train:
   mode: custom
-  batch_size: 512
+  batch_size: 64
   eval_period: 1
   ckpt_period: 100
 model:

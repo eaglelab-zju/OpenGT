@@ -118,6 +118,33 @@ if args.dataset in ['zinc']:
     config_out['optim']['max_epoch'] = 2000
     config_out['optim']['scheduler'] = 'cosine_with_warmup'
     config_out['optim']['num_warmup_epochs'] = 50
+if args.dataset in ['molhiv', 'molpcba']:
+    args.dataset = 'ogbg-'+args.dataset
+    config_out['metric_best'] = 'auc'
+    config_out['dataset']['format'] = 'OGB'
+    config_out['dataset']['name'] = args.dataset
+    config_out['dataset']['task'] = 'graph'
+    config_out['dataset']['task_type'] = 'classification'
+    if args.dataset == 'molpcba':
+        config_out['dataset']['task_type'] += '_multilabel'
+    config_out['dataset']['transductive'] = False
+    config_out['dataset']['node_encoder'] = True
+    config_out['dataset']['node_encoder_name'] = 'Atom'
+    config_out['dataset']['edge_encoder'] = True
+    config_out['dataset']['edge_encoder_name'] = 'Bond'
+    config_out['train']['batch_size'] = 32
+    config_out['train']['eval_period'] = 1
+    config_out['train']['ckpt_period'] = 100
+    config_out['model']['loss_fun'] = 'cross_entropy'
+    config_out['model']['edge_decoding'] = 'dot'
+    config_out['model']['graph_pooling'] = 'mean'
+    if 'gt' in config_out:
+        config_out['gt']['layers'] = 8
+        config_out['gt']['n_heads'] = 4
+        config_out['gt']['batch_norm'] = True
+    config_out['gnn']['head'] = 'san_graph'
+    config_out['optim']['max_epoch'] = 100
+
 
 if args.model == 'GraphMLPMixer':
     config_out['gnn']['head'] = 'mlp_mixer_graph'

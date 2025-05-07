@@ -47,10 +47,12 @@ for folder_name in os.listdir(results_dir):
 			"mse_std": metrics.get("mse_std", "N/A"),
 			"mae": metrics.get("mae", "N/A"),
 			"mae_std": metrics.get("mae_std", "N/A"),
+			"auc": metrics.get("auc", "N/A"),
+			"auc_std": metrics.get("auc_std", "N/A"),
 		}
 
 # Write data to separate CSV files for each metric
-metrics_to_write = ["acc", "f1", "mse", "mae"]
+metrics_to_write = ["acc", "f1", "mse", "mae", "auc"]
 for metric in metrics_to_write:
 	output_csv = f"results_summary_{metric}.csv"
 	with open(output_csv, "w", newline="") as csvfile:

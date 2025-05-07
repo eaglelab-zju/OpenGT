@@ -1,7 +1,8 @@
+accelerator: cuda:4
 out_dir: results
 metric_best: auc
 wandb:
-  use: True
+  use: False
   project: gtblueprint
 dataset:
   format: OGB
