@@ -1,5 +1,6 @@
 import torch.nn as nn
 from graphgps.layer.mlp_mixer import MLPMixer
+from graphgps.layer.patch_encoder import PatchEncoder
 import functorch.einops.rearrange as Rearrange
 from torch_scatter import scatter
 
@@ -42,19 +43,7 @@ class GraphMLPMixer(nn.Module):
         subgraph_x = scatter(x, batch_x, dim=0, reduce=self.pooling)
         '''
 
-        convs=[]
-        for i in range(cfg.gt.layers):
-            if(i > 0):
-                convs.append((lambda x: self.pre_layer_scatter(x), 'x -> x1'))
-                convs.append((MLP(new_layer_config(dim_in=cfg.gt.dim_hidden, dim_out=cfg.gt.dim_hidden, num_layers=1, has_act=True, has_bias=True, cfg=cfg)), 'x1 -> x1'))
-                convs.append((lambda x, x1: self.aggregate_batches_add(x, x1), 'x, x1 -> x'))
-                convs.append((lambda x: self.post_layer_scatter(x), 'x -> x'))
-            convs.append((GCNConv(new_layer_config(dim_in=cfg.gt.dim_hidden, dim_out=cfg.gt.dim_hidden, num_layers=1, has_act=True, has_bias=True, cfg=cfg)), 'x -> x'))
-            
-
-        convs.append((lambda x: self.final_scatter(x), 'x -> x'))
-
-        self.convs = Sequential('x', convs)
+        self.patch_encoder = PatchEncoder(dim_in=cfg.gt.dim_hidden, dim_out=cfg.gt.dim_hidden)
         # needs scatter & patch rw encoder residual
 
         # patch PE
@@ -84,31 +73,16 @@ class GraphMLPMixer(nn.Module):
         new_batch.x = x.x + x1.x
         return new_batch
 
-    def pre_layer_scatter(self, batch):
-        x = batch.x[batch.subgraphs_nodes_mapper]
-        batch_x = batch.subgraphs_batch
-        batch.x = scatter(x, batch_x, dim=0, reduce=self.pooling)[batch_x]
-        return batch
-
-    def post_layer_scatter(self, batch):
-        x = batch.x[batch.subgraphs_nodes_mapper]
-        batch.x = scatter(x, batch.subgraphs_nodes_mapper, dim=0, reduce='mean')[batch.subgraphs_nodes_mapper]
-        return batch
-    
-    def final_scatter(self, batch):
-        x = batch.x[batch.subgraphs_nodes_mapper]
-        batch_x = batch.subgraphs_batch
-        batch.x = scatter(x, batch_x, dim=0, reduce=self.pooling)
-        return batch
-
     def reshape(self, batch):
         # Reshape the input tensor to (B, P, D) format
-        batch.x = Rearrange(batch.x,'(B P) D -> B P D', P=cfg.metis.patches)
-        return batch
+        ret = batch.clone()
+        ret.x = Rearrange(batch.x,'(B P) D -> B P D', P=cfg.metis.patches)
+        return ret
 
     def global_pooling(self, batch):
-        batch.x = (batch.x * batch.mask.unsqueeze(-1)).sum(1) / batch.mask.sum(1, keepdim=True)
-        return batch
+        ret = batch.clone()
+        ret.x = (batch.x * batch.mask.unsqueeze(-1)).sum(1) / batch.mask.sum(1, keepdim=True)
+        return ret
 
     def forward(self, batch):
         for module in self.children():

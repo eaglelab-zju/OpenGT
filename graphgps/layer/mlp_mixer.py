@@ -20,8 +20,9 @@ class MLPMixer(nn.Module):
             self.layer_norm = nn.LayerNorm(dim_hidden)
 
     def forward(self, batch):
+        ret = batch.clone()
         for mixer_block in self.mixer_blocks:
-            batch.x = mixer_block(batch.x)
+            ret.x = mixer_block(ret.x)
         if self.with_final_norm:
-            batch.x = self.layer_norm(batch.x)
-        return batch
+            ret.x = self.layer_norm(ret.x)
+        return ret
