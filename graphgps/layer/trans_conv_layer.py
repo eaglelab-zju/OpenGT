@@ -88,6 +88,7 @@ class TransConvLayer(nn.Module):
             x = self.activation(x)
         x = self.dropout(x)
 
-        batch.x = x
+        ret = batch.clone()
+        ret.x = x
 
-        return batch
+        return ret

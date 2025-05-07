@@ -8,7 +8,6 @@ models=("SGFormer")
 datasets=("cornell" "texas" "wisconsin" "chameleon" "squirrel" "cora" "citeseer" "actor")
 #datasets=("ogbg-molhiv" "ogbg-molpcba")
 
-
 # Loop through each model and dataset
 for model in "${models[@]}"; do
 	for dataset in "${datasets[@]}"; do

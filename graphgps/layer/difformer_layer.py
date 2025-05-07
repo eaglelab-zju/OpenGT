@@ -136,7 +136,8 @@ class DIFFormerConv(nn.Module):
             final_output = self.norm(final_output)
         final_output = self.dropout(final_output)
 
-        batch.x = final_output
+        ret = batch.clone()
+        ret.x = final_output
 
-        return batch
+        return ret
 

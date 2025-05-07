@@ -1,4 +1,4 @@
-accelerator: cuda:5
+accelerator: cuda:1
 dataset:
   edge_encoder: false
   edge_encoder_bn: false
@@ -7,7 +7,6 @@ dataset:
   name: cornell
   node_encoder: false
   node_encoder_bn: false
-  node_encoder_name: DummyNode
   split_mode: standard
   task: node
   task_type: classification
