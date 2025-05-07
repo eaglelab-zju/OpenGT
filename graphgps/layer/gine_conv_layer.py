@@ -128,5 +128,6 @@ class GINEConvGraphGymLayer(nn.Module):
         self.model = pyg_nn.GINEConv(gin_nn)
 
     def forward(self, batch):
-        batch.x = self.model(batch.x, batch.edge_index, batch.edge_attr)
-        return batch
+        ret = batch.clone()
+        ret.x = self.model(batch.x, batch.edge_index, batch.edge_attr)
+        return ret
