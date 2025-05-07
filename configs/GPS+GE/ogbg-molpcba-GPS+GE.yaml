@@ -1,10 +1,10 @@
-accelerator: cuda:5
+accelerator: cuda:6
 dataset:
   edge_encoder: true
   edge_encoder_bn: false
   edge_encoder_name: Bond
   format: OGB
-  name: ogbg-molhiv
+  name: ogbg-molpcba
   node_encoder: true
   node_encoder_bn: false
   node_encoder_name: Atom+GraphormerBias
@@ -79,5 +79,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: molhiv
+  project: molpcba
   use: false
