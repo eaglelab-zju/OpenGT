@@ -9,3 +9,5 @@ def custom_gnn_cfg(cfg):
 
     # Use residual connections between the GNN layers.
     cfg.gnn.residual = False
+
+    cfg.gnn.layers = 2

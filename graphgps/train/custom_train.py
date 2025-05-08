@@ -23,6 +23,8 @@ def train_epoch(logger, loader, model, optimizer, scheduler, batch_accumulation)
         
         if cfg.model.type == 'NodeFormer' and cfg.gt.use_edge_loss:
             pred, true, extra_loss = model(batch)
+        elif cfg.model.type == 'CoBFormer':
+            pred, true, extra_loss = model(batch)
         else:
             pred, true = model(batch)
         if cfg.dataset.name == 'ogbg-code2':
@@ -36,6 +38,8 @@ def train_epoch(logger, loader, model, optimizer, scheduler, batch_accumulation)
         
         if cfg.model.type == 'NodeFormer' and cfg.gt.use_edge_loss:
             loss -= extra_loss
+        elif cfg.model.type == 'CoBFormer':
+            loss += extra_loss
         loss.backward()
         # Parameters update after accumulating gradients for given num. batches.
         if ((iter + 1) % batch_accumulation == 0) or (iter + 1 == len(loader)):
@@ -66,6 +70,9 @@ def eval_epoch(logger, loader, model, split='val'):
         elif cfg.model.type == 'NodeFormer' and cfg.gt.use_edge_loss:
             pred, true, extra_loss = model(batch)
             extra_stats = {}
+        elif cfg.model.type == 'CoBFormer':
+            pred, true, extra_loss = model(batch)
+            extra_stats = {}
         else:
             pred, true = model(batch)
             extra_stats = {}
@@ -80,6 +87,8 @@ def eval_epoch(logger, loader, model, split='val'):
         
         if cfg.model.type == 'NodeFormer' and cfg.gt.use_edge_loss:
             loss -= extra_loss
+        elif cfg.model.type == 'CoBFormer':
+            loss += extra_loss
             
         logger.update_stats(true=_true,
                             pred=_pred,
