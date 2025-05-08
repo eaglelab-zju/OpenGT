@@ -1,0 +1,98 @@
+accelerator: cuda:6
+dataset:
+  edge_encoder: true
+  edge_encoder_bn: false
+  edge_encoder_name: TypeDictEdge
+  edge_encoder_num_types: 4
+  format: PyG-ZINC
+  name: subset
+  node_encoder: true
+  node_encoder_bn: false
+  node_encoder_name: TypeDictNode+RWSE
+  node_encoder_num_types: 28
+  split_mode: standard
+  task: graph
+  task_type: regression
+  transductive: false
+gnn:
+  act: gelu
+  agg: mean
+  batchnorm: true
+  dim_inner: 64
+  dropout: 0.2
+  head: mlp_mixer_graph
+  layers_post_mp: 1
+  layers_pre_mp: 0
+  normalize_adj: false
+graphormer:
+  use_graph_token: false
+gt:
+  attn_dropout: 0.5
+  batch_norm: true
+  dim_hidden: 64
+  dropout: 0.5
+  layer_norm: false
+  layer_type: GINE+Transformer
+  layers: 4
+  mlpmixer_dropout: 0.2
+  mlpmixer_layers: 4
+  n_heads: 4
+  pooling: mean
+metis:
+  drop_rate: 0.3
+  enable: true
+  num_hops: 1
+  online: true
+  patch_num_diff: -1
+  patch_rw_dim: 8
+  patches: 32
+metric_agg: argmin
+metric_best: mae
+model:
+  edge_decoding: dot
+  graph_pooling: add
+  loss_fun: l1
+  type: GraphMLPMixer
+optim:
+  base_lr: 0.0005
+  clip_grad_norm: true
+  max_epoch: 800
+  num_warmup_epochs: 50
+  optimizer: adamW
+  scheduler: cosine_with_warmup
+  weight_decay: 1e-4
+out_dir: results
+posenc_GraphormerBias:
+  enable: false
+  node_degrees_only: true
+  num_in_degrees: 729
+  num_out_degrees: 89
+  num_spatial_types: 20
+posenc_LapPE:
+  dim_pe: 4
+  eigen:
+    eigvec_norm: L2
+    laplacian_norm: none
+    max_freqs: 4
+  enable: false
+  layers: 2
+  model: DeepSet
+  n_heads: 4
+  raw_norm_type: none
+posenc_RWSE:
+  dim_pe: 20
+  enable: True
+  kernel:
+    times_func: range(1,17)
+  model: Linear
+  raw_norm_type: BatchNorm
+train:
+  batch_size: 32
+  ckpt_period: 100
+  enable_ckpt: false
+  eval_period: 1
+  mode: custom
+  sampler: full_batch
+wandb:
+  project: zinc
+  use: false

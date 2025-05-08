@@ -1,0 +1,69 @@
+accelerator: cuda:0
+dataset:
+  edge_encoder: true
+  edge_encoder_bn: false
+  edge_encoder_name: DummyEdge
+  format: PyG-WikipediaNetwork
+  name: squirrel
+  node_encoder: true
+  node_encoder_bn: false
+  node_encoder_name: LapPE
+  split_mode: standard
+  task: node
+  task_type: classification
+  transductive: true
+gnn:
+  act: relu
+  agg: mean
+  batchnorm: true
+  dim_inner: 56
+  dropout: 0.0
+  head: node
+  layers_post_mp: 3
+  layers_pre_mp: 0
+  normalize_adj: false
+gt:
+  batch_norm: true
+  dim_hidden: 56
+  dropout: 0.0
+  full_graph: true
+  gamma: 1e-5
+  layer_norm: false
+  layers: 2
+  n_heads: 2
+  residual: true
+metric_best: accuracy
+model:
+  edge_decoding: dot
+  graph_pooling: add
+  loss_fun: cross_entropy
+  type: SANTransformer
+optim:
+  base_lr: 0.0007
+  max_epoch: 1000
+  min_lr: 1e-6
+  optimizer: adam
+  reduce_factor: 0.5
+  schedule_patience: 25
+  scheduler: reduce_on_plateau
+  weight_decay: 0.0
+out_dir: results
+posenc_LapPE:
+  dim_pe: 8
+  eigen:
+    eigvec_norm: L2
+    laplacian_norm: sym
+    max_freqs: 10
+  enable: true
+  layers: 2
+  model: Transformer
+  n_heads: 4
+  raw_norm_type: none
+train:
+  batch_size: 32
+  ckpt_period: 100
+  eval_period: 1
+  mode: custom
+wandb:
+  project: squirrel
+  use: false

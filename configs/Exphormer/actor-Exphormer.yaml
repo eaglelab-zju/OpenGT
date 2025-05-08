@@ -1,0 +1,73 @@
+accelerator: cuda:1
+dataset:
+  edge_encoder: true
+  edge_encoder_bn: false
+  edge_encoder_name: DummyEdge
+  format: PyG-Actor
+  name: none
+  node_encoder: true
+  node_encoder_bn: false
+  node_encoder_name: LinearNode
+  split_mode: standard
+  task: node
+  task_type: classification
+  transductive: true
+gnn:
+  act: relu
+  agg: mean
+  batchnorm: true
+  dim_inner: 96
+  dropout: 0.4
+  head: node
+  layers_post_mp: 1
+  layers_pre_mp: 1
+  normalize_adj: false
+gt:
+  attn_dropout: 0.6
+  batch_norm: true
+  dim_hidden: 96
+  dropout: 0.4
+  layer_norm: false
+  layer_type: GCN+Exphormer
+  layers: 1
+  n_heads: 3
+metric_best: accuracy
+model:
+  edge_decoding: dot
+  graph_pooling: add
+  loss_fun: cross_entropy
+  type: MultiModel
+optim:
+  base_lr: 0.003
+  clip_grad_norm: true
+  max_epoch: 200
+  num_warmup_epochs: 10
+  optimizer: adamW
+  scheduler: cosine_with_warmup
+  weight_decay: 3e-5
+out_dir: results
+posenc_LapPE:
+  dim_pe: 8
+  eigen:
+    eigvec_norm: L2
+    laplacian_norm: none
+    max_freqs: 8
+  enable: false
+  layers: 2
+  model: DeepSet
+  n_heads: 4
+  raw_norm_type: none
+prep:
+  add_edge_index: true
+  exp: true
+  exp_deg: 3
+  num_virt_node: 0
+train:
+  batch_size: 32
+  enable_ckpt: false
+  eval_period: 1
+  mode: custom
+wandb:
+  entity: expand-gnns
+  project: actor
+  use: false

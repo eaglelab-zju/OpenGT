@@ -1,0 +1,92 @@
+accelerator: cuda:1
+dataset:
+  edge_encoder: false
+  edge_encoder_bn: false
+  edge_encoder_name: DummyEdge
+  format: PyG-WikipediaNetwork
+  name: chameleon
+  node_encoder: false
+  node_encoder_bn: false
+  node_encoder_name: None
+  split_mode: standard
+  task: node
+  task_type: classification
+  transductive: true
+gnn:
+  act: gelu
+  agg: mean
+  batchnorm: true
+  dim_inner: 96
+  dropout: 0.2
+  head: node
+  layers_post_mp: 1
+  layers_pre_mp: 0
+  normalize_adj: false
+graphormer:
+  use_graph_token: false
+gt:
+  attn_dropout: 0.5
+  batch_norm: true
+  dim_hidden: 96
+  dropout: 0.5
+  edge_loss_weight: 0.1
+  kernel_trans: softmax
+  layer_norm: false
+  layer_type: GCN+Transformer
+  layers: 2
+  n_heads: 2
+  nb_random_features: 30
+  rb_order: 2
+  rb_trans: sigmoid
+  use_act: true
+  use_edge_loss: true
+  use_gumbel: true
+  use_residual: true
+metric_best: accuracy
+model:
+  edge_decoding: dot
+  loss_fun: cross_entropy
+  type: NodeFormer
+optim:
+  base_lr: 0.0005
+  clip_grad_norm: true
+  max_epoch: 400
+  num_warmup_epochs: 20
+  optimizer: adamW
+  scheduler: cosine_with_warmup
+  weight_decay: 5e-4
+out_dir: results
+posenc_GraphormerBias:
+  enable: false
+  node_degrees_only: true
+  num_in_degrees: 729
+  num_out_degrees: 89
+  num_spatial_types: 20
+posenc_LapPE:
+  dim_pe: 4
+  eigen:
+    eigvec_norm: L2
+    laplacian_norm: none
+    max_freqs: 4
+  enable: false
+  layers: 2
+  model: DeepSet
+  n_heads: 4
+  raw_norm_type: none
+posenc_RWSE:
+  dim_pe: 16
+  enable: false
+  kernel:
+    times_func: range(1,17)
+  model: Linear
+  raw_norm_type: BatchNorm
+prep:
+  rb_order: 2
+train:
+  enable_ckpt: false
+  eval_period: 5
+  mode: custom
+  sampler: full_batch
+wandb:
+  project: chameleon
+  use: false
