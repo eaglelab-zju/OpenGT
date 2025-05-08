@@ -56,7 +56,7 @@ model:
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
-  max_epoch: 2000
+  max_epoch: 800
   num_warmup_epochs: 50
   optimizer: adamW
   scheduler: cosine_with_warmup

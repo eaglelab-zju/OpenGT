@@ -1,13 +1,13 @@
-accelerator: cuda:1
+accelerator: cuda:0
 dataset:
   edge_encoder: false
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
-  format: PyG-Actor
-  name: none
-  node_encoder: false
+  format: PyG-WebKB
+  name: cornell
+  node_encoder: true
   node_encoder_bn: false
-  node_encoder_name: None
+  node_encoder_name: LinearNode
   split_mode: standard
   task: node
   task_type: classification
@@ -26,27 +26,18 @@ graphormer:
   use_graph_token: false
 gt:
   attn_dropout: 0.5
-  batch_norm: true
+  batch_norm: false
   dim_hidden: 96
   dropout: 0.5
-  edge_loss_weight: 0.1
-  kernel_trans: softmax
   layer_norm: false
-  layer_type: GCN+Transformer
+  layer_type: GAT
   layers: 2
   n_heads: 2
-  nb_random_features: 30
-  rb_order: 2
-  rb_trans: sigmoid
-  use_act: true
-  use_edge_loss: true
-  use_gumbel: true
-  use_residual: true
 metric_best: accuracy
 model:
   edge_decoding: dot
   loss_fun: cross_entropy
-  type: NodeFormer
+  type: Graphtransformer
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
@@ -80,13 +71,11 @@ posenc_RWSE:
     times_func: range(1,17)
   model: Linear
   raw_norm_type: BatchNorm
-prep:
-  rb_order: 2
 train:
   enable_ckpt: false
   eval_period: 5
   mode: custom
   sampler: full_batch
 wandb:
-  project: actor
+  project: cornell
   use: false

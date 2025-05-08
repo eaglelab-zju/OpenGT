@@ -118,9 +118,13 @@ if args.dataset in ['zinc']:
     config_out['optim']['max_epoch'] = 2000
     config_out['optim']['scheduler'] = 'cosine_with_warmup'
     config_out['optim']['num_warmup_epochs'] = 50
-if args.dataset in ['molhiv', 'molpcba']:
-    args.dataset = 'ogbg-'+args.dataset
-    config_out['metric_best'] = 'auc'
+if args.dataset in ['ogbg-molhiv', 'ogbg-molpcba']:
+    args.dataset = args.dataset
+    if args.dataset == 'ogbg-molhiv':
+        config_out['metric_best'] = 'auc'
+    else:
+        config_out['metric_best'] = 'ap'
+    config_out['metric_agg'] = 'argmax'
     config_out['dataset']['format'] = 'OGB'
     config_out['dataset']['name'] = args.dataset
     config_out['dataset']['task'] = 'graph'

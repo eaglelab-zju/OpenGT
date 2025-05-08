@@ -1,4 +1,4 @@
-accelerator: cuda:0
+accelerator: cuda:1
 dataset:
   edge_encoder: false
   edge_encoder_bn: false
@@ -29,6 +29,7 @@ gt:
   batch_norm: true
   dim_hidden: 96
   dropout: 0.5
+  edge_loss_weight: 0.1
   kernel_trans: softmax
   layer_norm: false
   layer_type: GCN+Transformer
@@ -38,6 +39,7 @@ gt:
   rb_order: 2
   rb_trans: sigmoid
   use_act: true
+  use_edge_loss: true
   use_gumbel: true
   use_residual: true
 metric_best: accuracy
