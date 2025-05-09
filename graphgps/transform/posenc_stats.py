@@ -43,7 +43,7 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
     'Graphormer': Computes spatial types and optionally edges along shortest paths.
     'LapRaw': Laplacian eigen-decomposition without further processing.
     'RRWP': Relative Random Walk Probabilities PE (for GRIT)
-    'WLPE': Weisfeiler-Lehman positional encoding.
+    'WLSE': Weisfeiler-Lehman encoding.
 
     Args:
         data: PyG graph
@@ -58,7 +58,7 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
     # Verify PE types.
     for t in pe_types:
         if t not in ['LapPE', 'EquivStableLapPE', 'SignNet', 'RWSE', 'HKdiagSE',
-                     'HKfullPE', 'ElstaticSE', 'GraphormerBias', 'LapRaw', 'RRWP', 'WLPE']:
+                     'HKfullPE', 'ElstaticSE', 'GraphormerBias', 'LapRaw', 'RRWP', 'WLSE']:
             raise ValueError(f"Unexpected PE stats selection {t} in {pe_types}")
 
     # Basic preprocessing of the input graph.
@@ -204,9 +204,9 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
                             )
         data = transform(data)
     
-    if 'WLPE' in pe_types:
-        # Add the WLPE encoding to the graph
-        pecfg = cfg.posenc_WLPE
+    if 'WLSE' in pe_types:
+        # Add the WLSE encoding to the graph
+        pecfg = cfg.posenc_WLSE
         G = to_networkx(data, to_undirected=True)
         edge_attr = data.edge_attr if hasattr(data, 'edge_attr') else None
         hashlist = nx.weisfeiler_lehman_subgraph_hashes(G, edge_attr=edge_attr, iterations = pecfg.iterations)

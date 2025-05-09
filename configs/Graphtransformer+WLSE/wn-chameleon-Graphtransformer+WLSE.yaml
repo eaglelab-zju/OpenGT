@@ -12,7 +12,7 @@ dataset:
   transductive: True
   split_mode: standard
   node_encoder: True
-  node_encoder_name: LinearNode+WLPE
+  node_encoder_name: LinearNode+WLSE
 #  node_encoder_name: LinearNode+GraphormerBias
   node_encoder_bn: False
   edge_encoder: False
@@ -44,7 +44,7 @@ posenc_RWSE:
   model: Linear
   dim_pe: 16
   raw_norm_type: BatchNorm
-posenc_WLPE:
+posenc_WLSE:
   enable: True
   iterations: 5
   dim_pe: 16

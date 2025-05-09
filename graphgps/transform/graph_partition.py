@@ -6,6 +6,7 @@ import numpy as np
 import networkx as nx
 import re
 import pymetis
+from torch_geometric.graphgym.config import cfg
 
 def random_walk(A, n_iter):
     # Geometric diffusion features with Random Walk
@@ -217,7 +218,8 @@ class GraphPartitionTransform(object):
         if self.metis:
             node_masks, edge_masks = metis_subgraph(
                 data, n_patches=self.n_patches, drop_rate=self.drop_rate, num_hops=self.num_hops, is_directed=self.is_directed)
-            data.patch = metis_partition(data, n_patches=self.n_patches)
+            if cfg.model.type == 'CoBFormer':
+                data.patch = metis_partition(data, n_patches=self.n_patches)
         else:
             node_masks, edge_masks = random_subgraph(
                 data, n_patches=self.n_patches, num_hops=self.num_hops)

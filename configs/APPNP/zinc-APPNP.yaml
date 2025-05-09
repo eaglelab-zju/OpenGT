@@ -1,4 +1,4 @@
-accelerator: cuda:6
+accelerator: cuda:3
 dataset:
   edge_encoder: true
   edge_encoder_bn: false
@@ -8,7 +8,7 @@ dataset:
   name: subset
   node_encoder: true
   node_encoder_bn: false
-  node_encoder_name: TypeDictNode+LapPE
+  node_encoder_name: TypeDictNode
   node_encoder_num_types: 28
   split_mode: standard
   task: graph
@@ -32,7 +32,7 @@ gt:
   dim_hidden: 96
   dropout: 0.5
   layer_norm: false
-  layer_type: GCN+Transformer
+  layer_type: APPNP
   layers: 8
   n_heads: 4
 metric_agg: argmin
@@ -63,7 +63,7 @@ posenc_LapPE:
     eigvec_norm: L2
     laplacian_norm: none
     max_freqs: 4
-  enable: true
+  enable: false
   layers: 2
   model: DeepSet
   n_heads: 4

@@ -1,18 +1,16 @@
-accelerator: cuda:6
+accelerator: cuda:3
 dataset:
   edge_encoder: true
   edge_encoder_bn: false
-  edge_encoder_name: TypeDictEdge
-  edge_encoder_num_types: 4
-  format: PyG-ZINC
-  name: subset
+  edge_encoder_name: Bond
+  format: OGB
+  name: ogbg-molhiv
   node_encoder: true
   node_encoder_bn: false
-  node_encoder_name: TypeDictNode+LapPE
-  node_encoder_num_types: 28
+  node_encoder_name: Atom
   split_mode: standard
   task: graph
-  task_type: regression
+  task_type: classification
   transductive: false
 gnn:
   act: gelu
@@ -32,21 +30,21 @@ gt:
   dim_hidden: 96
   dropout: 0.5
   layer_norm: false
-  layer_type: GCN+Transformer
+  layer_type: GAT
   layers: 8
   n_heads: 4
-metric_agg: argmin
-metric_best: mae
+metric_agg: argmax
+metric_best: auc
 model:
   edge_decoding: dot
-  graph_pooling: add
-  loss_fun: l1
+  graph_pooling: mean
+  loss_fun: cross_entropy
   type: Graphtransformer
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
-  max_epoch: 2000
-  num_warmup_epochs: 50
+  max_epoch: 100
+  num_warmup_epochs: 20
   optimizer: adamW
   scheduler: cosine_with_warmup
   weight_decay: 5e-4
@@ -63,7 +61,7 @@ posenc_LapPE:
     eigvec_norm: L2
     laplacian_norm: none
     max_freqs: 4
-  enable: true
+  enable: false
   layers: 2
   model: DeepSet
   n_heads: 4
@@ -83,5 +81,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: zinc
+  project: ogbg-molhiv
   use: false

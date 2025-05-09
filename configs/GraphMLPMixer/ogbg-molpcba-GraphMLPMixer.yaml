@@ -1,18 +1,16 @@
-accelerator: cuda:6
+accelerator: cuda:2
 dataset:
   edge_encoder: true
   edge_encoder_bn: false
-  edge_encoder_name: TypeDictEdge
-  edge_encoder_num_types: 4
-  format: PyG-ZINC
-  name: subset
+  edge_encoder_name: Bond
+  format: OGB
+  name: ogbg-molpcba
   node_encoder: true
   node_encoder_bn: false
-  node_encoder_name: TypeDictNode+LapPE
-  node_encoder_num_types: 28
+  node_encoder_name: Atom
   split_mode: standard
   task: graph
-  task_type: regression
+  task_type: classification
   transductive: false
 gnn:
   act: gelu
@@ -20,7 +18,7 @@ gnn:
   batchnorm: true
   dim_inner: 96
   dropout: 0.2
-  head: san_graph
+  head: mlp_mixer_graph
   layers_post_mp: 1
   layers_pre_mp: 0
   normalize_adj: false
@@ -30,26 +28,37 @@ gt:
   attn_dropout: 0.5
   batch_norm: true
   dim_hidden: 96
-  dropout: 0.5
+  dropout: 0.2
   layer_norm: false
   layer_type: GCN+Transformer
   layers: 8
+  mlpmixer_dropout: 0.0
+  mlpmixer_layers: 4
   n_heads: 4
-metric_agg: argmin
-metric_best: mae
+  pooling: mean
+metis:
+  drop_rate: 0.3
+  enable: true
+  num_hops: 1
+  online: true
+  patch_num_diff: -1
+  patch_rw_dim: 0
+  patches: 32
+metric_agg: argmax
+metric_best: ap
 model:
   edge_decoding: dot
-  graph_pooling: add
-  loss_fun: l1
-  type: Graphtransformer
+  graph_pooling: mean
+  loss_fun: cross_entropy
+  type: GraphMLPMixer
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
-  max_epoch: 2000
-  num_warmup_epochs: 50
+  max_epoch: 100
+  num_warmup_epochs: 10
   optimizer: adamW
   scheduler: cosine_with_warmup
-  weight_decay: 5e-4
+  weight_decay: 1e-5
 out_dir: results
 posenc_GraphormerBias:
   enable: false
@@ -63,7 +72,7 @@ posenc_LapPE:
     eigvec_norm: L2
     laplacian_norm: none
     max_freqs: 4
-  enable: true
+  enable: false
   layers: 2
   model: DeepSet
   n_heads: 4
@@ -83,5 +92,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: zinc
+  project: ogbg-molpcba
   use: false

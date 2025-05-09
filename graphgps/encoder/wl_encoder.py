@@ -3,18 +3,18 @@ import torch.nn as nn
 from torch_geometric.graphgym.config import cfg
 from torch_geometric.graphgym.register import register_node_encoder
 
-@register_node_encoder('WLPE')
-class WLPENodeEncoder(torch.nn.Module):
+@register_node_encoder('WLSE')
+class WLSENodeEncoder(torch.nn.Module):
     def __init__(self, dim_emb, expand_x = True):
         super().__init__()
         dim_in = cfg.share.dim_in
 
-        pecfg = cfg.posenc_WLPE
+        pecfg = cfg.posenc_WLSE
         num_types = pecfg.num_types
         dim_pe = pecfg.dim_pe
 
         if num_types < 1:
-            raise ValueError(f"Invalid 'WLPE_num_types': {num_types}")
+            raise ValueError(f"Invalid 'WLSE_num_types': {num_types}")
         
         if dim_emb - dim_pe < 0: # formerly 1, but you could have zero feature size
             raise ValueError(f"LapPE size {dim_pe} is too large for "

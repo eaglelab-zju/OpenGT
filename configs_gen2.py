@@ -122,15 +122,14 @@ if args.dataset in ['ogbg-molhiv', 'ogbg-molpcba']:
     args.dataset = args.dataset
     if args.dataset == 'ogbg-molhiv':
         config_out['metric_best'] = 'auc'
+        config_out['dataset']['task_type'] = 'classification'
     else:
         config_out['metric_best'] = 'ap'
+        config_out['dataset']['task_type'] = 'classification_multilabel'
     config_out['metric_agg'] = 'argmax'
     config_out['dataset']['format'] = 'OGB'
     config_out['dataset']['name'] = args.dataset
     config_out['dataset']['task'] = 'graph'
-    config_out['dataset']['task_type'] = 'classification'
-    if args.dataset == 'molpcba':
-        config_out['dataset']['task_type'] += '_multilabel'
     config_out['dataset']['transductive'] = False
     config_out['dataset']['node_encoder'] = True
     config_out['dataset']['node_encoder_name'] = 'Atom'
