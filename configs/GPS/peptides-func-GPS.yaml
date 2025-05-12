@@ -1,7 +1,8 @@
+accelerator: cuda:1
 out_dir: results
 metric_best: ap
 wandb:
-  use: True
+  use: False
   project: peptides-func
 dataset:
   format: OGB

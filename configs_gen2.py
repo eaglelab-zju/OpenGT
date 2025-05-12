@@ -119,13 +119,14 @@ if args.dataset in ['zinc']:
     config_out['optim']['scheduler'] = 'cosine_with_warmup'
     config_out['optim']['num_warmup_epochs'] = 50
 if args.dataset in ['ogbg-molhiv', 'ogbg-molpcba']:
-    args.dataset = args.dataset
     if args.dataset == 'ogbg-molhiv':
         config_out['metric_best'] = 'auc'
         config_out['dataset']['task_type'] = 'classification'
+        config_out['train']['batch_size'] = 32
     else:
         config_out['metric_best'] = 'ap'
         config_out['dataset']['task_type'] = 'classification_multilabel'
+        config_out['train']['batch_size'] = 512
     config_out['metric_agg'] = 'argmax'
     config_out['dataset']['format'] = 'OGB'
     config_out['dataset']['name'] = args.dataset
@@ -135,7 +136,6 @@ if args.dataset in ['ogbg-molhiv', 'ogbg-molpcba']:
     config_out['dataset']['node_encoder_name'] = 'Atom'
     config_out['dataset']['edge_encoder'] = True
     config_out['dataset']['edge_encoder_name'] = 'Bond'
-    config_out['train']['batch_size'] = 32
     config_out['train']['eval_period'] = 1
     config_out['train']['ckpt_period'] = 100
     config_out['model']['loss_fun'] = 'cross_entropy'
@@ -147,11 +147,48 @@ if args.dataset in ['ogbg-molhiv', 'ogbg-molpcba']:
         config_out['gt']['batch_norm'] = True
     config_out['gnn']['head'] = 'san_graph'
     config_out['optim']['max_epoch'] = 100
-
+    config_out['optim']['num_warmup_epochs'] = 10
+if args.dataset in ['peptides-func', 'peptides-struct']:
+    if args.dataset == 'peptides-func':
+        config_out['metric_best'] = 'ap'
+        config_out['metric_agg'] = 'argmax'
+        config_out['dataset']['task_type'] = 'classification_multilabel'
+        config_out['dataset']['name'] = 'peptides-functional'
+    else:
+        config_out['metric_best'] = 'mae'
+        config_out['metric_agg'] = 'argmin'
+        config_out['dataset']['task_type'] = 'regression'
+        config_out['dataset']['name'] = 'peptides-structural'
+    config_out['dataset']['format'] = 'OGB'
+    config_out['dataset']['task'] = 'graph'
+    config_out['dataset']['transductive'] = False
+    config_out['dataset']['node_encoder'] = True
+    config_out['dataset']['node_encoder_name'] = 'Atom'
+    config_out['dataset']['node_encoder_num_types'] = 20
+    config_out['dataset']['edge_encoder'] = True
+    config_out['dataset']['edge_encoder_name'] = 'Bond'
+    config_out['dataset']['edge_encoder_num_types'] = 4
+    config_out['train']['eval_period'] = 1
+    config_out['train']['ckpt_period'] = 100
+    config_out['train']['batch_size'] = 128
+    if args.dataset == 'peptides-func':
+        config_out['model']['loss_fun'] = 'cross_entropy'
+        config_out['model']['graph_pooling'] = 'mean'
+    else:
+        config_out['model']['loss_fun'] = 'l1'
+        config_out['model']['graph_pooling'] = 'mean'
+    if 'gt' in config_out:
+        config_out['gt']['layers'] = 4
+        config_out['gt']['n_heads'] = 4
+        config_out['gt']['batch_norm'] = True
+    config_out['gnn']['head'] = 'default'
+    config_out['optim']['max_epoch'] = 200
+    config_out['optim']['num_warmup_epochs'] = 10
 
 if args.model == 'GraphMLPMixer':
     config_out['gnn']['head'] = 'mlp_mixer_graph'
-
+if len(args.model.split('+'))>1:
+    config_out['dataset']['node_encoder_name'] += '+'+args.model.split('+')[1]
 
 with open(f'configs/{args.model}/{args.dataset}-{args.model}.yaml', 'w') as f:
     yaml.dump(config_out, f, default_flow_style=False)

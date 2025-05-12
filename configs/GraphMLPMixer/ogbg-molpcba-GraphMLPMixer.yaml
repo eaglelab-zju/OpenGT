@@ -1,4 +1,4 @@
-accelerator: cuda:2
+accelerator: cuda:1
 dataset:
   edge_encoder: true
   edge_encoder_bn: false
@@ -10,7 +10,7 @@ dataset:
   node_encoder_name: Atom
   split_mode: standard
   task: graph
-  task_type: classification
+  task_type: classification_multilabel
   transductive: false
 gnn:
   act: gelu
@@ -85,7 +85,7 @@ posenc_RWSE:
   model: Linear
   raw_norm_type: BatchNorm
 train:
-  batch_size: 32
+  batch_size: 512
   ckpt_period: 100
   enable_ckpt: false
   eval_period: 1

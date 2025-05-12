@@ -1,13 +1,15 @@
-accelerator: cuda:4
+accelerator: cuda:1
 dataset:
   edge_encoder: true
   edge_encoder_bn: false
   edge_encoder_name: Bond
+  edge_encoder_num_types: 4
   format: OGB
-  name: ogbgmolpcba
+  name: peptides-functional
   node_encoder: true
   node_encoder_bn: false
   node_encoder_name: Atom
+  node_encoder_num_types: 20
   split_mode: standard
   task: graph
   task_type: classification_multilabel
@@ -18,7 +20,7 @@ gnn:
   batchnorm: true
   dim_inner: 96
   dropout: 0.2
-  head: san_graph
+  head: mlp_mixer_graph
   layers_post_mp: 1
   layers_pre_mp: 0
   normalize_adj: false
@@ -28,25 +30,37 @@ gt:
   attn_dropout: 0.5
   batch_norm: true
   dim_hidden: 96
-  dropout: 0.5
+  dropout: 0.2
   layer_norm: false
   layer_type: GCN+Transformer
-  layers: 8
+  layers: 4
+  mlpmixer_dropout: 0.0
+  mlpmixer_layers: 4
   n_heads: 4
-metric_best: auc
+  pooling: mean
+metis:
+  drop_rate: 0.3
+  enable: true
+  num_hops: 1
+  online: true
+  patch_num_diff: -1
+  patch_rw_dim: 0
+  patches: 32
+metric_agg: argmax
+metric_best: ap
 model:
   edge_decoding: dot
   graph_pooling: mean
   loss_fun: cross_entropy
-  type: Graphtransformer
+  type: GraphMLPMixer
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
-  max_epoch: 100
-  num_warmup_epochs: 20
+  max_epoch: 200
+  num_warmup_epochs: 10
   optimizer: adamW
   scheduler: cosine_with_warmup
-  weight_decay: 5e-4
+  weight_decay: 1e-5
 out_dir: results
 posenc_GraphormerBias:
   enable: false
@@ -60,7 +74,7 @@ posenc_LapPE:
     eigvec_norm: L2
     laplacian_norm: none
     max_freqs: 4
-  enable: true
+  enable: false
   layers: 2
   model: DeepSet
   n_heads: 4
@@ -73,12 +87,12 @@ posenc_RWSE:
   model: Linear
   raw_norm_type: BatchNorm
 train:
-  batch_size: 32
+  batch_size: 128
   ckpt_period: 100
   enable_ckpt: false
   eval_period: 1
   mode: custom
   sampler: full_batch
 wandb:
-  project: molpcba
+  project: peptides-func
   use: false

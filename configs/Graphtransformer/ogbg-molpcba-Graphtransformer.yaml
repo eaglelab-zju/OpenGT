@@ -1,4 +1,4 @@
-accelerator: cuda:4
+accelerator: cuda:1
 dataset:
   edge_encoder: true
   edge_encoder_bn: false
@@ -10,7 +10,7 @@ dataset:
   node_encoder_name: Atom
   split_mode: standard
   task: graph
-  task_type: classification
+  task_type: classification_multilabel
   transductive: false
 gnn:
   act: gelu
@@ -33,7 +33,8 @@ gt:
   layer_type: GCN+Transformer
   layers: 8
   n_heads: 4
-metric_best: auc
+metric_agg: argmax
+metric_best: ap
 model:
   edge_decoding: dot
   graph_pooling: mean
@@ -43,7 +44,7 @@ optim:
   base_lr: 0.0005
   clip_grad_norm: true
   max_epoch: 100
-  num_warmup_epochs: 20
+  num_warmup_epochs: 10
   optimizer: adamW
   scheduler: cosine_with_warmup
   weight_decay: 5e-4
@@ -73,12 +74,12 @@ posenc_RWSE:
   model: Linear
   raw_norm_type: BatchNorm
 train:
-  batch_size: 32
+  batch_size: 512
   ckpt_period: 100
   enable_ckpt: false
   eval_period: 1
   mode: custom
   sampler: full_batch
 wandb:
-  project: molpcba
+  project: ogbg-molpcba
   use: false
