@@ -16,6 +16,6 @@ for model in "${models[@]}"; do
 		python configs_gen2.py --model "$model" --dataset "$dataset" --dataset0 wn-chameleon --accelerator cuda:3
 		
 		# Run the main script with the generated configuration
-		python main.py --repeat 3 --cfg "configs/$model/$dataset-$model.yaml"
+		#python main.py --repeat 3 --cfg "configs/$model/$dataset-$model.yaml"
 	done
 done

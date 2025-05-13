@@ -187,8 +187,12 @@ if args.dataset in ['peptides-func', 'peptides-struct']:
 
 if args.model == 'GraphMLPMixer':
     config_out['gnn']['head'] = 'mlp_mixer_graph'
+
 if args.dataset in ['zinc', 'ogbg-molhiv', 'ogbg-molpcba', 'peptides-func', 'peptides-struct']:
     if len(args.model.split('+'))>1:
+        pe_name = args.model.split('+')[1]
+        if pe_name == 'GE':
+            pe_name = 'GraphormerBias'
         config_out['dataset']['node_encoder_name'] += '+'+args.model.split('+')[1]
     elif args.model == 'DeGTA':
         config_out['dataset']['node_encoder_name'] += '+LapPE+RWSE'

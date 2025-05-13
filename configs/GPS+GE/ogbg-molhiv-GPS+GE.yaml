@@ -1,4 +1,4 @@
-accelerator: cuda:5
+accelerator: cuda:6
 dataset:
   edge_encoder: true
   edge_encoder_bn: false
@@ -33,6 +33,7 @@ gt:
   layer_type: GCN+Transformer
   layers: 8
   n_heads: 4
+metric_agg: argmax
 metric_best: auc
 model:
   edge_decoding: dot
@@ -79,5 +80,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: molhiv
+  project: ogbg-molhiv
   use: false
