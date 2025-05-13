@@ -187,8 +187,11 @@ if args.dataset in ['peptides-func', 'peptides-struct']:
 
 if args.model == 'GraphMLPMixer':
     config_out['gnn']['head'] = 'mlp_mixer_graph'
-if len(args.model.split('+'))>1:
-    config_out['dataset']['node_encoder_name'] += '+'+args.model.split('+')[1]
+if args.dataset in ['zinc', 'ogbg-molhiv', 'ogbg-molpcba', 'peptides-func', 'peptides-struct']:
+    if len(args.model.split('+'))>1:
+        config_out['dataset']['node_encoder_name'] += '+'+args.model.split('+')[1]
+    elif args.model == 'DeGTA':
+        config_out['dataset']['node_encoder_name'] += '+LapPE+RWSE'
 
 with open(f'configs/{args.model}/{args.dataset}-{args.model}.yaml', 'w') as f:
     yaml.dump(config_out, f, default_flow_style=False)

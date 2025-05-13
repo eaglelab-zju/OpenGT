@@ -157,3 +157,7 @@ def set_cfg_gt(cfg):
     # CoBFormer
 
     cfg.gt.use_patch_attn = True
+
+    # DeGTA
+
+    cfg.gt.K = 4

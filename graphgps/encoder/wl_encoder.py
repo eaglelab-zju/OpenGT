@@ -17,7 +17,7 @@ class WLSENodeEncoder(torch.nn.Module):
             raise ValueError(f"Invalid 'WLSE_num_types': {num_types}")
         
         if dim_emb - dim_pe < 0: # formerly 1, but you could have zero feature size
-            raise ValueError(f"LapPE size {dim_pe} is too large for "
+            raise ValueError(f"WLSE size {dim_pe} is too large for "
                              f"desired embedding size of {dim_emb}.")
 
         if expand_x and dim_emb - dim_pe > 0:
