@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-MODEL=DeGTA
-CONFIG=wn-chameleon-DeGTA
-GRID=wn-chameleon-DeGTA
+MODEL=GPS
+CONFIG=wn-chameleon-GPS
+GRID=wn-chameleon-GPS
 REPEAT=3
 MAX_JOBS=8
 
