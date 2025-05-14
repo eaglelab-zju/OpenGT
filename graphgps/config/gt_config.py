@@ -146,6 +146,8 @@ def set_cfg_gt(cfg):
 
     cfg.gt.attn.fwl = False
 
+    cfg.gt.attn.signed_sqrt = False
+
     # MLPMixer
 
     cfg.gt.mlpmixer_dropout = 0.

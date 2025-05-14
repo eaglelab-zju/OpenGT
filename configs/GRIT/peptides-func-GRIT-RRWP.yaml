@@ -28,7 +28,7 @@ posenc_RRWP:
 train:
   mode: custom
 #  batch_size: 32
-  batch_size: 16
+  batch_size: 128
   eval_period: 1
   ckpt_period: 100
 model:

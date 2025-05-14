@@ -46,7 +46,7 @@ posenc_RWSE:
   raw_norm_type: BatchNorm
 posenc_WLSE:
   enable: True
-  iterations: 5
+  iterations: 3
   dim_pe: 16
 train:
   mode: custom
