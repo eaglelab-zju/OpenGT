@@ -10,7 +10,7 @@ dataset:
   node_encoder_name: Atom+GraphormerBias
   split_mode: standard
   task: graph
-  task_type: classification
+  task_type: classification_multilabel
   transductive: false
 gnn:
   act: gelu
@@ -33,7 +33,8 @@ gt:
   layer_type: GCN+Transformer
   layers: 8
   n_heads: 4
-metric_best: auc
+metric_agg: argmax
+metric_best: ap
 model:
   edge_decoding: dot
   graph_pooling: mean
@@ -72,12 +73,12 @@ posenc_RWSE:
   model: Linear
   raw_norm_type: BatchNorm
 train:
-  batch_size: 32
+  batch_size: 512
   ckpt_period: 100
   enable_ckpt: false
   eval_period: 1
   mode: custom
   sampler: full_batch
 wandb:
-  project: molpcba
+  project: ogbg-molpcba
   use: false
