@@ -6,6 +6,7 @@ import numpy as np
 import networkx as nx
 import re
 import pymetis
+from torch_geometric.graphgym.config import cfg
 
 def random_walk(A, n_iter):
     # Geometric diffusion features with Random Walk
@@ -153,6 +154,42 @@ def combine_subgraphs(edge_index, subgraphs_nodes, subgraphs_edges, num_selected
     combined_subgraphs = node_label_mapper[combined_subgraphs]
     return combined_subgraphs
 
+def metis_partition(data, n_patches):
+    if hasattr(data, 'num_nodes'):
+        N = data.num_nodes  # Explicitly given number of nodes, e.g. ogbg-ppa
+    else:
+        N = data.x.shape[0]  # Number of nodes, including disconnected nodes.
+    if N < n_patches:
+        membership = torch.randperm(n_patches)
+    else:
+        # data augmentation
+        adjlist = data.edge_index.t()
+        G = nx.Graph()
+        G.add_nodes_from(np.arange(N))
+        G.add_edges_from(adjlist.tolist())
+        # metis partition
+        cuts, membership = pymetis.part_graph(n_patches, G)
+
+    assert len(membership) >= N
+    membership = torch.tensor(membership[:N])
+
+
+    patch = []
+    max_patch_size = -1
+    for i in range(n_patches):
+        patch.append(list())
+        patch[-1] = torch.where(membership == i)[0].tolist()
+        max_patch_size = max(max_patch_size, len(patch[-1]))
+
+    for i in range(len(patch)):
+        l = len(patch[i])
+        if l < max_patch_size:
+            patch[i] += [N] * (max_patch_size - l)
+
+    patch = torch.tensor(patch)
+
+    return patch
+
 class GraphPartitionTransform(object):
     def __init__(self, n_patches, metis=True, drop_rate=0.0, num_hops=1, is_directed=False, patch_rw_dim=0, patch_num_diff=0):
         super().__init__()
@@ -181,6 +218,8 @@ class GraphPartitionTransform(object):
         if self.metis:
             node_masks, edge_masks = metis_subgraph(
                 data, n_patches=self.n_patches, drop_rate=self.drop_rate, num_hops=self.num_hops, is_directed=self.is_directed)
+            if cfg.model.type == 'CoBFormer':
+                data.patch = metis_partition(data, n_patches=self.n_patches)
         else:
             node_masks, edge_masks = random_subgraph(
                 data, n_patches=self.n_patches, num_hops=self.num_hops)
@@ -206,3 +245,5 @@ class GraphPartitionTransform(object):
 
         data.__num_nodes__ = data.num_nodes  # set number of nodes of the current graph
         return data
+
+

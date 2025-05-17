@@ -87,7 +87,7 @@ def set_cfg_gt(cfg):
     # DIFFormer
     cfg.gt.kernel = "simple"
 
-    cfg.gt.alpha = 0.1
+    cfg.gt.alpha = 0.1   # also used by CoBFormer, cannot be 0
 
     cfg.gt.use_source = True
 
@@ -112,7 +112,7 @@ def set_cfg_gt(cfg):
 
     cfg.gt.edge_loss_weight = 0.1
 
-    cfg.gt.tau = 1.0
+    cfg.gt.tau = 1.0   # also used by CoBFormer
 
     # GRIT
 
@@ -146,6 +146,8 @@ def set_cfg_gt(cfg):
 
     cfg.gt.attn.fwl = False
 
+    cfg.gt.attn.signed_sqrt = False
+
     # MLPMixer
 
     cfg.gt.mlpmixer_dropout = 0.
@@ -153,3 +155,11 @@ def set_cfg_gt(cfg):
     cfg.gt.mlpmixer_layers = 4
 
     cfg.gt.pooling = 'mean'
+
+    # CoBFormer
+
+    cfg.gt.use_patch_attn = True
+
+    # DeGTA
+
+    cfg.gt.K = 4

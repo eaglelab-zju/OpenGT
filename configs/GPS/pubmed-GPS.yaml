@@ -1,4 +1,4 @@
-accelerator: cuda:0
+accelerator: cuda:1
 dataset:
   edge_encoder: false
   edge_encoder_bn: false
@@ -28,11 +28,11 @@ gt:
   attn_dropout: 0.5
   batch_norm: false
   dim_hidden: 96
-  dropout: 0.2
+  dropout: 0.5
   layer_norm: false
   layer_type: GCN+Transformer
   layers: 3
-  n_heads: 4
+  n_heads: 1
 metric_best: accuracy
 model:
   edge_decoding: dot

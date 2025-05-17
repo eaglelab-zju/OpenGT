@@ -15,6 +15,18 @@ for folder_name in os.listdir(results_dir):
 		# Split folder name into dataset and model
 		try:
 			dataset, model = folder_name.rsplit("-", 1)
+			if dataset in ["ogbg-molhiv"]:
+				crit = "auc"
+				better = lambda x, y: x > y  # Higher is better for AUC
+			elif dataset in ["ogbg-molpcba", "peptides-func"]:
+				crit = "ap"
+				better = lambda x, y: x > y  # Higher is better for AP
+			elif dataset in ["zinc", "peptides-struct"]:
+				crit = "mae"
+				better = lambda x, y: x < y  # Lower is better for MSE/MAE
+			else:
+				crit = "accuracy"
+				better = lambda x, y: x > y  # Higher is better for accuracy
 		except ValueError:
 			print(f"Skipping folder with invalid name format: {folder_name}")
 			continue
@@ -49,10 +61,76 @@ for folder_name in os.listdir(results_dir):
 			"mae_std": metrics.get("mae_std", "N/A"),
 			"auc": metrics.get("auc", "N/A"),
 			"auc_std": metrics.get("auc_std", "N/A"),
+			"ap": metrics.get("ap", "N/A"),
+			"ap_std": metrics.get("ap_std", "N/A"),
 		}
 
+		# Collect time statistics
+		times = []
+		for run_id in os.listdir(folder_path):
+			if not run_id.isdigit():
+				continue
+			run_path = os.path.join(folder_path, run_id)
+			val_stats_path = os.path.join(run_path, "val", "stats.json")
+			train_stats_path = os.path.join(run_path, "train", "stats.json")
+
+			if not os.path.exists(val_stats_path) or not os.path.exists(train_stats_path):
+				print(f"Skipping run '{run_id}' of model '{model}' on dataset '{dataset}' due to missing stats.json files.")
+				continue
+
+			# Get the best epoch from val/stats.json
+			with open(val_stats_path, "r") as f:
+				best_epoch = 0
+				best_value = None
+				for line in f:
+					try:
+						val_data = json.loads(line)
+						if val_data.get(crit) is not None:
+							if best_value is None or better(val_data[crit], best_value):
+								best_value = val_data[crit]
+								best_epoch = val_data.get("epoch", 0)
+						else:
+							print(f"Missing '{crit}' in val stats for run '{run_id}' of model '{model}' on dataset '{dataset}'.")
+							continue
+					except json.JSONDecodeError:
+						print(f"Skipping invalid JSON line in val stats for run '{run_id}' of model '{model}' on dataset '{dataset}'.")
+						continue
+				if best_epoch is None:
+					print(f"Missing 'best_epoch' in val stats for run '{run_id}' of model '{model}' on dataset '{dataset}'.")
+					continue
+
+			# Calculate total time up to the best epoch from train/stats.json
+			with open(train_stats_path, "r") as f:
+				epoch_times = []
+				for line in f:
+					try:
+						epoch_data = json.loads(line)
+						epoch_times.append(epoch_data.get("time_epoch", 0))
+					except json.JSONDecodeError:
+						print(f"Skipping invalid JSON line in train stats for run '{run_id}' of model '{model}' on dataset '{dataset}'.")
+						continue
+
+				if len(epoch_times) <= best_epoch:
+					print(f"Insufficient epoch times in train stats for run '{run_id}' of model '{model}' on dataset '{dataset}'.")
+					continue
+
+			total_time = sum(epoch_times[:best_epoch + 1])
+			times.append(total_time)
+
+		# Calculate average time and standard deviation
+		if times:
+			avg_time = sum(times) / len(times)
+			std_time = (sum((t - avg_time) ** 2 for t in times) / len(times)) ** 0.5
+			avg_time = round(avg_time, 5)
+			std_time = round(std_time, 5)
+			data[model][dataset]["time"] = avg_time
+			data[model][dataset]["time_std"] = std_time
+		else:
+			data[model][dataset]["time"] = "N/A"
+			data[model][dataset]["time_std"] = "N/A"
+
 # Write data to separate CSV files for each metric
-metrics_to_write = ["acc", "f1", "mse", "mae", "auc"]
+metrics_to_write = ["acc", "f1", "mse", "mae", "auc", "ap", "time"]
 for metric in metrics_to_write:
 	output_csv = f"results_summary_{metric}.csv"
 	with open(output_csv, "w", newline="") as csvfile:

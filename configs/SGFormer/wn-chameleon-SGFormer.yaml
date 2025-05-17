@@ -1,3 +1,4 @@
+accelerator: cuda:1
 out_dir: results
 metric_best: accuracy
 wandb:
@@ -47,7 +48,7 @@ train:
   sampler: full_batch
 #  sampler: saint_rw
 #  batch_size: 32
-  eval_period: 5
+  eval_period: 1
   enable_ckpt: False
 #  ckpt_period: 100
 model:
@@ -56,8 +57,8 @@ model:
   edge_decoding: dot
 gt:
   layer_type: GCN+Transformer
-  layers: 2
-  n_heads: 2
+  layers: 4
+  n_heads: 3
   use_weight: True
   use_residual: True
   use_act: True
@@ -65,7 +66,7 @@ gt:
   dropout: 0.5
   attn_dropout: 0.5
   use_graph: True
-  graph_weight: 0.8
+  graph_weight: 0.2
   aggregate: add
   layer_norm: False
   batch_norm: False

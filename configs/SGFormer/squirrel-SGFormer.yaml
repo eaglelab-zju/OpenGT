@@ -29,11 +29,11 @@ gt:
   batch_norm: false
   dim_hidden: 96
   dropout: 0.5
-  graph_weight: 0.8
+  graph_weight: 0.2
   layer_norm: false
   layer_type: GCN+Transformer
-  layers: 2
-  n_heads: 2
+  layers: 4
+  n_heads: 3
   use_act: true
   use_graph: true
   use_residual: true
@@ -78,7 +78,7 @@ posenc_RWSE:
   raw_norm_type: BatchNorm
 train:
   enable_ckpt: false
-  eval_period: 5
+  eval_period: 1
   mode: custom
   sampler: full_batch
 wandb:

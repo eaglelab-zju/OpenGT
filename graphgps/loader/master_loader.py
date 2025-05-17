@@ -350,6 +350,7 @@ def load_dataset_master(format, name, dataset_dir):
                   + f'{elapsed:.2f}'[-3:]
         logging.info(f"Done! Took {timestr}")
     
+    
     dataset.data['extra_loss'] = torch.Tensor([0.0])
 
     # This could not be done earlier because the training wants 'train_mask' etc.

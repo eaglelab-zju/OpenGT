@@ -1,8 +1,9 @@
+accelerator: cuda:2
 out_dir: results
 metric_best: mae
 metric_agg: argmin
 wandb:
-  use: True
+  use: False
   project: peptides-struct
 dataset:
   format: OGB

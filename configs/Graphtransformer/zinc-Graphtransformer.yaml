@@ -8,7 +8,7 @@ dataset:
   name: subset
   node_encoder: true
   node_encoder_bn: false
-  node_encoder_name: TypeDictNode
+  node_encoder_name: TypeDictNode+LapPE
   node_encoder_num_types: 28
   split_mode: standard
   task: graph

@@ -59,11 +59,13 @@ class PeptidesStructuralDataset(InMemoryDataset):
         self.md5sum_stratified_split = '5a0114bdadc80b94fc7ae974f13ef061'
 
         # Check version and update if necessary.
+        '''
         release_tag = osp.join(self.folder, self.version)
         if osp.isdir(self.folder) and (not osp.exists(release_tag)):
             print(f"{self.__class__.__name__} has been updated.")
             if input("Will you update the dataset now? (y/N)\n").lower() == 'y':
                 shutil.rmtree(self.folder)
+        '''
 
         super().__init__(self.folder, transform, pre_transform)
         self.data, self.slices = torch.load(self.processed_paths[0])
@@ -128,7 +130,9 @@ class PeptidesStructuralDataset(InMemoryDataset):
             data.edge_attr = torch.from_numpy(graph['edge_feat']).to(
                 torch.int64)
             data.x = torch.from_numpy(graph['node_feat']).to(torch.int64)
-            data.y = torch.Tensor([y])
+            # data.y = torch.Tensor([y]) # deprecated warning
+            data.y = torch.Tensor([list(y)])
+            # print(data.y, data.y.shape)
 
             data_list.append(data)
 

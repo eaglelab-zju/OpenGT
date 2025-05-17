@@ -18,6 +18,7 @@ dataset:
   edge_encoder_bn: False
 posenc_GraphormerBias:
   enable: True
+  node_degrees_only: True
   num_spatial_types: 20
   num_in_degrees: 729
   num_out_degrees: 89
@@ -55,10 +56,10 @@ model:
   edge_decoding: dot
 gt:
   layer_type: GCN+Transformer
-  layers: 3
-  n_heads: 4
+  layers: 1
+  n_heads: 2
   dim_hidden: 96  # `gt.dim_hidden` must match `gnn.dim_inner`
-  dropout: 0.2
+  dropout: 0.5
   attn_dropout: 0.5
   layer_norm: False
   batch_norm: False

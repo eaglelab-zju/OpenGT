@@ -1,0 +1,86 @@
+accelerator: cuda:6
+dataset:
+  edge_encoder: true
+  edge_encoder_bn: false
+  edge_encoder_name: Bond
+  edge_encoder_num_types: 4
+  format: OGB
+  name: peptides-structural
+  node_encoder: true
+  node_encoder_bn: false
+  node_encoder_name: Atom+GraphormerBias
+  node_encoder_num_types: 20
+  split_mode: standard
+  task: graph
+  task_type: regression
+  transductive: false
+gnn:
+  act: gelu
+  agg: mean
+  batchnorm: true
+  dim_inner: 96
+  dropout: 0.2
+  head: default
+  layers_post_mp: 1
+  layers_pre_mp: 0
+  normalize_adj: false
+graphormer:
+  use_graph_token: false
+gt:
+  attn_dropout: 0.5
+  batch_norm: true
+  dim_hidden: 96
+  dropout: 0.2
+  layer_norm: false
+  layer_type: GCN+Transformer
+  layers: 4
+  n_heads: 4
+metric_agg: argmin
+metric_best: mae
+model:
+  edge_decoding: dot
+  graph_pooling: mean
+  loss_fun: l1
+  type: GPSModel
+optim:
+  base_lr: 0.0005
+  clip_grad_norm: true
+  max_epoch: 200
+  num_warmup_epochs: 10
+  optimizer: adamW
+  scheduler: cosine_with_warmup
+  weight_decay: 1e-5
+out_dir: results
+posenc_GraphormerBias:
+  enable: true
+  num_in_degrees: 729
+  num_out_degrees: 89
+  num_spatial_types: 20
+posenc_LapPE:
+  dim_pe: 4
+  eigen:
+    eigvec_norm: L2
+    laplacian_norm: none
+    max_freqs: 4
+  enable: false
+  layers: 2
+  model: DeepSet
+  n_heads: 4
+  raw_norm_type: none
+posenc_RWSE:
+  dim_pe: 16
+  enable: false
+  kernel:
+    times_func: range(1,17)
+  model: Linear
+  raw_norm_type: BatchNorm
+train:
+  batch_size: 128
+  ckpt_period: 100
+  enable_ckpt: false
+  eval_period: 1
+  mode: custom
+  sampler: full_batch
+wandb:
+  project: peptides-struct
+  use: false

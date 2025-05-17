@@ -1,4 +1,4 @@
-accelerator: cuda:6
+accelerator: cuda:1
 out_dir: results
 metric_best: accuracy
 wandb:
@@ -12,14 +12,13 @@ dataset:
   transductive: True
   split_mode: standard
   node_encoder: True
-  node_encoder_name: LinearNode+WLPE
-#  node_encoder_name: LinearNode+GraphormerBias
+  node_encoder_name: LinearNode+GraphormerBias
   node_encoder_bn: False
   edge_encoder: False
   edge_encoder_name: DummyEdge
   edge_encoder_bn: False
 posenc_GraphormerBias:
-  enable: False
+  enable: True
   node_degrees_only: True
   num_spatial_types: 20
   num_in_degrees: 729
@@ -44,29 +43,31 @@ posenc_RWSE:
   model: Linear
   dim_pe: 16
   raw_norm_type: BatchNorm
-posenc_WLPE:
-  enable: True
-  iterations: 5
-  dim_pe: 16
 train:
   mode: custom
   sampler: full_batch
 #  sampler: saint_rw
 #  batch_size: 32
-  eval_period: 5
+  eval_period: 1
   enable_ckpt: False
 #  ckpt_period: 100
 model:
-  type: Graphtransformer
+  type: SGFormer
   loss_fun: cross_entropy
   edge_decoding: dot
 gt:
   layer_type: GCN+Transformer
-  layers: 2
-  n_heads: 2
+  layers: 4
+  n_heads: 3
+  use_weight: True
+  use_residual: True
+  use_act: True
   dim_hidden: 96  # `gt.dim_hidden` must match `gnn.dim_inner`
   dropout: 0.5
   attn_dropout: 0.5
+  use_graph: True
+  graph_weight: 0.2
+  aggregate: add
   layer_norm: False
   batch_norm: False
 gnn:

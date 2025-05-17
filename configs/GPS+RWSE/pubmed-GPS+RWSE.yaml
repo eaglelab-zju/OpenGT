@@ -1,3 +1,4 @@
+accelerator: cuda:1
 dataset:
   edge_encoder: false
   edge_encoder_bn: false

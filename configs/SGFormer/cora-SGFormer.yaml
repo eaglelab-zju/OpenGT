@@ -1,4 +1,4 @@
-accelerator: cuda:1
+accelerator: cuda:3
 dataset:
   edge_encoder: false
   edge_encoder_bn: false
@@ -28,12 +28,12 @@ gt:
   attn_dropout: 0.5
   batch_norm: false
   dim_hidden: 96
-  dropout: 0.5
+  dropout: 0.8
   graph_weight: 0.8
   layer_norm: false
   layer_type: GCN+Transformer
   layers: 2
-  n_heads: 2
+  n_heads: 1
   use_act: true
   use_graph: true
   use_residual: true
@@ -78,7 +78,7 @@ posenc_RWSE:
   raw_norm_type: BatchNorm
 train:
   enable_ckpt: false
-  eval_period: 5
+  eval_period: 1
   mode: custom
   sampler: full_batch
 wandb:

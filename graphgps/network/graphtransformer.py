@@ -27,7 +27,7 @@ class Graphtransformer(nn.Module):
         convlist = []
 
         for i in range(cfg.gt.layers):
-            convlist.append((GeneralLayer(cfg.gt.layer_type.split('+')[0].lower()+'conv', new_layer_config(dim_in = cfg.gt.dim_hidden, dim_out = cfg.gt.dim_hidden, has_bias = True, has_act = False, num_layers = 1, cfg = cfg)), 'x -> x'))
+            convlist.append((GeneralLayer(cfg.gt.layer_type.split('+')[0].lower()+'conv', new_layer_config(dim_in = cfg.gt.dim_hidden, dim_out = cfg.gt.dim_hidden, has_bias = True, has_act = False, num_layers = cfg.gnn.layers, cfg = cfg)), 'x -> x'))
         
         self.convs = Sequential('x', convlist)
 
