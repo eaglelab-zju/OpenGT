@@ -1,4 +1,4 @@
-accelerator: cuda:1
+accelerator: cuda:2
 out_dir: results
 metric_best: accuracy
 wandb:

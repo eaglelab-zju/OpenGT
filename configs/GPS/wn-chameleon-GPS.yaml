@@ -1,4 +1,4 @@
-accelerator: cuda:3
+accelerator: cuda:4
 out_dir: results
 metric_best: accuracy
 wandb:
@@ -63,7 +63,7 @@ gt:
   dim_hidden: 96  # `gt.dim_hidden` must match `gnn.dim_inner`
   dropout: 0.5
   attn_dropout: 0.5
-  layer_norm: False
+  layer_norm: True
   batch_norm: False
 gnn:
   head: node

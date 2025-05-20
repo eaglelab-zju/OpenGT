@@ -77,7 +77,7 @@ posenc_RWSE:
   raw_norm_type: BatchNorm
 train:
   enable_ckpt: false
-  eval_period: 5
+  eval_period: 1
   mode: custom
   sampler: full_batch
 wandb:

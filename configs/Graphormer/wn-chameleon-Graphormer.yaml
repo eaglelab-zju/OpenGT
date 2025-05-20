@@ -1,3 +1,4 @@
+accelerator: cuda:6
 out_dir: results
 metric_best: accuracy
 wandb:
@@ -35,7 +36,7 @@ model:
   edge_decoding: dot
 graphormer:
   use_graph_token: False
-  num_layers: 2
+  num_layers: 3
   num_heads: 4
   embed_dim: 64  # `graphormer.embed_dim` must match `gnn.dim_inner`
   dropout: 0.2

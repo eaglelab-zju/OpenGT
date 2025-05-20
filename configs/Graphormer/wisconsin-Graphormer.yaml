@@ -1,4 +1,4 @@
-accelerator: cuda:0
+accelerator: cuda:1
 dataset:
   edge_encoder: false
   edge_encoder_bn: false
@@ -29,7 +29,7 @@ graphormer:
   input_dropout: 0.0
   mlp_dropout: 0.2
   num_heads: 4
-  num_layers: 2
+  num_layers: 3
   use_graph_token: false
 metric_best: accuracy
 model:
@@ -53,7 +53,7 @@ posenc_GraphormerBias:
   num_spatial_types: 20
 train:
   enable_ckpt: false
-  eval_period: 5
+  eval_period: 1
   mode: custom
   sampler: full_batch
 wandb:

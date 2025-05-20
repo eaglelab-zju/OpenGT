@@ -1,4 +1,4 @@
-accelerator: cuda:4
+accelerator: cuda:3
 out_dir: results
 metric_best: accuracy
 wandb:
@@ -60,12 +60,12 @@ prep:
   rb_order: 2 # NodeFormer Special, must match `gt.rb_order`
 gt:
   layer_type: GCN+Transformer
-  layers: 2
-  n_heads: 2
+  layers: 3
+  n_heads: 3
   use_residual: True  # NodeFormer Special
   use_act: True  # NodeFormer Special
   dim_hidden: 96  # `gt.dim_hidden` must match `gnn.dim_inner`
-  dropout: 0.5
+  dropout: 0.2
   attn_dropout: 0.5
   layer_norm: False
   batch_norm: True

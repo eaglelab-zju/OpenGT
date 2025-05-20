@@ -1,4 +1,4 @@
-accelerator: cuda:1
+accelerator: cuda:6
 out_dir: results
 metric_best: ap
 wandb:

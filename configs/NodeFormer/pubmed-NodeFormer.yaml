@@ -1,4 +1,4 @@
-accelerator: cuda:0
+accelerator: cuda:3
 dataset:
   edge_encoder: false
   edge_encoder_bn: false
@@ -29,15 +29,18 @@ gt:
   batch_norm: true
   dim_hidden: 96
   dropout: 0.5
+  edge_loss_weight: 0.1
+  graph_weight: 0.8
   kernel_trans: softmax
   layer_norm: false
   layer_type: GCN+Transformer
-  layers: 2
-  n_heads: 2
+  layers: 3
+  n_heads: 1
   nb_random_features: 30
   rb_order: 2
   rb_trans: sigmoid
   use_act: true
+  use_edge_loss: true
   use_gumbel: true
   use_residual: true
 metric_best: accuracy
@@ -82,7 +85,7 @@ prep:
   rb_order: 2
 train:
   enable_ckpt: false
-  eval_period: 5
+  eval_period: 1
   mode: custom
   sampler: full_batch
 wandb:
