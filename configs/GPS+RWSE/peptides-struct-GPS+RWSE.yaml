@@ -1,4 +1,4 @@
-accelerator: cuda:2
+accelerator: cuda:6
 out_dir: results
 metric_best: mae
 metric_agg: argmin

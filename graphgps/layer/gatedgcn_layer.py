@@ -141,6 +141,10 @@ class GatedGCNGraphGymLayer(nn.Module):
     """GatedGCN layer.
     Residual Gated Graph ConvNets
     https://arxiv.org/pdf/1711.07553.pdf
+
+    Parameters:
+        in_dim (int): Number of input features. Handled by GraphGym.
+        out_dim (int): Number of output features. Handled by GraphGym.
     """
     def __init__(self, layer_config: LayerConfig, **kwargs):
         super().__init__()

@@ -224,13 +224,41 @@ class GlobalModel(nn.Module):
 
 
 class MultiLayer(nn.Module):
-    """Any combination of different models can be made here.
+    """
+    This layer can be used to combine different types of layers.
+    Adapted from https://github.com/hamed1375/Exphormer
+
+    Any combination of different models can be made here.
       Each layer can have several types of MPNN and Attention models combined.
       Examples:
       1. GCN
       2. GCN + Exphormer
       3. GINE + CustomGatedGCN
       4. GAT + CustomGatedGCN + Exphormer + Transformer
+    
+    Parameters:
+        dim_h (int): Number of input features.
+        model_types (list): List of model types to combine.
+        num_heads (int): Number of attention heads.
+        pna_degrees (list): List of degrees for PNAConv. Default: None.
+        equivstable_pe (bool): Whether to use EquivStableLapPE. Default: False.
+        dropout (float): Dropout rate. Default: 0.0.
+        attn_dropout (float): Attention dropout rate. Default: 0.0.
+        layer_norm (bool): Whether to use layer normalization. Default: False.
+        batch_norm (bool): Whether to use batch normalization. Default: True.
+        bigbird_cfg (dict): Configuration for BigBird layer. Default: None.
+        exp_edges_cfg (dict): Configuration for expander edges. Default: None.
+    
+    Input:
+        batch.x (torch.Tensor): Input node features.
+        batch.edge_index (torch.Tensor): Edge indices of the graph.
+        batch.edge_attr (torch.Tensor): Edge attributes of the graph.
+        batch.expander_edge_index (torch.Tensor): Expander edge indices.
+        batch.expander_edge_attr (torch.Tensor): Expander edge attributes.
+        batch.pe_EquivStableLapPE (torch.Tensor): EquivStableLapPE features.
+    
+    Output:
+        batch.x (torch.Tensor): Output node features after applying the combined layers.
     """
 
     def __init__(self, dim_h,

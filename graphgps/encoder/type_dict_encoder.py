@@ -80,6 +80,13 @@ Edge labels:
 
 @register_node_encoder('TypeDictNode')
 class TypeDictNodeEncoder(torch.nn.Module):
+    """
+    Generic node encoder for datasets with node features that consist of
+    only one type dictionary thus require a single nn.Embedding layer.
+
+    Parameters:
+        emb_dim (int): The dimension of the output node features.
+    """
     def __init__(self, emb_dim):
         super().__init__()
 
@@ -100,6 +107,13 @@ class TypeDictNodeEncoder(torch.nn.Module):
 
 @register_edge_encoder('TypeDictEdge')
 class TypeDictEdgeEncoder(torch.nn.Module):
+    """
+    Generic edge encoder for datasets with edge features that consist of
+    only one type dictionary thus require a single nn.Embedding layer.
+    
+    Parameters:
+        emb_dim (int): The dimension of the output edge features.
+    """
     def __init__(self, emb_dim):
         super().__init__()
 

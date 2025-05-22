@@ -10,6 +10,21 @@ from torch_geometric.graphgym.register import register_layer
 
 @register_layer('DeGTAConv')
 class DeGTAConv(torch.nn.Module):
+    """
+    Decouplized Graph Triple Attention Layer.
+    Adapted from https://github.com/wangxiaotang0906/DeGTA
+
+    Parameters:
+        dim_in (int): Number of input features. 
+    
+    Input:
+        batch.x (Tensor): Input node features. Should be concatenated from three different encoders.
+        batch.edge_index (Tensor): Edge indices of the graph.
+    
+    Output:
+        ret.x (Tensor): Output node features after applying the DeGTA layer.
+    """
+
     def __init__(
             self, dim_in
     ):

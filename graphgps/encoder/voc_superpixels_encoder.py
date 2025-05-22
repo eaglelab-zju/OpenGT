@@ -17,6 +17,13 @@ VOC_node_input_dim = 14
 
 @register_node_encoder('VOCNode')
 class VOCNodeEncoder(torch.nn.Module):
+    """
+    Dataset specific node encoder for VOCSuperpixels dataset.
+    Applies a linear transformation to the input node features.
+
+    Parameters:
+        emb_dim (int): The dimension of the output node features.
+    """
     def __init__(self, emb_dim):
         super().__init__()
 
@@ -31,6 +38,14 @@ class VOCNodeEncoder(torch.nn.Module):
 
 @register_edge_encoder('VOCEdge')
 class VOCEdgeEncoder(torch.nn.Module):
+    """
+    Dataset specific edge encoder for VOCSuperpixels dataset.
+    Applies a linear transformation to the input edge features.
+    
+    Parameters:
+        emb_dim (int): The dimension of the output edge features.
+    """
+
     def __init__(self, emb_dim):
         super().__init__()
 

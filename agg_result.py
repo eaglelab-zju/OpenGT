@@ -47,22 +47,24 @@ for folder_name in os.listdir(results_dir):
 		with open(best_json_path, "r") as f:
 			metrics = json.load(f)
 
+		process = lambda x: x if x == "N/A" else str(round(float(x),4))
+
 		# Record metrics
 		if model not in data:
 			data[model] = {}
 		data[model][dataset] = {
-			"acc": metrics.get("accuracy", "N/A"),
-			"acc_std": metrics.get("accuracy_std", "N/A"),
-			"f1": metrics.get("f1", "N/A"),
-			"f1_std": metrics.get("f1_std", "N/A"),
-			"mse": metrics.get("mse", "N/A"),
-			"mse_std": metrics.get("mse_std", "N/A"),
-			"mae": metrics.get("mae", "N/A"),
-			"mae_std": metrics.get("mae_std", "N/A"),
-			"auc": metrics.get("auc", "N/A"),
-			"auc_std": metrics.get("auc_std", "N/A"),
-			"ap": metrics.get("ap", "N/A"),
-			"ap_std": metrics.get("ap_std", "N/A"),
+			"acc": process(metrics.get("accuracy", "N/A")),
+			"acc_std": process(metrics.get("accuracy_std", "N/A")),
+			"f1": process(metrics.get("f1", "N/A")),
+			"f1_std": process(metrics.get("f1_std", "N/A")),
+			"mse": process(metrics.get("mse", "N/A")),
+			"mse_std": process(metrics.get("mse_std", "N/A")),
+			"mae": process(metrics.get("mae", "N/A")),
+			"mae_std": process(metrics.get("mae_std", "N/A")),
+			"auc": process(metrics.get("auc", "N/A")),
+			"auc_std": process(metrics.get("auc_std", "N/A")),
+			"ap": process(metrics.get("ap", "N/A")),
+			"ap_std": process(metrics.get("ap_std", "N/A")),
 		}
 
 		# Collect time statistics
@@ -121,8 +123,8 @@ for folder_name in os.listdir(results_dir):
 		if times:
 			avg_time = sum(times) / len(times)
 			std_time = (sum((t - avg_time) ** 2 for t in times) / len(times)) ** 0.5
-			avg_time = round(avg_time, 5)
-			std_time = round(std_time, 5)
+			avg_time = round(avg_time, 4)
+			std_time = round(std_time, 4)
 			data[model][dataset]["time"] = avg_time
 			data[model][dataset]["time_std"] = std_time
 		else:

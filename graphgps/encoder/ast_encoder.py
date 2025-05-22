@@ -35,12 +35,16 @@ max_depth = 20
 class ASTNodeEncoder(torch.nn.Module):
     """The Abstract Syntax Tree (AST) Node Encoder used for ogbg-code2 dataset.
 
+    Parameters:
+        emb_dim (int): Output node embedding dimension
+
     Input:
-        x: Default node feature. The first and second column represents node
+        batch.x (torch.Tensor): Default node feature. The first and second column represents node
             type and node attributes.
-        node_depth: The depth of the node in the AST.
+        batch.node_depth (torch.Tensor): The depth of the node in the AST.
+        
     Output:
-        emb_dim-dimensional vector
+        batch.x (torch.Tensor): emb_dim-dimensional vector
     """
 
     def __init__(self, emb_dim):
@@ -69,8 +73,14 @@ class ASTEdgeEncoder(torch.nn.Module):
     edge_attr[:,0]: whether it is AST edge (0) for next-token edge (1)
     edge_attr[:,1]: whether it is original direction (0) or inverse direction (1)
 
-    Args:
+    Parameters:
         emb_dim (int): Output edge embedding dimension
+
+    Input:
+        batch.edge_attr (torch.Tensor): Default edge feature.
+
+    Output:
+        batch.edge_attr (torch.Tensor): emb_dim-dimensional vector
     """
 
     def __init__(self, emb_dim):

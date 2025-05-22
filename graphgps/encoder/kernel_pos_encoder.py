@@ -18,9 +18,9 @@ class KernelPENodeEncoder(torch.nn.Module):
     If `expand_x` set True, original node features will be first linearly
     projected to (dim_emb - dim_pe) size and the concatenated with PE.
 
-    Args:
-        dim_emb: Size of final node embedding
-        expand_x: Expand node features `x` from dim_in to (dim_emb - dim_pe)
+    Parameters:
+        dim_emb (int): Size of final node embedding
+        expand_x (bool): Expand node features `x` from dim_in to (dim_emb - dim_pe)
     """
 
     kernel_type = None  # Instantiated type of the KernelPE, e.g. RWSE

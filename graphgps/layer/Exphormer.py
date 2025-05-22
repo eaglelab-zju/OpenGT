@@ -113,13 +113,38 @@ def get_activation(activation):
 
 class ExphormerFullLayer(nn.Module):
     """Exphormer attention + FFN
+    Adapted from https://github.com/hamed1375/Exphormer
+
+    Parameters:
+        in_dim (int): Number of input features.
+        out_dim (int): Number of output features.
+        num_heads (int): Number of attention heads.
+        dropout (float): Dropout rate.
+        dim_edge (int): Number of edge features. Default: None.
+        layer_norm (bool): Whether to use layer normalization. Default: False.
+        batch_norm (bool): Whether to use batch normalization. Default: True.
+        activation (str): Activation function. Default: 'relu'.
+        residual (bool): Whether to use residual connection. Default: True.
+        use_bias (bool): Whether to use bias in linear layers. Default: False.
+        use_virt_nodes (bool): Whether to use virtual nodes. Default: False.
+    
+    Input:
+        batch.x (Tensor): Input node features.
+        batch.edge_index (Tensor): Edge indices of the graph.
+        batch.expander_edge_attr (Tensor): Edge features for attention.
+        batch.expander_edge_index (Tensor): Edge indices for attention.
+        batch.virt_h (Tensor): Virtual node features.
+    
+    Output:
+        batch.x (Tensor): Output node features after applying the Exphormer layer.
+
     """
 
     def __init__(self, in_dim, out_dim, num_heads,
                  dropout=0.0,
                  dim_edge=None,
                  layer_norm=False, batch_norm=True,
-                 activation = 'reul',
+                 activation = 'relu',
                  residual=True, use_bias=False, use_virt_nodes=False):
         super().__init__()
 

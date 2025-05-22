@@ -6,6 +6,16 @@ from torch_geometric.graphgym.register import register_edge_encoder
 
 @register_edge_encoder('ERE')
 class EREdgeEncoder(torch.nn.Module):
+    """
+    Effective Resistance Edge Encoder
+
+    This encoder calculates the effective resistance edge embedding mentioned in https://arxiv.org/pdf/2206.11941
+
+    Parameters:
+        emb_dim (int): Size of final edge embedding
+        use_edge_attr (bool): If True, the edge attributes are prepended to the effective resistance embedding.
+        expand_edge_attr (bool): If True, the edge attributes are linearly projected to (dim_in - emb_dim) size. 
+    """
     def __init__(self, emb_dim, use_edge_attr=False, expand_edge_attr=False):
         super().__init__()
 

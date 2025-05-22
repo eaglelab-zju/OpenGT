@@ -15,6 +15,32 @@ from graphgps.layer.gine_conv_layer import GINEConvESLapPE
 
 class GPSLayer(nn.Module):
     """Local MPNN + full graph attention x-former layer.
+    Adapted from https://github.com/rampasek/GraphGPS
+
+    Parameters:
+        dim_h (int): Number of input features.
+        local_gnn_type (str): Type of local GNN model. Options: 'None', 'GCN', 'GIN', 'GENConv', 'GINE', 'GAT', 'PNA', 'CustomGatedGCN'.
+        global_model_type (str): Type of global attention model. Options: 'None', 'Transformer', 'BiasedTransformer', 'Performer', 'BigBird'.
+        num_heads (int): Number of attention heads.
+        act (str): Activation function. Default: 'relu'.
+        pna_degrees (list): Degrees for PNAConv. Default: None.
+        equivstable_pe (bool): Whether to use EquivStableLapPE. Default: False.
+        dropout (float): Dropout rate. Default: 0.0.
+        attn_dropout (float): Attention dropout rate. Default: 0.0.
+        layer_norm (bool): Whether to use layer normalization. Default: False.
+        batch_norm (bool): Whether to use batch normalization. Default: True.
+        bigbird_cfg (object): Configuration object for BigBird layer. Default: None.
+        log_attn_weights (bool): Whether to log attention weights. Default: False.
+
+    Input:
+        batch.x (Tensor): Input node features.
+        batch.edge_index (Tensor): Edge indices of the graph.
+        batch.edge_attr (Tensor): Edge attributes.
+        batch.pe_EquivStableLapPE (Tensor): EquivStableLapPE features.
+        batch.attn_bias (Tensor): Attention bias for BiasedTransformer.
+    
+    Output:
+        batch.x (Tensor): Output node features after applying the GPS layer.
     """
 
     def __init__(self, dim_h,

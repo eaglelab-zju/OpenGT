@@ -8,9 +8,10 @@ from torch_geometric.graphgym.register import register_layer
 @register_layer("feature_encoder")
 class FeatureEncoder(torch.nn.Module):
     """
-    Encoding node and edge features
+    Encodes node and edge features.
+    Receives the encoder type from the config file. 
 
-    Args:
+    Parameters:
         dim_in (int): Input feature dimension
     """
     def __init__(self, dim_in):

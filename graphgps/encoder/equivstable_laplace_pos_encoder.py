@@ -12,8 +12,16 @@ class EquivStableLapPENodeEncoder(torch.nn.Module):
     later used at the local GNN module as edge weights.
     Based on the approach proposed in paper https://openreview.net/pdf?id=e95i1IHcWj
     
-    Args:
+    Parameters:
         dim_emb: Size of final node embedding
+    
+    Input:
+        batch.EigVals (torch.Tensor): Eigenvalues of the graph Laplacian.
+        batch.EigVecs (torch.Tensor): Eigenvectors of the graph Laplacian.
+
+    Output:
+        batch.pe_EquivStableLapPE (torch.Tensor): Positional encoding of the
+            graph Laplacian eigenvalues and eigenvectors.
     """
 
     def __init__(self, dim_emb):

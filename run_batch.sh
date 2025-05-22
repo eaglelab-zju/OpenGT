@@ -2,9 +2,9 @@
 
 MODEL=GPS
 CONFIG=wn-chameleon-GPS
-GRID=wn-chameleon-GPS
+GRID=layer
 REPEAT=3
-MAX_JOBS=8
+MAX_JOBS=4
 
 # generate configs (after controlling computational budget)
 # please remove --config_budget, if don't control computational budget

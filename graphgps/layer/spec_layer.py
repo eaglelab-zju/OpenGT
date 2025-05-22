@@ -12,6 +12,24 @@ from torch_scatter import scatter
 
 @register_layer('SpecLayer')
 class SpecLayer(nn.Module):
+    """
+    SpecFormer Layer.
+    Adapted from https://github.com/DSL-Lab/Specformer
+
+    Parameters:
+        dim_out (int): Number of output features.
+        n_heads (int): Number of attention heads.
+        dropout (float): Dropout rate. Default: 0.0.
+        norm (str): Normalization type. Options are 'none', 'layer', 'batch'. Default: 'none'.
+    
+    Input:
+        batch.x (Tensor): Input node features.
+        batch.EigVecs (Tensor): Eigenvectors of the graph Laplacian.
+        batch.EigVals (Tensor): Eigenvalues of the graph Laplacian.
+    
+    Output:
+        ret.x (Tensor): Output node features after applying the SpecLayer.
+    """
 
     def __init__(self, dim_out, n_heads, dropout=0.0, norm='none'): # nbases=n_heads+1, ncombines=dim_out
         super(SpecLayer, self).__init__()

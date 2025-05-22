@@ -48,7 +48,7 @@ train:
   sampler: full_batch
 #  sampler: saint_rw
 #  batch_size: 32
-  eval_period: 5
+  eval_period: 1
   enable_ckpt: False
 #  ckpt_period: 100
 model:
@@ -80,6 +80,6 @@ optim:
   optimizer: adamW
   weight_decay: 5e-4
   base_lr: 0.0005
-  max_epoch: 800
+  max_epoch: 400
   scheduler: cosine_with_warmup
   num_warmup_epochs: 20

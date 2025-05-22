@@ -9,9 +9,17 @@ class GNNInductiveNodeHead(nn.Module):
     """
     GNN prediction head for inductive node prediction tasks.
 
-    Args:
+    Parameters:
         dim_in (int): Input dimension
         dim_out (int): Output dimension. For binary prediction, dim_out=1.
+    
+    Input:
+        batch.x (torch.Tensor): Node features.
+        batch.y (torch.Tensor): Node labels.
+    
+    Output:
+        pred (torch.Tensor): Predicted node labels.
+        true (torch.Tensor): True node labels.
     """
 
     def __init__(self, dim_in, dim_out):
@@ -25,5 +33,5 @@ class GNNInductiveNodeHead(nn.Module):
 
     def forward(self, batch):
         batch = self.layer_post_mp(batch)
-        pred, label = self._apply_index(batch)
-        return pred, label
+        pred, true = self._apply_index(batch)
+        return pred, true

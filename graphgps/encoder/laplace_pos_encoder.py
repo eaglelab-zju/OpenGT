@@ -13,9 +13,9 @@ class LapPENodeEncoder(torch.nn.Module):
     If `expand_x` set True, original node features will be first linearly
     projected to (dim_emb - dim_pe) size and the concatenated with LapPE.
 
-    Args:
-        dim_emb: Size of final node embedding
-        expand_x: Expand node features `x` from dim_in to (dim_emb - dim_pe)
+    Parameters:
+        dim_emb (int): Size of final node embedding
+        expand_x (bool): Expand node features `x` from dim_in to (dim_emb - dim_pe)
     """
 
     def __init__(self, dim_emb, expand_x=True):

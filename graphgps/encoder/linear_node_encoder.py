@@ -5,6 +5,12 @@ from torch_geometric.graphgym.register import register_node_encoder
 
 @register_node_encoder('LinearNode')
 class LinearNodeEncoder(torch.nn.Module):
+    """
+    Linear node encoder that applies a linear transformation to the input features.
+
+    Parameters:
+        emb_dim (int): The dimension of the output node features.
+    """
     def __init__(self, emb_dim):
         super().__init__()
         

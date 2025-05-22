@@ -1,5 +1,6 @@
 '''
-    The RRWP encoder for GRIT (ours)
+    The SPD encoder for GRIT
+    Adapted from https://github.com/LiamMa/GRIT
 '''
 import torch
 from torch import nn
@@ -22,8 +23,8 @@ def full_edge_index(edge_index, batch=None, total_nodes=None):
     Returns batched sparse adjacency matrices with exactly those edges that
     are not in the input `edge_index` while ignoring self-loops.
     Implementation inspired by `torch_geometric.utils.to_dense_adj`
-    Args:
-        edge_index: The edge indices.
+    Parameters:
+        edge_index (torch.Tensor): The edge indices.
         batch: Batch vector, which assigns each node to a specific example.
     Returns:
         Complementary edge index.
@@ -61,6 +62,17 @@ def full_edge_index(edge_index, batch=None, total_nodes=None):
 class SPDEdgeEncoder(torch.nn.Module):
     '''
         Shortest-path-distance (SPD) Embedding Encoder
+
+        Args:
+            in_dim (int): The input dimension of the edge features.
+            out_dim (int): The output dimension of the edge features.
+            batchnorm (bool): Whether to apply batch normalization. Default: False.
+            layernorm (bool): Whether to apply layer normalization. Default: False.
+            use_bias (bool): Whether to use bias in the linear layer. Default: False.
+            pad_to_full_graph (bool): Whether to pad to a full graph. Default: True.
+            pe_name (str): The name of the positional encoding. Default: "spd".
+            pad_0th (bool): Whether to pad the 0-th embedding with a zero vector. Default: False.
+            overwrite_old_attr (bool): Whether to overwrite old attributes. Default: False.
     '''
     def __init__(self, in_dim, out_dim,
                  batchnorm=False, layernorm=False, use_bias=False,

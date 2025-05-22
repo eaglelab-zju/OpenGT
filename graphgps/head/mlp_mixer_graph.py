@@ -10,12 +10,20 @@ class MLPMixerGraphHead(nn.Module):
     """
     Graph MLP Mixer prediction head for graph prediction tasks.
 
-    Note that this head is specially designed for Graph MLP Mixer. Cannot work on other models.
+    Note that this head is specially designed for Graph MLP Mixer (without pooling layer). Cannot work on other models.
 
-    Args:
+    Parameters:
         dim_in (int): Input dimension.
         dim_out (int): Output dimension. For binary prediction, dim_out=1.
         L (int): Number of hidden layers.
+    
+    Input:
+        batch.x (torch.Tensor): Graph embedding.
+        batch.y (torch.Tensor): Graph labels.
+    
+    Output:
+        pred (torch.Tensor): Predicted graph labels.
+        true (torch.Tensor): True graph labels.
     """
 
     def __init__(self, dim_in, dim_out, L=2):
@@ -39,5 +47,5 @@ class MLPMixerGraphHead(nn.Module):
             graph_emb = self.activation(graph_emb)
         graph_emb = self.FC_layers[self.L](graph_emb)
         batch.graph_feature = graph_emb
-        pred, label = self._apply_index(batch)
-        return pred, label
+        pred, true = self._apply_index(batch)
+        return pred, true

@@ -1,5 +1,6 @@
 '''
     The RRWP encoder for GRIT
+    Adapted from https://github.com/LiamMa/GRIT
 '''
 import torch
 from torch import nn
@@ -19,12 +20,12 @@ import warnings
 
 def full_edge_index(edge_index, batch=None):
     """
-    Retunr the Full batched sparse adjacency matrices given by edge indices.
+    Returns the Full batched sparse adjacency matrices given by edge indices.
     Returns batched sparse adjacency matrices with exactly those edges that
     are not in the input `edge_index` while ignoring self-loops.
     Implementation inspired by `torch_geometric.utils.to_dense_adj`
-    Args:
-        edge_index: The edge indices.
+    Parameters:
+        edge_index (torch.Tensor): The edge indices.
         batch: Batch vector, which assigns each node to a specific example.
     Returns:
         Complementary edge index.
@@ -63,7 +64,7 @@ class RRWPLinearNodeEncoder(torch.nn.Module):
         FC_1(RRWP) + FC_2 (Node-attr)
         note: FC_2 is given by the Typedict encoder of node-attr in some cases
         Parameters:
-        num_classes - the number of classes for the embedding mapping to learn
+        num_classes (int) - the number of classes for the embedding mapping to learn
     """
     def __init__(self, emb_dim, out_dim, use_bias=False, batchnorm=False, layernorm=False, pe_name="rrwp"):
         super().__init__()

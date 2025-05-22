@@ -8,9 +8,18 @@ class InferLinksHead(torch.nn.Module):
     """
     InferLinks prediction head for graph prediction tasks.
 
-    Args:
+    Parameters:
         dim_in (int): Input dimension.
         dim_out (int): Output dimension. For binary prediction, dim_out=1.
+    
+    Input:
+        batch.x (torch.Tensor): Node features.
+        batch.y (torch.Tensor): Edge labels.
+        batch.complete_edge_index (torch.Tensor): Edge indices for the complete graph.
+    
+    Output:
+        pred (torch.Tensor): Predicted edge labels.
+        true (torch.Tensor): True edge labels.
     """
 
     def __init__(self, dim_in, dim_out):

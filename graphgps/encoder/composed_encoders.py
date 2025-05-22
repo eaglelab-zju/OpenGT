@@ -23,7 +23,7 @@ def concat_node_encoders(encoder_classes, pe_enc_names):
     of the given list of two or three Encoder classes. First Encoder is expected
     to be a dataset-specific encoder, and the rest PE Encoders.
 
-    Args:
+    Parameters:
         encoder_classes: List of node encoder classes
         pe_enc_names: List of PE embedding Encoder names, used to query a dict
             with their desired PE embedding dims. That dict can only be created
@@ -34,7 +34,8 @@ def concat_node_encoders(encoder_classes, pe_enc_names):
     """
 
     class Concat2NodeEncoder(torch.nn.Module):
-        """Encoder that concatenates two node encoders.
+        """
+        Encoder that concatenates two node encoders.
         """
         enc1_cls = None
         enc2_cls = None
@@ -59,7 +60,8 @@ def concat_node_encoders(encoder_classes, pe_enc_names):
             return batch
 
     class Concat3NodeEncoder(torch.nn.Module):
-        """Encoder that concatenates three node encoders.
+        """
+        Encoder that concatenates three node encoders.
         """
         enc1_cls = None
         enc2_cls = None

@@ -5,6 +5,12 @@ from torch_geometric.graphgym.register import register_edge_encoder
 
 @register_edge_encoder('LinearEdge')
 class LinearEdgeEncoder(torch.nn.Module):
+    """
+    Linear edge encoder that applies a linear transformation to the edge features.
+
+    Parameters:
+        emb_dim (int): The dimension of the output edge features.
+    """
     def __init__(self, emb_dim):
         super().__init__()
         if cfg.dataset.name in ['MNIST', 'CIFAR10']:

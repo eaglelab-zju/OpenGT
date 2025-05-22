@@ -228,7 +228,38 @@ def add_conv_relational_bias(x, edge_index, b, trans='sigmoid'):
 @register_layer("NodeFormerConv")
 class NodeFormerConv(nn.Module):
 	'''
-	one layer of NodeFormer that attentive aggregates all nodes over a latent graph
+	One layer of NodeFormer that attentive aggregates all nodes over a latent graph
+	Adapted from https://github.com/qitianwu/NodeFormer
+
+	Parameters:
+		dim_in (int): Number of input features.
+		dim_out (int): Number of output features.
+		config (object): Configuration object containing hyperparameters.
+		    - rb_order (int): Order of relational bias
+			- rb_trans (str): Transformation for relational bias, either 'sigmoid' or 'identity'
+			- kernel_trans (str): Type of kernel transformation, either 'softmax' or 'relu'
+			- projection_matrix_type (str): Type of projection matrix, either 'a' or None
+			- nb_random_features (int): Number of random features
+			- use_gumbel (bool): Whether to use Gumbel sampling
+			- nb_gumbel_sample (int): Number of Gumbel samples
+			- use_edge_loss (bool): Whether to use edge loss
+			- use_bn (bool): Whether to use batch normalization
+			- use_residual (bool): Whether to use residual connection
+			- use_act (bool): Whether to use activation function
+			- dropout (float): Dropout rate
+			- tau (float): Temperature parameter for Gumbel softmax
+			- n_heads (int): Number of attention heads
+	
+	Input:
+		batch.x (torch.Tensor): Input node features.
+		batch.adjs (list): List of adjacency matrices for different orders of relational bias.
+		batch.extra_loss (torch.Tensor): Aggregated extra loss for edge regularization in previous layers.
+	
+	Output:
+		ret.x (torch.Tensor): Output node features after applying the NodeFormer layer.
+		ret.extra_loss (torch.Tensor): Aggregated extra loss for edge regularization.
+	
+
 	return: node embeddings for next layer, edge loss at this layer
 	'''
 	def __init__(self, dim_in, dim_out, config):

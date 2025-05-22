@@ -145,6 +145,29 @@ class MultiHeadAttentionLayerGritSparse(nn.Module):
 class GritTransformerLayer(nn.Module):
     """
         Proposed Transformer Layer for GRIT
+        Adapted from https://github.com/LiamMa/GRIT
+
+        Parameters:
+            in_dim (int): Number of input features.
+            out_dim (int): Number of output features.
+            num_heads (int): Number of attention heads.
+            dropout (float): Dropout rate.
+            attn_dropout (float): Attention dropout rate.
+            layer_norm (bool): Whether to use layer normalization.
+            batch_norm (bool): Whether to use batch normalization.
+            residual (bool): Whether to use residual connections.
+            act (str): Activation function ('relu', 'gelu', etc.).
+            norm_e (bool): Whether to normalize edge features.
+            O_e (bool): Whether to use edge features in the output.
+        
+        Input:
+            batch.x (torch.Tensor): Input node features.
+            batch.edge_index (torch.Tensor): Edge indices of the graph.
+            batch.edge_attr (torch.Tensor): Edge attributes.
+        
+        Output:
+            batch.x (torch.Tensor): Output node features after applying the GritTransformer layer.
+            batch.edge_attr (torch.Tensor): Updated edge attributes.
     """
     def __init__(self, in_dim, out_dim, num_heads,
                  dropout=0.0,
@@ -197,7 +220,7 @@ class GritTransformerLayer(nn.Module):
             no_qk=cfg.attn.get("no_qk", False),
         )
 
-        if cfg.attn.get('graphormer_attn', False):
+        if cfg.attn.get('graphormer_attn', False): # not used in GRIT
             self.attention = MultiHeadAttentionLayerGraphormerSparse(
                 in_dim=in_dim,
                 out_dim=out_dim // num_heads,

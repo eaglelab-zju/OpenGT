@@ -15,7 +15,7 @@ def pyg_softmax(src, index, num_nodes=None):
     along the first dimension based on the indices specified in :attr:`index`,
     and then proceeds to compute the softmax individually for each group.
 
-    Args:
+    Parameters:
         src (Tensor): The source tensor.
         index (LongTensor): The indices of elements for applying the softmax.
         num_nodes (int, optional): The number of nodes, *i.e.*

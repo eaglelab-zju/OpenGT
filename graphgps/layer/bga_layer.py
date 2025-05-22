@@ -106,6 +106,24 @@ class FFN(nn.Module):
 
 @register_layer('BGALayer')
 class BGALayer(nn.Module):
+    """
+    Bilevel Graph Attention Layer. Used in CoBFormer model.
+    Adapted from https://github.com/null-xyj/CoBFormer
+
+    Parameters:
+        n_head (int): Number of attention heads. Handled by GraphGym.
+        channels (int): Number of input channels. Handled by GraphGym.
+        dropout (float): Dropout rate.
+    
+    Input:
+        x (Tensor): Input node features.
+        patch (Tensor): Patch indices.
+        attn_mask (Tensor): Attention mask.
+        need_attn (bool): Whether to return attention weights.
+    
+    Output:
+        x (Tensor): Output node features after applying the BGA layer.
+    """
     def __init__(self, n_head, channels, dropout=0.1):
         super(BGALayer, self).__init__()
         dropout = dropout

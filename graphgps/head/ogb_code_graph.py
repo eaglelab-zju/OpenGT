@@ -10,7 +10,7 @@ class OGBCodeGraphHead(nn.Module):
     """
     Sequence prediction head for ogbg-code2 graph-level prediction tasks.
 
-    Args:
+    Parameters:
         dim_in (int): Input dimension.
         dim_out (int): IGNORED, kept for GraphGym framework compatibility
         L (int): Number of hidden layers.
@@ -41,5 +41,5 @@ class OGBCodeGraphHead(nn.Module):
             pred_list.append(self.graph_pred_linear_list[i](graph_emb))
         batch.pred_list = pred_list
 
-        pred, label = self._apply_index(batch)
-        return pred, label
+        pred, true = self._apply_index(batch)
+        return pred, true

@@ -4,6 +4,19 @@ from torch_geometric.graphgym.config import cfg
 import math
 
 class SineEncoder(nn.Module):
+    """
+    SineEncoder encodes the eigenvalues of the graph Laplacian into a higher dimensional space using sine and cosine functions.
+    It is used in SpecFormer model.
+
+    Parameters:
+        hidden_dim (int): The dimension of the hidden layer.
+    
+    Input:
+        batch.x (torch.Tensor): Eigenvalues of the graph Laplacian. 
+    
+    Output:
+        batch.x (torch.Tensor): Encoded eigenvalues in a higher dimensional space.
+    """
     def __init__(self, hidden_dim=128):
         super(SineEncoder, self).__init__()
         self.constant = 100

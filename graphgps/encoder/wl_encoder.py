@@ -5,6 +5,15 @@ from torch_geometric.graphgym.register import register_node_encoder
 
 @register_node_encoder('WLSE')
 class WLSENodeEncoder(torch.nn.Module):
+    """
+    Encodes the Weisfeiler-Lehman subgraph type of each node in the graph.
+
+    Parameters:
+        dim_emb (int): The dimension of the embedding.
+        expand_x (bool): If True, expands the input node features by the
+            embedding dimension. Default: True.
+    
+    """
     def __init__(self, dim_emb, expand_x = True):
         super().__init__()
         dim_in = cfg.share.dim_in

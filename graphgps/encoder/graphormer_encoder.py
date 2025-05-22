@@ -29,12 +29,12 @@ def graphormer_pre_processing(data, distance):
     concept to decompose the spatial type matrix and the shortest path edge type tensor
     via the ``graph_index`` tensor.
 
-    Args:
-        data: A PyG data object holding a single graph
-        distance: The distance up to which types are calculated
+    Parameters:
+        data (torch_geometric.data.Data): A PyG data object holding a single graph
+        distance (int): The distance up to which types are calculated
 
     Returns:
-        The augmented data object.
+        data (torch_geometric.data.Data): The augmented data object.
     """
     graph: nx.DiGraph = to_networkx(data)
 
@@ -118,11 +118,11 @@ class BiasEncoder(torch.nn.Module):
         https://github.com/microsoft/Graphormer/tree/v1.0
         Note that this refers to v1 of Graphormer.
 
-        Args:
-            num_heads: The number of heads of the Graphormer model
-            num_spatial_types: The total number of different spatial types
-            num_edge_types: The total number of different edge types
-            use_graph_token: If True, pads the attn_bias to account for the
+        Parameters:
+            num_heads (int): The number of heads of the Graphormer model
+            num_spatial_types (int): The total number of different spatial types
+            num_edge_types (int): The total number of different edge types
+            use_graph_token (bool): If True, pads the attn_bias to account for the
             additional graph token that can be added by the ``NodeEncoder``.
         """
         super().__init__()
@@ -198,12 +198,12 @@ def add_graph_token(data, token):
     with a graph token each. Note that the token is
     automatically replicated to fit the batch.
 
-    Args:
-        data: A PyG data object holding a single graph
-        token: A tensor containing the graph token values
+    Parameters:
+        data (torch_geometric.data.Data): A PyG data object holding a single graph
+        token (torch.Tensor): A tensor containing the graph token values
 
     Returns:
-        The augmented data object.
+        data (torch_geometric.data.Data): The augmented data object.
     """
     B = len(data.batch.unique())
     tokens = torch.repeat_interleave(token, B, 0)
@@ -224,12 +224,12 @@ class NodeEncoder(torch.nn.Module):
         https://github.com/microsoft/Graphormer/tree/v1.0
         Note that this refers to v1 of Graphormer.
 
-        Args:
-            embed_dim: The number of hidden dimensions of the model
-            num_in_degree: Maximum size of in-degree to encode
-            num_out_degree: Maximum size of out-degree to encode
-            input_dropout: Dropout applied to the input features
-            use_graph_token: If True, adds the graph token to the incoming batch.
+        Parameters:
+            embed_dim (int): The number of hidden dimensions of the model
+            num_in_degree (int): Maximum size of in-degree to encode
+            num_out_degree (int): Maximum size of out-degree to encode
+            input_dropout (float): Dropout applied to the input features
+            use_graph_token (bool): If True, adds the graph token to the incoming batch.
         """
         super().__init__()
         self.in_degree_encoder = torch.nn.Embedding(num_in_degree, embed_dim)

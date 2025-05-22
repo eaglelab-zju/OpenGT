@@ -10,9 +10,18 @@ class GraphormerHead(torch.nn.Module):
     """
     Graphormer prediction head for graph prediction tasks.
 
-    Args:
+    Parameters:
         dim_in (int): Input dimension.
         dim_out (int): Output dimension. For binary prediction, dim_out=1.
+    
+    Input:
+        batch.x (torch.Tensor): Node features.
+        batch.y (torch.Tensor): Graph labels.
+        batch.batch (torch.Tensor): Batch indices.
+    
+    Output:
+        pred (torch.Tensor): Predicted graph labels.
+        true (torch.Tensor): True graph labels.
     """
 
     def __init__(self, dim_in, dim_out):
@@ -33,5 +42,5 @@ class GraphormerHead(torch.nn.Module):
         graph_emb = self.pooling_fun(x, batch.batch)
         graph_emb = self.layers(graph_emb)
         batch.graph_feature = graph_emb
-        pred, label = self._apply_index(batch)
-        return pred, label
+        pred, true = self._apply_index(batch)
+        return pred, true

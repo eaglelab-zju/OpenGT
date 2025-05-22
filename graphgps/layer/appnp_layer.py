@@ -8,31 +8,29 @@ from torch_geometric.graphgym.config import cfg
 
 @register_layer("appnpconv")
 class APPNP(nn.Module):
-	def __init__(self, layer_config: LayerConfig, **kwargs):
-		"""
-		Wrapper layer for the APPNP layer from torch_geometric.nn.
+	"""
+	Wrapper layer for the APPNP layer from torch_geometric.nn.
 
-		Args:
-			dim_in (int): Number of input features.
-			dim_out (int): Number of output features.
-			K (int): Number of propagation steps. Default is 10.
-			alpha (float): Teleport probability. Default is 0.1.
-		"""
+	Parameters:
+		dim_in (int): Number of input features. Handled by GraphGym.
+		dim_out (int): Number of output features. Handled by GraphGym.
+		K (int): Number of propagation steps. Default is 10.
+		alpha (float): Teleport probability. Default is 0.1.
+	
+	Input:
+		batch.x (Tensor): Input node features of shape.
+		batch.edge_index (Tensor): Edge indices of the graph.
+
+	Output:
+		ret.x (Tensor): Output node features after applying the APPNP layer.
+	"""
+	def __init__(self, layer_config: LayerConfig, **kwargs):
 		super(APPNP, self).__init__()
 		K = 10
 		alpha = 0.1
 		self.appnp = pygnn.APPNP(K=K, alpha=alpha, dropout=0., add_self_loops=False) # Dropout is handled in GraphGym Wrapper
 
 	def forward(self, batch):
-		"""
-		Forward pass for the APPNPWrapper.
-
-		Args:
-			batch (torch_geometric.data.Batch): Input batch containing node features and edge indices.
-
-		Returns:
-			Tensor: Output node features of shape [num_nodes, out_channels].
-		"""
 		x = batch.x
 		edge_index = batch.edge_index
 		x = self.appnp(x, edge_index)

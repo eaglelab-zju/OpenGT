@@ -29,6 +29,24 @@ def gen_layer_config(dim_in_out, dim_inner, num_layers, dropout):
 @register_layer("mixer_block")
 class MixerBlock(nn.Module):
 
+    """
+    Mixer Block for GraphMLPMixer
+    Adapted from https://github.com/XiaoxinHe/Graph-ViT-MLPMixer
+
+    Parameters:
+        dim (int): Number of input features.
+        num_patch (int): Number of patches.
+        token_dim (int): Dimension of the token MLP.
+        channel_dim (int): Dimension of the channel MLP.
+        dropout (float): Dropout rate. Default is 0.0.
+    
+    Input:
+        x (torch.Tensor): Input node features.
+    
+    Output:
+        x (torch.Tensor): Output node features after applying the Mixer block.
+    """
+
     def __init__(self, dim, num_patch, token_dim, channel_dim, dropout=0.):
         super().__init__()
         self.token_mix = Sequential('x',[

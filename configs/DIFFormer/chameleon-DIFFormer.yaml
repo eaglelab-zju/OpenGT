@@ -28,13 +28,13 @@ gt:
   attn_dropout: 0.5
   batch_norm: false
   dim_hidden: 96
-  dropout: 0.5
-  graph_weight: 0.8
+  dropout: 0.8
+  graph_weight: 0.5
   kernel: simple
   layer_norm: false
   layer_type: GCN+Transformer
-  layers: 2
-  n_heads: 2
+  layers: 4
+  n_heads: 3
   use_graph: true
   use_residual: true
   use_source: true

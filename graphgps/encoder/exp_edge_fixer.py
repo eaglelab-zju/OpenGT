@@ -10,7 +10,15 @@ from torch_geometric.graphgym.register import register_layer
 
 class ExpanderEdgeFixer(nn.Module):
     '''
-        Gets the batch and sets new edge indices + global nodes
+        Gets the batch and sets new edge indices + global nodes.
+        Creates expander_edge_index and expander_edge_attr for the batch instead of modifying the original edge_index and edge_attr.
+        Also adds virtual nodes and edges for the batch and stores them in batch.virt_h, batch.virt_edge_index and batch.virt_edge_attr.
+
+        Used in Exphormer model.
+
+        Parameters:
+            add_edge_index (bool): If True, adds the edge index to the batch.
+            num_virt_node (int): Number of virtual nodes to add to the batch.
     '''
     def __init__(self, add_edge_index=False, num_virt_node=0):
         

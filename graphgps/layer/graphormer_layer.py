@@ -10,12 +10,20 @@ class GraphormerLayer(torch.nn.Module):
         https://github.com/microsoft/Graphormer/tree/v1.0
         Note that this refers to v1 of Graphormer.
 
-        Args:
+        Parameters:
             embed_dim: The number of hidden dimensions of the model
             num_heads: The number of heads of the Graphormer model
             dropout: Dropout applied after the attention and after the MLP
             attention_dropout: Dropout applied within the attention
             input_dropout: Dropout applied within the MLP
+        
+        Input:
+            data.x (Tensor): Input node features of shape (N, D)
+            data.batch (Tensor): Batch vector of shape (N,)
+            data.attn_bias (Tensor): Attention bias of shape (N, N)
+        
+        Output:
+            ret.x (Tensor): Output node features after applying the Graphormer layer.
         """
         super().__init__()
         self.attention = torch.nn.MultiheadAttention(embed_dim,

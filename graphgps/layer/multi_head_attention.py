@@ -4,6 +4,21 @@ from torch_geometric.graphgym.register import register_layer
 
 @register_layer('MultiHeadAttention')
 class MultiHeadAttention(nn.Module):
+    """
+    Multi-Head Attention layer wrapper for PyTorch Geometric.
+
+    Parameters:
+        dim_hidden (int): Number of input features.
+        n_heads (int): Number of attention heads.
+        dropout (float): Dropout rate.
+    
+    Input:
+        batch.x (Tensor): Input node features.
+    
+    Output:
+        batch.x (Tensor): Output node features after applying the Multi-Head Attention layer.
+    """
+
     def __init__(self, dim_hidden: int, n_heads: int, dropout: float, **kwargs):
         super().__init__()
         self.model = nn.MultiheadAttention(

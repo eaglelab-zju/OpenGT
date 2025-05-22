@@ -78,7 +78,29 @@ def gcn_conv(x, edge_index, edge_weight = None):
 @register_layer('DIFFormerConv')
 class DIFFormerConv(nn.Module):
     '''
-    one DIFFormer layer
+    DIFFormer layer, Adapted from https://github.com/qitianwu/DIFFormer
+
+    Parameters:
+        dim_in (int): Number of input features. 
+        dim_out (int): Number of output features.
+        config (object): Configuration object containing various parameters.
+            - n_heads (int): Number of attention heads.
+            - kernel (str): Kernel type for attention ('simple' or 'sigmoid').
+            - use_weight (bool): Whether to use weight for value transformation.
+            - use_graph (bool): Whether to use graph convolution.
+            - graph_weight (float): Weight for graph convolution.
+            - use_residual (bool): Whether to use residual connection.
+            - use_source (bool): Whether to add original features.
+            - alpha (float): Alpha value for residual connection.
+            - batch_norm (bool): Whether to use batch normalization.
+        
+    Input:
+        batch.x (Tensor): Input node features.
+        batch.edge_index (Tensor): Edge indices of the graph.
+        batch_orig.x (Tensor): Original node features for residual connection.
+    
+    Output:
+        ret.x (Tensor): Output node features after applying the DIFFormer layer.
     '''
     def __init__(self, dim_in, dim_out, config):
         super(DIFFormerConv, self).__init__()
@@ -102,7 +124,7 @@ class DIFFormerConv(nn.Module):
         self.use_bn = config.batch_norm
         
 
-    def forward(self, batch, batch_orig): # batch_orig conects to the original node features
+    def forward(self, batch, batch_orig): # batch_orig contains the original node features
 
         x = batch.x
         edge_index = batch.edge_index

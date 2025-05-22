@@ -119,6 +119,18 @@ class GINEConvLayer(nn.Module):
 @register_layer('gineconv')
 class GINEConvGraphGymLayer(nn.Module):
     """Graph Isomorphism Network with Edge features (GINE) layer.
+
+    Parameters:
+        dim_in (int): Number of input features. Handled by GraphGym.
+        dim_out (int): Number of output features. Handled by GraphGym.
+    
+    Input:
+        batch.x (Tensor): Input node features.
+        batch.edge_index (Tensor): Edge indices of the graph.
+        batch.edge_attr (Tensor): Edge features.
+    
+    Output:
+        ret.x (Tensor): Output node features after applying the GINE layer.
     """
     def __init__(self, layer_config: LayerConfig, **kwargs):
         super().__init__()

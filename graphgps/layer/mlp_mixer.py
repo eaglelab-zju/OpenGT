@@ -5,6 +5,23 @@ from torch_geometric.graphgym.register import register_layer
 
 @register_layer("mlp_mixer")
 class MLPMixer(nn.Module):
+    """
+    GraphMLPMixer layer.
+    Adapted from https://github.com/XiaoxinHe/Graph-ViT-MLPMixer
+
+    Parameters:
+        layers (int): Number of Mixer blocks.
+        dim_hidden (int): Number of input features.
+        patches (int): Number of patches.
+        with_final_norm (bool): Whether to apply final normalization. Default: True.
+        dropout (float): Dropout rate. Default: 0.0.
+    
+    Input:
+        batch.x (torch.Tensor): Input node features.
+    
+    Output:
+        batch.x (torch.Tensor): Output node features after applying the Mixer blocks.
+    """
     def __init__(self,
                  layers,
                  dim_hidden,

@@ -12,9 +12,17 @@ class GNNInductiveEdgeHead(nn.Module):
 
     Implementation adapted from the transductive GraphGym's GNNEdgeHead.
 
-    Args:
+    Parameters:
         dim_in (int): Input dimension
         dim_out (int): Output dimension. For binary prediction, dim_out=1.
+    
+    Input:
+        batch.x (torch.Tensor): Node features.
+        batch.edge_label (torch.Tensor): Edge labels.
+    
+    Output:
+        pred (torch.Tensor): Predicted edge labels.
+        true (torch.Tensor): True edge labels.
     """
 
     def __init__(self, dim_in, dim_out):
@@ -49,15 +57,15 @@ class GNNInductiveEdgeHead(nn.Module):
     def forward(self, batch):
         if cfg.model.edge_decoding != 'concat':
             batch = self.layer_post_mp(batch)
-        pred, label = self._apply_index(batch)
+        pred, true = self._apply_index(batch)
         nodes_first = pred[0]
         nodes_second = pred[1]
         pred = self.decode_module(nodes_first, nodes_second)
         if not self.training:  # Compute extra stats when in evaluation mode.
             stats = self.compute_mrr(batch)
-            return pred, label, stats
+            return pred, true, stats
         else:
-            return pred, label
+            return pred, true
 
     def compute_mrr(self, batch):
         if cfg.model.edge_decoding != 'dot':

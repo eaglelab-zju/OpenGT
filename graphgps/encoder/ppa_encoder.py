@@ -7,6 +7,9 @@ from torch_geometric.graphgym.register import (register_node_encoder,
 class PPANodeEncoder(torch.nn.Module):
     """
     Uniform input node embedding for PPA that has no node features.
+
+    Parameters:
+        emb_dim (int): The dimension of the output node features.
     """
 
     def __init__(self, emb_dim):
@@ -20,6 +23,12 @@ class PPANodeEncoder(torch.nn.Module):
 
 @register_edge_encoder('PPAEdge')
 class PPAEdgeEncoder(torch.nn.Module):
+    """
+    Edge encoder for PPA that applies a linear transformation to the edge features.
+    
+    Parameters:
+        emb_dim (int): The dimension of the output edge features.
+    """
     def __init__(self, emb_dim):
         super().__init__()
         self.encoder = torch.nn.Linear(7, emb_dim)

@@ -15,7 +15,7 @@ class NodeFormer(nn.Module):
     NodeFormer model implementation
     return: predicted node labels, a list of edge losses at every layer
     '''
-    def __init__(self, dim_in, dim_out): # does not support use_edge_loss currently
+    def __init__(self, dim_in, dim_out):
                  # cfg.gt.dim_hidden, num_layers=2, num_heads=4, dropout=0.0,
                  # kernel_transformation=softmax_kernel_transformation, nb_random_features=30, use_bn=True, use_gumbel=True,
                  # use_residual=True, use_act=False, use_jk=False, nb_gumbel_sample=10, rb_order=2, rb_trans='sigmoid', use_edge_loss=True):

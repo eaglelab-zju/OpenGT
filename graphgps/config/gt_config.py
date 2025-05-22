@@ -4,7 +4,8 @@ from yacs.config import CfgNode as CN
 
 @register_config('cfg_gt')
 def set_cfg_gt(cfg):
-    """Configuration for Graph Transformer-style models, e.g.:
+    """
+    Configuration for Graph Transformer-style models, e.g.:
     - Spectral Attention Network (SAN) Graph Transformer.
     - "vanilla" Transformer / Performer.
     - General Powerful Scalable (GPS) Model.
@@ -145,6 +146,8 @@ def set_cfg_gt(cfg):
     cfg.gt.attn.edge_enhance = True
 
     cfg.gt.attn.fwl = False
+
+    cfg.gt.attn.signed_sqrt = False
 
     # MLPMixer
 

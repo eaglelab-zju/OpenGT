@@ -10,6 +10,27 @@ from torch_geometric.graphgym.register import register_layer
 
 @register_layer('patch_encoder')
 class PatchEncoder(nn.Module):
+
+    """
+    Patch encoder for GraphMLPMixer.
+    Adapted from https://github.com/XiaoxinHe/Graph-ViT-MLPMixer
+
+    Parameters:
+        dim_in (int): Number of input features.
+        dim_out (int): Number of output features.
+    
+    Input:
+        batch.x (torch.Tensor): Input node features.
+        batch.edge_index (torch.Tensor): Edge indices of the graph.
+        batch.edge_attr (torch.Tensor): Edge attributes of the graph.
+        batch.subgraphs_nodes_mapper (torch.Tensor): Node mapping for subgraphs.
+        batch.subgraphs_edges_mapper (torch.Tensor): Edge mapping for subgraphs.
+        batch.combined_subgraphs (torch.Tensor): Combined subgraphs.
+        batch.subgraphs_batch (torch.Tensor): Batch indices for subgraphs.
+
+    Output:
+        ret.x (torch.Tensor): Output node features after applying the patch encoder.
+    """
     def __init__(self, dim_in, dim_out):
         super().__init__()
         self.dim_in = dim_in

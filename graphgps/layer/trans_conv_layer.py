@@ -30,7 +30,27 @@ def full_attention_conv(qs, ks, vs, kernel='simple', output_attn=False):
 @register_layer('TransConvLayer')
 class TransConvLayer(nn.Module):
     '''
-    transformer with fast attention
+    Transformer with fast attention. Used in SGFormer.
+    Adapted from https://github.com/qitianwu/SGFormer
+
+    Parameters:
+        dim_in (int): Number of input features.
+        dim_out (int): Number of output features.
+        config (object): Configuration object containing hyperparameters.
+            - n_heads (int): Number of attention heads.
+            - use_weight (bool): Whether to use weight for value.
+            - use_residual (bool): Whether to use residual connection.
+            - use_act (bool): Whether to use activation function.
+            - layer_norm (bool): Whether to use layer normalization.
+            - batch_norm (bool): Whether to use batch normalization.
+            - dropout (float): Dropout rate.
+    
+    Input:
+        batch.x (torch.Tensor): Input node features.
+        batch.edge_index (torch.Tensor): Edge indices of the graph.
+    
+    Output:
+        ret.x (torch.Tensor): Output node features after applying the TransConv layer.
     '''
 
     def __init__(self, dim_in,
