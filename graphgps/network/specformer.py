@@ -14,6 +14,18 @@ from torch_geometric.graphgym.register import register_network
 
 
 class swapex(nn.Module):
+    """
+    Swaps the x and EigVals attributes of the input batch. 
+
+    Input: 
+        batch (torch_geometric.data.Batch): Input batch containing node features and graph structure.
+            - batch.x (torch.Tensor): Input node features.
+            - batch.EigVals (torch.Tensor): Eigenvalues of the graph Laplacian.
+
+    Output:
+        batch (torch_geometric.data.Batch): Output batch with swapped x and EigVals.
+            
+    """
     def __init__(self):
         super().__init__()
     def forward(self, batch):
@@ -23,6 +35,31 @@ class swapex(nn.Module):
 
 @register_network("SpecFormer")
 class SpecFormer(nn.Module):
+    """
+    SpecFormer model. Adapted from https://github.com/DSL-Lab/Specformer
+    Only supports the case where the input is a batch of graphs with the same number of nodes.
+    Needs preprocessing for LapRaw positional encoding.
+
+    Parameters:
+        dim_in (int): Number of input features.
+        dim_out (int): Number of output features.
+        cfg (dict): Configuration dictionary containing model parameters from GraphGym.
+            - cfg.gt.dim_hidden: Hidden dimension for GNN layers and SpecFormer layers.
+            - cfg.gt.n_heads: Number of attention heads.
+            - cfg.gt.dropout: Dropout rate for the model.
+            - cfg.gt.attn_dropout: Dropout rate for the attention mechanism.
+            - cfg.gnn.head: Type of head to use for the final output layer.
+    
+    Input:
+        batch (torch_geometric.data.Batch): Input batch containing node features and graph structure.
+            - batch.x (torch.Tensor): Input node features.
+            - batch.edge_index (torch.Tensor): Edge indices of the graph.
+            - batch.EigVals (torch.Tensor): Eigenvalues of the graph Laplacian.
+            - batch.EigVecs (torch.Tensor): Eigenvectors of the graph Laplacian.
+    
+    Output:
+        batch (task dependent type, see output head): Output after model processing.
+    """
     def __init__(self, dim_in, dim_out):
         super().__init__()
 

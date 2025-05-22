@@ -13,6 +13,34 @@ from graphgps.encoder.feature_encoder import FeatureEncoder
 
 @register_network('GraphMLPMixer')
 class GraphMLPMixer(nn.Module):
+    """
+    GraphMLPMixer model. Only supports graph-level tasks.
+    Adapted from https://github.com/XiaoxinHe/Graph-ViT-MLPMixer
+
+    Parameters:
+        dim_in (int): Number of input features.
+        dim_out (int): Number of output features.
+        cfg (dict): Configuration dictionary containing model parameters from GraphGym.
+            - cfg.gt.dim_hidden (int): Hidden dimension for GNN layers and GraphMLPMixer layers.
+            - cfg.gt.mlpmixer_layers (int): Number of Mixer blocks.
+            - cfg.gt.mlpmixer_dropout (float): Dropout rate for the Mixer blocks.
+            - cfg.metis.patches (int): Number of patches.
+            - cfg.metis.patch_rw_dim (int): Dimension of the patch random walk encoder.
+
+    Input:
+        batch (torch_geometric.data.Batch): Input batch containing node features and graph structure.
+            - batch.x (torch.Tensor): Input node features.
+            - batch.edge_index (torch.Tensor): Edge indices of the graph.
+            - batch.subgraphs_nodes_mapper (torch.Tensor): Mapping of nodes to subgraphs.
+            - batch.subgraphs_edges_mapper (torch.Tensor): Mapping of edges to subgraphs.
+            - batch.combined_subgraphs (torch.Tensor): Combined subgraphs.
+            - batch.subgraphs_batch (torch.Tensor): Batch indices for subgraphs.
+            - batch.mask (torch.Tensor): Mask for global pooling.
+    
+    Output:
+        pred (torch.Tensor): Graph logits after model processing.
+        true (torch.Tensor): Labels for the input batch.
+    """
 
     def __init__(self, dim_in, dim_out):
 

@@ -10,6 +10,32 @@ from graphgps.network.bga_model import BGA
 
 @register_network('CoBFormer')
 class CoBFormer(torch.nn.Module):
+    """
+    CoBFormer model. Only supports transductive node level tasks.
+    Adapted from https://github.com/null-xyj/CoBFormer
+
+    Parameters:
+        dim_in (int): Number of input features.
+        dim_out (int): Number of output features.
+        cfg (dict): Configuration dictionary containing model parameters from GraphGym.
+            - cfg.gt.alpha (float): Balance factor for GNN and BGA loss.
+            - cfg.gt.tau (float): Temperature parameter for softmax.
+            - cfg.gt.layer_type (str): Type of GNN layer to use. e.g., 'GCN'.
+            - cfg.gnn.layers (int): Number of GNN layers.
+        
+    Input:
+        batch (torch_geometric.data.Batch): Input batch containing node features and graph structure.
+            - batch.x (torch.Tensor): Input node features.
+            - batch.edge_index (torch.Tensor): Edge indices of the graph.
+            - batch.patch (torch.Tensor): Patch indices.
+            - batch.y (torch.Tensor): Input labels.
+            - batch.split (str): Split type (train, val, test).
+    
+    Output:
+        pred (torch.Tensor): Predicted node features after applying the CoBFormer model.
+        true (torch.Tensor): True labels.
+        extra_loss (torch.Tensor): Extra loss term for GNN and BGA cotraining.
+    """
     def __init__(self, dim_in: int, dim_out: int):
         super(CoBFormer, self).__init__()
         self.alpha = cfg.gt.alpha

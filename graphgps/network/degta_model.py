@@ -13,6 +13,26 @@ from graphgps.encoder.feature_encoder import FeatureEncoder
 
 @register_network('DeGTA')
 class DeGTA(torch.nn.Module):
+    """
+    Decouplized Graph Triple Attention model. 
+    Adapted from https://github.com/wangxiaotang0906/DeGTA
+
+    Parameters:
+        dim_in (int): Number of input features.
+        dim_out (int): Number of output features.
+        cfg (dict): Configuration dictionary containing model parameters from GraphGym.
+            - cfg.gt.layers: Number of DeGTA layers.
+            - cfg.gt.dim_hidden: Hidden dimension for GNN layers.
+            - cfg.gnn.head: Type of head to use for the final output layer.
+        
+    Input:
+        batch (torch_geometric.data.Batch): Input batch containing node features and graph structure.
+            - batch.x (torch.Tensor): Input node features.
+            - batch.edge_index (torch.Tensor): Edge indices of the graph.
+    
+    Output:
+        batch (task dependent type, see output head): Output after model processing.
+    """
     def __init__(self,
                  dim_in: int,
                  dim_out: int

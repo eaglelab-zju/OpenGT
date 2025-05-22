@@ -8,6 +8,23 @@ from torch_geometric.graphgym.register import register_network
 
 @register_network("TransConv")
 class TransConv(nn.Module):
+    """
+    TransConv module for SGFormer model. Adapted from https://github.com/qitianwu/SGFormer
+
+    Parameters:
+        dim_in (int): Number of input features.
+        dim_out (int): Number of output features.
+        cfg (dict): Configuration dictionary containing model parameters from GraphGym.
+            - cfg.gt.layers: Number of TransConv layers.
+    
+    Input:
+        batch (torch_geometric.data.Batch): Input batch containing node features and graph structure.
+            - batch.x (torch.Tensor): Input node features.
+            - batch.edge_index (torch.Tensor): Edge indices of the graph.
+    
+    Output:
+        batch (torch_geometric.data.Batch): Output batch after processing.
+    """
     def __init__(self, dim_in, dim_out):
         super().__init__()
 

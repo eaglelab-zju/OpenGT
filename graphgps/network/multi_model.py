@@ -15,7 +15,7 @@ class FeatureEncoder(torch.nn.Module):
     """
     Encoding node and edge features
 
-    Args:
+    Parameters:
         dim_in (int): Input feature dimension
     """
     def __init__(self, dim_in):
@@ -64,7 +64,34 @@ class FeatureEncoder(torch.nn.Module):
 
 
 class MultiModel(torch.nn.Module):
-    """Multiple layer types can be combined here.
+    """Multiple layer model for Exphormer and other models.
+    Adapted from https://github.com/hamed1375/Exphormer
+
+    Parameters:
+        dim_in (int): Number of input features.
+        dim_out (int): Number of output features.
+        cfg (dict): Configuration dictionary containing model parameters from GraphGym.
+            - cfg.gt.layers (int): Number of GPS layers.
+            - cfg.gt.dim_hidden (int): Hidden dimension for GPS layers. Need to match cfg.gnn.dim_inner.
+            - cfg.gt.layer_type (str): Type of layer to use, containing '+'-separated local model type and global model type, e.g., 'GINE+Transformer'.
+            - cfg.gt.pna_degrees (list): List of PNA degrees for local model.
+            - cfg.gt.n_heads (int): Number of attention heads.
+            - cfg.gt.dropout (float): Dropout rate.
+            - cfg.gt.attn_dropout (float): Attention dropout rate.
+            - cfg.gt.layer_norm (bool): Whether to use layer normalization.
+            - cfg.gt.batch_norm (bool): Whether to use batch normalization.
+            - cfg.gnn.head (str): Type of head to use for the final output layer.
+            - cfg.gnn.layers_pre_mp (int): Number of pre-message-passing layers.
+            - cfg.gnn.dim_inner (int): Inner dimension for GNN layers. Need to match cfg.gt.dim_hidden.
+            - cfg.gnn.act (str): Activation function to use.
+
+    Input:
+        batch (torch_geometric.data.Batch): Input batch containing node features and graph structure.
+            - batch.x (torch.Tensor): Input node features.
+            - batch.edge_index (torch.Tensor): Edge indices of the graph.
+    
+    Output:
+        batch (task dependent type, see output head): Output after model processing.
     """
 
     def __init__(self, dim_in, dim_out):

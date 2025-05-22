@@ -11,6 +11,24 @@ from graphgps.layer.bga_layer import BGALayer
 
 @register_network('BGA')
 class BGA(nn.Module):
+    """
+    Bilevel Graph Attention model. Used in CoBFormer model.
+    Adapted from https://github.com/null-xyj/CoBFormer
+
+    Parameters:
+        dim_in (int): Number of input features.
+        dim_out (int): Number of output features.
+        dropout1 (float): Dropout rate for the final layer.
+        dropout2 (float): Dropout rate for the BGA layers.
+    
+    Input:
+        batch (torch_geometric.data.Batch): Input batch containing node features and graph structure.
+            - batch.x (torch.Tensor): Input node features.
+            - batch.patch (torch.Tensor): Patch indices.
+    
+    Output:
+        batch.x (torch.Tensor): Output node features after applying the BGA model.
+    """
     def __init__(self, dim_in: int, dim_out: int, dropout1=0.5, dropout2=0.1):
         super(BGA, self).__init__()
         self.encoder = FeatureEncoder(dim_in)

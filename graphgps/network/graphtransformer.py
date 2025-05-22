@@ -13,10 +13,24 @@ from graphgps.encoder.feature_encoder import FeatureEncoder
 @register_network("Graphtransformer")
 class Graphtransformer(nn.Module):
     '''
-    Graphtransformer model class
-    x: input node features [N, D]
-    edge_index: 2-dim indices of edges [2, E]
-    return y_hat predicted logits [N, C]
+    Graphtransformer model. Adapted from https://github.com/graphdeeplearning/graphtransformer
+
+    Parameters:
+        dim_in (int): Number of input features.
+        dim_out (int): Number of output features.
+        cfg (dict): Configuration dictionary containing model parameters from GraphGym.
+            - cfg.gt.layers (int): Number of Graphtransformer layers.
+            - cfg.gt.dim_hidden (int): Hidden dimension for GNN layers and Graphtransformer layers.
+            - cfg.gt.layer_type (str): Type of layer to use for the Graphtransformer layers.
+            - cfg.gnn.head (str): Type of head to use for the final output layer.
+        
+    Input:
+        batch (torch_geometric.data.Batch): input batch containing node features and graph structure.
+            - batch.x (torch.Tensor): input node features.
+            - batch.edge_index (torch.Tensor): edge indices of the graph.
+    
+    Output:
+        batch (task dependent type, see output head): Output after model processing.
     '''
     def __init__(self, dim_in, dim_out):
         super(Graphtransformer, self).__init__()

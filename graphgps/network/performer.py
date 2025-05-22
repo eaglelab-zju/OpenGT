@@ -12,6 +12,7 @@ class Performer(torch.nn.Module):
     """Performer without edge features.
     This model disregards edge features and runs a linear transformer over a set of node features only.
     https://arxiv.org/abs/2009.14794
+    Adapted from https://github.com/rampasek/GraphGPS
     """
 
     def __init__(self, dim_in, dim_out):

@@ -107,7 +107,7 @@ class FFN(nn.Module):
 @register_layer('BGALayer')
 class BGALayer(nn.Module):
     """
-    Bilevel Graph Attention Layer. Used in CoBFormer model.
+    Bilevel Graph Attention layer. Used in CoBFormer model.
     Adapted from https://github.com/null-xyj/CoBFormer
 
     Parameters:

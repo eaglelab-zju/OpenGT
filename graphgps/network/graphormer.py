@@ -15,6 +15,29 @@ class GraphormerModel(torch.nn.Module):
     https://arxiv.org/abs/2106.05234
     Ying, C., Cai, T., Luo, S., Zheng, S., Ke, G., He, D., ... & Liu, T. Y.
     Do transformers really perform badly for graph representation? (NeurIPS2021)
+    Adapted from https://github.com/rampasek/GraphGPS
+
+    Parameters:
+        dim_in (int): Number of input features.
+        dim_out (int): Number of output features.
+        cfg (dict): Configuration dictionary containing model parameters from GraphGym.
+            - cfg.graphormer.num_layers (int): Number of Graphormer layers.
+            - cfg.graphormer.embed_dim (int): Embedding dimension for Graphormer layers. Need to match cfg.gnn.dim_inner.
+            - cfg.graphormer.num_heads (int): Number of attention heads.
+            - cfg.graphormer.dropout (float): Dropout rate.
+            - cfg.graphormer.attention_dropout (float): Attention dropout rate.
+            - cfg.graphormer.mlp_dropout (float): MLP dropout rate.
+            - cfg.gnn.head (str): Type of head to use for the final output layer.
+            - cfg.gnn.layers_pre_mp (int): Number of pre-message-passing layers.
+            - cfg.gnn.dim_inner (int): Inner dimension for GNN layers. Need to match cfg.graphormer.embed_dim.
+    
+    Input:
+        batch (torch_geometric.data.Batch): Input batch containing node features and graph structure.
+            - batch.x (torch.Tensor): Input node features.
+            - batch.edge_index (torch.Tensor): Edge indices of the graph.
+    
+    Output:
+        batch (task dependent type, see output head): Output after model processing.
     """
 
     def __init__(self, dim_in, dim_out):

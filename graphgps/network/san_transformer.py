@@ -12,6 +12,32 @@ from graphgps.layer.san2_layer import SAN2Layer
 class SANTransformer(torch.nn.Module):
     """Spectral Attention Network (SAN) Graph Transformer.
     https://arxiv.org/abs/2106.03893
+    Adapted from https://github.com/rampasek/GraphGPS
+
+    Parameters:
+        dim_in (int): Number of input features.
+        dim_out (int): Number of output features.
+        cfg (dict): Configuration dictionary containing model parameters from GraphGym.
+            - cfg.gt.layers (int): Number of SAN layers.
+            - cfg.gt.dim_hidden (int): Hidden dimension for GNN layers and SAN layers. Need to match cfg.gnn.dim_inner.
+            - cfg.gt.gamma (float): Gamma parameter for SAN layers.
+            - cfg.gt.n_heads (int): Number of attention heads.
+            - cfg.gt.full_graph (bool): Whether to use full graph attention.
+            - cfg.gt.dropout (float): Dropout rate for the SAN layers.
+            - cfg.gt.layer_norm (bool): Whether to use layer normalization.
+            - cfg.gt.batch_norm (bool): Whether to use batch normalization.
+            - cfg.gt.residual (bool): Whether to use residual connections.
+            - cfg.gnn.head (str): Type of head to use for the final output layer.
+            - cfg.gnn.layers_pre_mp (int): Number of pre-message-passing layers.
+            - cfg.gnn.dim_inner (int): Inner dimension for GNN layers. Need to match cfg.gt.dim_hidden.
+
+    Input:
+        batch (torch_geometric.data.Batch): Input batch containing node features and graph structure.
+            - batch.x (torch.Tensor): Input node features.
+            - batch.edge_index (torch.Tensor): Edge indices of the graph.
+    
+    Output:
+        batch (task dependent type, see output head): Output after model processing.
     """
 
     def __init__(self, dim_in, dim_out):

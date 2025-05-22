@@ -14,6 +14,26 @@ class CustomGNN(torch.nn.Module):
     """
     GNN model that customizes the torch_geometric.graphgym.models.gnn.GNN
     to support specific handling of new conv layers.
+
+    Parameters:
+        dim_in (int): Number of input features.
+        dim_out (int): Number of output features.
+        cfg (dict): Configuration dictionary containing model parameters from GraphGym.
+            - cfg.gnn.layers_pre_mp: Number of pre-message-passing layers.
+            - cfg.gnn.dim_inner: Inner dimension for GNN layers.
+            - cfg.gnn.layers_mp: Number of message-passing layers.
+            - cfg.gnn.dropout: Dropout rate for GNN layers.
+            - cfg.gnn.residual: Whether to use residual connections in GNN layers.
+            - cfg.gnn.layer_type: Type of GNN layer to use ('gatedgcnconv' or 'gineconv').
+            - cfg.gnn.head: Type of head to use for the final output layer.
+        
+    Input:
+        batch (torch_geometric.data.Batch): Input batch containing node features and graph structure.
+            - batch.x (torch.Tensor): Input node features.
+            - batch.edge_index (torch.Tensor): Edge indices of the graph.
+    
+    Output:
+        batch (task dependent type, see output head): Output after model processing.
     """
 
     def __init__(self, dim_in, dim_out):

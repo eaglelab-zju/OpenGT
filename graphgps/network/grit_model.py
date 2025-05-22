@@ -11,7 +11,23 @@ from graphgps.encoder.feature_encoder import FeatureEncoder
 @register_network('GritTransformer')
 class GritTransformer(torch.nn.Module):
     '''
-        The proposed GritTransformer (Graph Inductive Bias Transformer)
+        Graph Inductive Bias Transformer (GRIT) model. Adapted from https://github.com/LiamMa/GRIT
+
+        Parameters:
+            dim_in (int): Number of input features.
+            dim_out (int): Number of output features.
+            cfg (dict): configuration dictionary containing model parameters from GraphGym.
+                - cfg.gt.layers (int): Number of GRIT layers.
+                - cfg.gt.n_heads (int): Number of attention heads.
+                - cfg.gt.dropout (float): Dropout rate for the GRIT layers.
+                - cfg.gt.dim_hidden (int): Hidden dimension for GNN layers and GRIT layers. Need to match cfg.gnn.dim_inner.
+                - cfg.gt.layer_type (str): Type of layer to use for the GRIT layers.
+                - cfg.gt.attn_dropout (float): Dropout rate for the attention mechanism.
+                - cfg.gt.layer_norm (bool): Whether to use layer normalization.
+                - cfg.gt.batch_norm (bool): Whether to use batch normalization.
+                - cfg.gnn.head (str): Type of head to use for the final output layer.
+                - cfg.gnn.layers_pre_mp (int): Number of pre-message-passing layers.
+                - cfg.gnn.dim_inner (int): Inner dimension for GNN layers. Need to match cfg.gt.dim_hidden.
     '''
 
     def __init__(self, dim_in, dim_out):
