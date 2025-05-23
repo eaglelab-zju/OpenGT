@@ -1,3 +1,12 @@
- theme:
-   name: material
-site_url: !ENV READTHEDOCS_CANONICAL_URL
+site_name: OpenGT
+theme:
+  name: material
+  highlightjs: true
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        # See: https://mkdocstrings.github.io/python/usage/
+        python:
+          options:
+            docstring_style: sphinx
