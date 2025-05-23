@@ -1,4 +1,33 @@
-### Python environment setup with Conda
+# OpenGT
+
+Official code for [OpenGT](https://openreview.net/forum?id=qa1nx4CYID), a comprehensive and extensible benchmark suite built on top of [`torch_geometric.graphgym`](https://github.com/pyg-team/pytorch_geometric/tree/master/graphgym), designed for evaluating and analyzing **Graph Transformers (GTs)** under a unified framework.
+
+## Overview
+
+## 🔧 Features
+
+- ✅ **Standardized Implementations** of 16 Graph Transformer and GNN baselines, including:
+  - GT models: `Graphormer`, `NodeFormer`, `DIFFormer`, `GraphGPS`, `GRIT`, `SpecFormer`, `Exphormer`, `SAN`, `SGFormer`, `CoBFormer`, `GraphMLPMixer`, `GraphTransformer`, `DeGTA`
+  - GNN baselines: `GCN`, `GAT`, `APPNP`
+- 📊 **Unified Training and Evaluation Pipeline**
+  - Consistent data splits and batch sizes per dataset
+  - Standardized metric computation and logging
+- 🧪 **Flexible Hyperparameter Tuning**
+  - Provides an easy-to-use interface for performing grid search over multiple hyperparameters
+  - Supports specifying search spaces via configuration files
+  - Automatically logs and evaluates results across all combinations for robust comparison
+- 📁 **Diverse Datasets**
+  - Covers both **node-level** and **graph-level** tasks
+  - Includes graphs with varying levels of **homophily** and **sparsity**
+
+## 🎯 Goal
+
+**OpenGT** aims to promote:
+- 📌 Fair and reproducible comparisons across Graph Transformers
+- 🔍 Deeper understanding of design choices and their practical implications
+- 🚀 Acceleration of GT research through a solid benchmarking foundation
+
+## ⚙ Python environment setup with Conda
 
 ```bash
 conda create -n opengt python=3.10
@@ -24,7 +53,7 @@ conda clean --all
 ```
 
 
-### Running Experiment
+## Running Experiment
 ```bash
 conda activate opengt
 
