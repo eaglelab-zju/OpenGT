@@ -128,3 +128,26 @@ python agg_test.py
 ```
 
 This script collects results across seeds and outputs averaged performance metrics with standard deviations in to a `.csv` file.
+
+## 📚 References
+
+| Paper Title | Authors | Venue | Year | Link |
+|-------------|---------|-------|------|------|
+| Semi-Supervised Classification with Graph Convolutional Networks | Thomas Kipf, Max Welling | ICLR | 2017 | [GCN](https://arxiv.org/abs/1609.02907) |
+| Graph Attention Networks | Petar Veličković et al. | ICLR | 2018 | [GAT](https://arxiv.org/abs/1710.10903) |
+| Predict Then Propagate: Graph Neural Networks Meet Personalized PageRank | Johannes Gasteiger et al. | ICLR | 2019 | [APPNP](https://arxiv.org/abs/1810.05997) |
+| A Generalization of Transformer Networks to Graphs | Vijay Prakash Dwivedi, Xavier Bresson | AAAI | 2021 | [Graphtransformer](https://arxiv.org/abs/2012.09699) |
+| Do Transformers Really Perform Badly for Graph Representation? | Chengxuan Ying et al. | NeurIPS | 2021 | [Graphormer](https://proceedings.neurips.cc/paper/2021/hash/f1c1592588411002af340cbaedd6fc33-Abstract.html) |
+| Rethinking Graph Transformers with Spectral Attention | Devin Kreuzer et al. | NeurIPS | 2021 | [SAN](https://proceedings.neurips.cc/paper_files/paper/2021/hash/b4fd1d2cb085390fbbadae65e07876a7-Abstract.html) |
+| Nodeformer: A Scalable Graph Structure Learning Transformer for Node Classification | Qitian Wu et al. | NeurIPS | 2022 | [NodeFormer](https://proceedings.neurips.cc/paper_files/paper/2022/hash/af790b7ae573771689438bbcfc5933fe-Abstract-Conference.html) |
+| Recipe for a General, Powerful, Scalable Graph Transformer | Ladislav Rampášek et al. | NeurIPS | 2022 | [GraphGPS](https://arxiv.org/abs/2205.12454) |
+| Graph Inductive Biases in Transformers Without Message Passing | Liheng Ma et al. | ICML | 2023 | [GRIT](https://proceedings.mlr.press/v202/ma23c.html) |
+| DIFFormer: Scalable (Graph) Transformers Induced by Energy Constrained Diffusion | Qitian Wu et al. | ICLR | 2023 | [DIFFormer](https://arxiv.org/abs/2301.09474) |
+| SGFormer: Simplifying and Empowering Transformers for Large-Graph Representations | Qitian Wu et al. | NeurIPS | 2023 | [SGFormer](https://proceedings.neurips.cc/paper_files/paper/2023/hash/cc57fac10eacadb3b72a907ac48f9a98-Abstract-Conference.html) |
+| Specformer: Spectral Graph Neural Networks Meet Transformers | Deyu Bo et al. | ICLR | 2023 | [SpecFormer](https://arxiv.org/abs/2303.01028) |
+| Exphormer: Sparse Transformers for Graphs | Hamed Shirzad et al. | ICML | 2023 | [Exphormer](https://proceedings.mlr.press/v202/shirzad23a.html) |
+| A Generalization of ViT/MLP-Mixer to Graphs | Xiaoxin He et al. | ICML | 2023 | [GraphMLPMixer](https://proceedings.mlr.press/v202/he23a.html) |
+| Less is More: On the Over-Globalizing Problem in Graph Transformers | Yujie Xing et al. | ICML | 2024 | [CoBFormer](https://proceedings.mlr.press/v235/xing24b.html) |
+| Graph Triple Attention Network: A Decoupled Perspective | Xiaotang Wang et al. | KDD | 2025 | [DeGTA](https://arxiv.org/abs/2408.07654) |
+
+
