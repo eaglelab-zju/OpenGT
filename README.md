@@ -4,6 +4,10 @@ Official code for [OpenGT](https://openreview.net/forum?id=qa1nx4CYID), a compre
 
 ## Overview
 
+The picture below shows a timeline of GT development, dividing GTs into 3 categories.
+
+![GT Timeline](./timeline.png)
+
 ## 🔧 Features
 
 - ✅ **Standardized Implementations** of 16 Graph Transformer and GNN baselines, including:
@@ -52,22 +56,75 @@ pip install pymetis
 conda clean --all
 ```
 
+## 🚀 Running Experiments
 
-## Running Experiment
+### 1. Activate Environment
+
+First, activate the project environment:
+
 ```bash
 conda activate opengt
-
-# Use main.py with config file to run
-# Config files are placed at "configs/<ModelName>/<DatasetName-ModelName>.yaml"
-# For example, to run DIFFormer model on cora dataset 3 times, use:
-
-python main.py --cfg configs/DIFFormer/cora-DIFFormer.yaml --repeat 3
-
-# then the results will be stored into results/DIFFormer/cora-DIFFormer/
-
-# Use run_batch.sh to tune hyperparameters with grid file at "grids/"
-
-# Use agg_test.py to obtain aggregated results for all experiments
-
 ```
 
+---
+
+### 2. Run a Single Experiment
+
+Use `main.py` along with a configuration file to launch an experiment. Configuration files are stored in:
+
+```
+configs/<ModelName>/<DatasetName-ModelName>.yaml
+```
+
+#### Example: Run DIFFormer on Cora (3 runs)
+
+```bash
+python main.py --cfg configs/DIFFormer/cora-DIFFormer.yaml --repeat 3
+```
+
+Results will be saved automatically to:
+
+```
+results/DIFFormer/cora-DIFFormer/
+```
+
+---
+
+### 3. Hyperparameter Tuning
+
+To perform grid search on hyperparameters, use the provided `run_batch.sh` script and corresponding grid files under the `grids/` directory.
+
+
+```bash
+bash run_batch.sh
+```
+
+Please note that the grid file and the configuration file names should be modified in the script.
+
+Each line of the grid file should be written in the following format:
+
+```text
+<Config parameter name> <Display name> <List of possible values>
+```
+
+For example:
+
+```text
+gt.layers nlayer [1,2,3,4]
+gt.aggregate agg ['add', 'cat']
+gt.dropout dropout [0.2, 0.5, 0.8]
+```
+
+This will explore all parameter combinations defined in the relevant grid configuration.
+
+---
+
+### 4. Aggregating Results
+
+To summarize and aggregate results from multiple runs:
+
+```bash
+python agg_test.py
+```
+
+This script collects results across seeds and outputs averaged performance metrics with standard deviations in to a `.csv` file.
