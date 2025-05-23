@@ -1,6 +1,6 @@
 site_name: OpenGT
 theme:
-  name: material
+  name: readthedocs
   highlightjs: true
 plugins:
   - search
