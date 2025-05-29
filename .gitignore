@@ -30,6 +30,7 @@ __pycache__/
 *_grid_*/
 results*.csv
 *.html
+docs/build/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
