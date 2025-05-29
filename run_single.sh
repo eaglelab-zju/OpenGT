@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-MODEL=GPS+GE
+MODEL=DIFFormer
 DATASET=wn-chameleon
 
 python main.py --cfg configs/${MODEL}/${DATASET}-${MODEL}.yaml --repeat 3
