@@ -2,13 +2,10 @@
 
 OpenGT Documentation
 ===================================
-.. figure:: img/opengt.jpg
-   :width: 400
-   :align: center
 
 **OpenGT** is a benchmark for Graph Transformers.
 
-.. figure:: img/timeline.jpg
+.. figure:: img/timeline.png
    :align: center
 
 It is designed for evaluating and analyzing Graph Transformers (GTs) under a unified framework.
@@ -25,7 +22,7 @@ If you use our benchmark in your works, we would appreciate citations to the pap
 
 .. code-block:: bibtex
 
-   placeholder
+   currently under review
 
 .. toctree::
    :glob:
