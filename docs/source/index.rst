@@ -5,7 +5,7 @@ OpenGT Documentation
 
 **OpenGT** is a benchmark for Graph Transformers.
 
-.. figure:: img/timeline.png
+.. figure:: img/timeline.jpg
    :align: center
 
 It is designed for evaluating and analyzing Graph Transformers (GTs) under a unified framework.
