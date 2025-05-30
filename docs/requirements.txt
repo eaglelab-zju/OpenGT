@@ -3,10 +3,12 @@ sphinx_rtd_theme
 
 torch==2.5.0
 torch_geometric
-torch_scatter
-torch_sparse
-torch_cluster
-torch_spline_conv
+https://data.pyg.org/whl/torch-2.5.0%2Bcpu/pyg_lib-0.4.0%2Bpt25cpu-cp310-cp310-linux_x86_64.whl
+https://data.pyg.org/whl/torch-2.5.0%2Bcpu/torch_cluster-1.6.3%2Bpt25cpu-cp310-cp310-linux_x86_64.whl
+https://data.pyg.org/whl/torch-2.5.0%2Bcpu/torch_scatter-2.1.2%2Bpt25cpu-cp310-cp310-linux_x86_64.whl
+https://data.pyg.org/whl/torch-2.5.0%2Bcpu/torch_sparse-0.6.18%2Bpt25cpu-cp310-cp310-linux_x86_64.whl
+https://data.pyg.org/whl/torch-2.5.0%2Bcpu/torch_spline_conv-1.2.2%2Bpt25cpu-cp310-cp310-linux_x86_64.whl
+
 yacs
 pytorch-lightning
 torchmetrics
