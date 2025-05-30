@@ -39,7 +39,7 @@ The picture below shows a timeline of GT development, dividing GTs into 3 catego
 conda create -n opengt python=3.10
 conda activate opengt
 
-pip install pytorch=2.5 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+pip install torch==2.5 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
 
 pip install torch_geometric
 
@@ -54,6 +54,7 @@ pip install tensorboardX
 pip install ogb
 pip install wandb
 pip install pymetis
+pip install opt-einsum
 
 conda clean --all
 ```
