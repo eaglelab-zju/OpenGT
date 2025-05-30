@@ -1,9 +1,8 @@
 sphinx
 sphinx_rtd_theme
 
-torch
+torch==2.5.0
 torch_geometric
-pyg_lib
 torch_scatter
 torch_sparse
 torch_cluster
