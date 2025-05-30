@@ -1,6 +1,14 @@
 opengt.config
 ==============
 
-.. automodule:: opengt.config
-   :members: overwrite_defaults_cfg set_cfg_gt set_cfg_preprocess
+.. automodule:: opengt.config.defaults_config
+   :members: overwrite_defaults_cfg
+   :show-inheritance:
+
+.. automodule:: opengt.config.data_preprocess_config
+   :members:
+   :show-inheritance:
+
+.. automodule:: opengt.config.gt_config
+   :members:
    :show-inheritance:
