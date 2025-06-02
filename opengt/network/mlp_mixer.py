@@ -54,22 +54,22 @@ class GraphMLPMixer(nn.Module):
 
         self.pre_mp = GeneralLayer('linear', new_layer_config(dim_in = dim_in, dim_out = cfg.gt.dim_hidden, num_layers = 1, has_act = True, has_bias = True, cfg = cfg))
 
-        '''
+        
         # Patch Encoder
-        x = x[data.subgraphs_nodes_mapper]
-        e = edge_attr[data.subgraphs_edges_mapper]
-        edge_index = data.combined_subgraphs
-        batch_x = data.subgraphs_batch
-        for i, gnn in enumerate(self.gnns):
-            if i > 0:
-                subgraph = scatter(x, batch_x, dim=0,
-                                   reduce=self.pooling)[batch_x]
-                x = x + self.U[i-1](subgraph)
-                x = scatter(x, data.subgraphs_nodes_mapper,
-                            dim=0, reduce='mean')[data.subgraphs_nodes_mapper]
-            x = gnn(x, edge_index, e)
-        subgraph_x = scatter(x, batch_x, dim=0, reduce=self.pooling)
-        '''
+        # x = x[data.subgraphs_nodes_mapper]
+        # e = edge_attr[data.subgraphs_edges_mapper]
+        # edge_index = data.combined_subgraphs
+        # batch_x = data.subgraphs_batch
+        # for i, gnn in enumerate(self.gnns):
+        #     if i > 0:
+        #         subgraph = scatter(x, batch_x, dim=0,
+        #                            reduce=self.pooling)[batch_x]
+        #         x = x + self.U[i-1](subgraph)
+        #         x = scatter(x, data.subgraphs_nodes_mapper,
+        #                     dim=0, reduce='mean')[data.subgraphs_nodes_mapper]
+        #     x = gnn(x, edge_index, e)
+        # subgraph_x = scatter(x, batch_x, dim=0, reduce=self.pooling)
+        
 
         self.patch_encoder = PatchEncoder(dim_in=cfg.gt.dim_hidden, dim_out=cfg.gt.dim_hidden)
         # needs scatter & patch rw encoder residual

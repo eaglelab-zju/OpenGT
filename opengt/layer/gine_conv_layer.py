@@ -13,7 +13,7 @@ class GINEConvESLapPE(pyg_nn.conv.MessagePassing):
 
     Modified torch_geometric.nn.conv.GINEConv layer to perform message scaling
     according to equiv. stable PEG-layer with Laplacian Eigenmap (LapPE):
-        ICLR 2022 https://openreview.net/pdf?id=e95i1IHcWj
+    ICLR 2022 https://openreview.net/pdf?id=e95i1IHcWj
     """
     def __init__(self, nn, eps=0., train_eps=False, edge_dim=None, **kwargs):
         kwargs.setdefault('aggr', 'add')

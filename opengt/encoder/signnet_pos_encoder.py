@@ -174,7 +174,8 @@ class MaskedGINDeepSigns(nn.Module):
 
 @register_node_encoder('SignNet')
 class SignNetNodeEncoder(torch.nn.Module):
-    """SignNet Positional Embedding node encoder.
+    """
+    SignNet Positional Embedding node encoder.
     https://arxiv.org/abs/2202.13013
     https://github.com/cptq/SignNet-BasisNet
 
@@ -189,9 +190,9 @@ class SignNetNodeEncoder(torch.nn.Module):
     If `expand_x` set True, original node features will be first linearly
     projected to (dim_emb - dim_pe) size and the concatenated with SignNetPE.
 
-    Args:
-        dim_emb: Size of final node embedding
-        expand_x: Expand node features `x` from dim_in to (dim_emb - dim_pe)
+    Parameters:
+        dim_emb (int): Size of final node embedding
+        expand_x (bool): Expand node features `x` from dim_in to (dim_emb - dim_pe)
     """
 
     def __init__(self, dim_emb, expand_x=True):

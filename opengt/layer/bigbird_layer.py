@@ -54,7 +54,8 @@ def apply_chunking_to_forward(
     `chunk_dim`. It then applies a layer `forward_fn` to each chunk independently to save memory.
     If the `forward_fn` is independent across the `chunk_dim` this function will yield the same result as directly
     applying `forward_fn` to `input_tensors`.
-    Args:
+
+    Parameters:
         forward_fn (`Callable[..., torch.Tensor]`):
             The forward function of the model.
         chunk_size (`int`):
@@ -63,8 +64,10 @@ def apply_chunking_to_forward(
             The dimension over which the `input_tensors` should be chunked.
         input_tensors (`Tuple[torch.Tensor]`):
             The input tensors of `forward_fn` which will be chunked
+    
     Returns:
         `torch.Tensor`: A tensor with the same shape as the `forward_fn` would have given if applied`.
+    
     Examples:
     ```python
     # rename the usual forward() fn to forward_chunk()
@@ -74,6 +77,7 @@ def apply_chunking_to_forward(
     # implement a chunked forward function
     def forward(self, hidden_states):
         return apply_chunking_to_forward(self.forward_chunk, self.chunk_size_lm_head, self.seq_len_dim, hidden_states)
+    
     ```
     """
 
