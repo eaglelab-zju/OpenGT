@@ -12,3 +12,4 @@ opengt.config
 .. automodule:: opengt.config.gt_config
    :members:
    :show-inheritance:
+

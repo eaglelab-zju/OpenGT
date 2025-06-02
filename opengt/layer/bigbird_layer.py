@@ -74,7 +74,8 @@ def apply_chunking_to_forward(
     # implement a chunked forward function
     def forward(self, hidden_states):
         return apply_chunking_to_forward(self.forward_chunk, self.chunk_size_lm_head, self.seq_len_dim, hidden_states)
-    ```"""
+    ```
+    """
 
     assert len(input_tensors) > 0, f"{input_tensors} has to be a tuple/list of tensors"
 
