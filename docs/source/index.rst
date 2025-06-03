@@ -26,7 +26,7 @@ If you use our benchmark in your works, we would appreciate citations to the pap
 
 .. toctree::
    :glob:
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Getting Started
 
    notes/installation
@@ -35,7 +35,7 @@ If you use our benchmark in your works, we would appreciate citations to the pap
 
 .. toctree::
    :glob:
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Modules
 
    opengt.config
