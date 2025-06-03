@@ -11,26 +11,20 @@ First, activate the project environment:
 	conda activate opengt
 
 
----
 
 2. Run a Single Experiment
 
-Use `main.py` along with a configuration file to launch an experiment. Configuration files are stored in:
+Use `main.py` along with a configuration file to launch an experiment. Configuration files are stored in: ``configs/<ModelName>/<DatasetName-ModelName>.yaml``
 
-``configs/<ModelName>/<DatasetName-ModelName>.yaml``
-
-#### Example: Run DIFFormer on Cora (3 runs)
+Example: Run DIFFormer on Cora (3 runs)
 
 .. code-block:: bash
 
 	python main.py --cfg configs/DIFFormer/cora-DIFFormer.yaml --repeat 3
 
 
-Results will be saved automatically to:
+Results will be saved automatically to: ``results/DIFFormer/cora-DIFFormer/``
 
-``results/DIFFormer/cora-DIFFormer/``
-
----
 
 3. Hyperparameter Tuning
 
@@ -62,7 +56,6 @@ For example:
 
 This will explore all parameter combinations defined in the relevant grid configuration.
 
----
 
 4. Aggregating Results
 
