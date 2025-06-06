@@ -1,7 +1,7 @@
 sphinx
 sphinx_rtd_theme
 
-torch==2.5.0
+torch==2.7.1
 torch_geometric
 https://data.pyg.org/whl/torch-2.5.0%2Bcpu/pyg_lib-0.4.0%2Bpt25cpu-cp310-cp310-linux_x86_64.whl
 https://data.pyg.org/whl/torch-2.5.0%2Bcpu/torch_cluster-1.6.3%2Bpt25cpu-cp310-cp310-linux_x86_64.whl
