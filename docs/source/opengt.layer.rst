@@ -11,11 +11,6 @@ opengt.layer
    :exclude-members: forward
    :show-inheritance:
 
-.. automodule:: opengt.layer.bigbird_layer
-   :members:
-   :exclude-members: forward
-   :show-inheritance:
-
 .. automodule:: opengt.layer.degta_layer
    :members:
    :exclude-members: forward
@@ -63,7 +58,7 @@ opengt.layer
 
 .. automodule:: opengt.layer.multi_model_layer
    :members:
-   :exclude-members: forward
+   :exclude-members: forward GlobalModel LocalModel
    :show-inheritance:
 
 .. automodule:: opengt.layer.nodeformer_layer
@@ -77,11 +72,6 @@ opengt.layer
    :show-inheritance:
 
 .. automodule:: opengt.layer.patch_encoder
-   :members:
-   :exclude-members: forward
-   :show-inheritance:
-
-.. automodule:: opengt.layer.performer_layer
    :members:
    :exclude-members: forward
    :show-inheritance:

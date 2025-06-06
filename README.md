@@ -2,6 +2,8 @@
 
 [![Documentation Status](https://readthedocs.org/projects/opengt/badge/?version=latest)](https://opengt.readthedocs.io/en/latest/?badge=latest)
 
+![logo](./logo.png)
+
 Official code for [OpenGT](https://openreview.net/forum?id=qa1nx4CYID), a comprehensive and extensible benchmark suite built on top of [`torch_geometric.graphgym`](https://github.com/pyg-team/pytorch_geometric/tree/master/graphgym), designed for evaluating and analyzing **Graph Transformers (GTs)** under a unified framework.
 
 ## Overview

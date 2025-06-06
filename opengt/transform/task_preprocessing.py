@@ -9,7 +9,7 @@ def shuffle(tensor):
 def task_specific_preprocessing(data, cfg):
     """Task-specific preprocessing before the dataset is logged and finalized.
 
-    Args:
+    Parameters:
         data: PyG graph
         cfg: Main configuration node
 

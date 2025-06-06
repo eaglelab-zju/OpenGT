@@ -11,11 +11,6 @@ opengt.encoder
    :exclude-members: forward
    :show-inheritance:
 
-.. automodule:: opengt.encoder.dummy_edge_encoder
-   :members: 
-   :exclude-members: forward
-   :show-inheritance:
-
 .. automodule:: opengt.encoder.equivstable_laplace_pos_encoder
    :members: 
    :exclude-members: forward
@@ -43,7 +38,7 @@ opengt.encoder
 
 .. automodule:: opengt.encoder.graphormer_encoder
    :members: 
-   :exclude-members: forward
+   :exclude-members: forward BiasEncoder NodeEncoder GraphormerEncoder graphormer_pre_processing
    :show-inheritance:
 
 .. automodule:: opengt.encoder.kernel_pos_encoder
@@ -78,7 +73,7 @@ opengt.encoder
 
 .. automodule:: opengt.encoder.signnet_pos_encoder
    :members: 
-   :exclude-members: forward
+   :exclude-members: forward GIN MLP
    :show-inheritance:
 
 .. automodule:: opengt.encoder.sine_encoder
@@ -88,7 +83,7 @@ opengt.encoder
 
 .. automodule:: opengt.encoder.spd_encoder
    :members: 
-   :exclude-members: forward
+   :exclude-members: forward full_edge_index
    :show-inheritance:
 
 .. automodule:: opengt.encoder.type_dict_encoder
