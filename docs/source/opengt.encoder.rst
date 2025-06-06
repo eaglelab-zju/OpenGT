@@ -73,7 +73,7 @@ opengt.encoder
 
 .. automodule:: opengt.encoder.signnet_pos_encoder
    :members: GINDeepSigns, MaskedGINDeepSigns, SignNetNodeEncoder
-   :exclude-members: forward GIN MLP
+   :exclude-members: forward, GIN, MLP
    :show-inheritance:
 
 .. automodule:: opengt.encoder.sine_encoder
