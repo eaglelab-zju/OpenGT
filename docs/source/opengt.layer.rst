@@ -58,7 +58,7 @@ opengt.layer
 
 .. automodule:: opengt.layer.multi_model_layer
    :members:
-   :exclude-members: forward GlobalModel LocalModel
+   :exclude-members: forward, GlobalModel, LocalModel
    :show-inheritance:
 
 .. automodule:: opengt.layer.nodeformer_layer

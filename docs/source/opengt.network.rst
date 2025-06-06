@@ -83,7 +83,7 @@ opengt.network
 
 .. automodule:: opengt.network.specformer
    :members: 
-   :exclude-members: forward swapex
+   :exclude-members: forward, swapex
    :show-inheritance:
 
 .. automodule:: opengt.network.trans_conv

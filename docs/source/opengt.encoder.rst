@@ -38,7 +38,7 @@ opengt.encoder
 
 .. automodule:: opengt.encoder.graphormer_encoder
    :members: 
-   :exclude-members: forward BiasEncoder NodeEncoder GraphormerEncoder graphormer_pre_processing
+   :exclude-members: forward, BiasEncoder, NodeEncoder, GraphormerEncoder, graphormer_pre_processing
    :show-inheritance:
 
 .. automodule:: opengt.encoder.kernel_pos_encoder
@@ -72,7 +72,7 @@ opengt.encoder
    :show-inheritance:
 
 .. automodule:: opengt.encoder.signnet_pos_encoder
-   :members: 
+   :members: GINDeepSigns, MaskedGINDeepSigns, SignNetNodeEncoder
    :exclude-members: forward GIN MLP
    :show-inheritance:
 
@@ -83,7 +83,7 @@ opengt.encoder
 
 .. automodule:: opengt.encoder.spd_encoder
    :members: 
-   :exclude-members: forward full_edge_index
+   :exclude-members: forward, full_edge_index
    :show-inheritance:
 
 .. automodule:: opengt.encoder.type_dict_encoder
