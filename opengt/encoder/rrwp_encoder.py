@@ -107,7 +107,8 @@ class RRWPLinearEdgeEncoder(torch.nn.Module):
         - FC_2 given by the TypedictEncoder in same cases
         - Zero-padding for non-existing edges in fully-connected graph
         - (optional) add node-attr as the E_{i,i}'s attr
-            note: assuming  node-attr and edge-attr is with the same dimension after Encoders
+        
+        note: assuming  node-attr and edge-attr is with the same dimension after Encoders
     '''
     def __init__(self, emb_dim, out_dim, batchnorm=False, layernorm=False, use_bias=False,
                  pad_to_full_graph=True, fill_value=0.,

@@ -2,6 +2,8 @@
 
 [![Documentation Status](https://readthedocs.org/projects/opengt/badge/?version=latest)](https://opengt.readthedocs.io/en/latest/?badge=latest)
 
+![logo](./logo.png)
+
 Official code for [OpenGT](https://openreview.net/forum?id=qa1nx4CYID), a comprehensive and extensible benchmark suite built on top of [`torch_geometric.graphgym`](https://github.com/pyg-team/pytorch_geometric/tree/master/graphgym), designed for evaluating and analyzing **Graph Transformers (GTs)** under a unified framework.
 
 ## Overview
@@ -39,7 +41,7 @@ The picture below shows a timeline of GT development, dividing GTs into 3 catego
 conda create -n opengt python=3.10
 conda activate opengt
 
-pip install pytorch=2.5 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+pip install torch==2.5 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
 
 pip install torch_geometric
 
@@ -54,6 +56,7 @@ pip install tensorboardX
 pip install ogb
 pip install wandb
 pip install pymetis
+pip install opt-einsum
 
 conda clean --all
 ```

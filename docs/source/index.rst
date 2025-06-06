@@ -3,6 +3,9 @@
 OpenGT Documentation
 ===================================
 
+.. figure:: img/logo.png
+   :align: center
+
 **OpenGT** is a benchmark for Graph Transformers.
 
 .. figure:: img/timeline.jpg
@@ -26,7 +29,7 @@ If you use our benchmark in your works, we would appreciate citations to the pap
 
 .. toctree::
    :glob:
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Getting Started
 
    notes/installation
@@ -35,7 +38,7 @@ If you use our benchmark in your works, we would appreciate citations to the pap
 
 .. toctree::
    :glob:
-   :maxdepth: 3
+   :maxdepth: 1
    :caption: Modules
 
    opengt.config
