@@ -20,6 +20,7 @@ from opengt.loader.dataset.aqsol_molecules import AQSOL
 from opengt.loader.dataset.coco_superpixels import COCOSuperpixels
 from opengt.loader.dataset.malnet_tiny import MalNetTiny
 from opengt.loader.dataset.voc_superpixels import VOCSuperpixels
+from opengt.loader.dataset.critical import Critical
 from opengt.loader.split_generator import (prepare_splits,
                                              set_dataset_splits)
 from opengt.transform.posenc_stats import compute_posenc_stats
@@ -205,6 +206,10 @@ def load_dataset_master(format, name, dataset_dir):
 
         else:
             raise ValueError(f"Unsupported OGB(-derived) dataset: {name}")
+    elif format == 'Critical':
+        dataset_dir = osp.join(dataset_dir, 'Critical')
+        dataset = Critical(dataset_dir, name)
+        
     else:
         raise ValueError(f"Unknown data format: {format}")
     log_loaded_dataset(dataset, format, name)
