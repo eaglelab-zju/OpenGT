@@ -1,6 +1,7 @@
 # OpenGT
 
 [![Documentation Status](https://readthedocs.org/projects/opengt/badge/?version=latest)](https://opengt.readthedocs.io/en/latest/?badge=latest)
+[![license](https://badgen.net/github/license/eaglelab-zju/OpenGT?color=green)](https://github.com/eaglelab-zju/OpenGT/blob/main/LICENSE)
 
 ![logo](./logo.png)
 
