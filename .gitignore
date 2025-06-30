@@ -31,6 +31,7 @@ __pycache__/
 results*.csv
 *.html
 docs/build/
+*.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

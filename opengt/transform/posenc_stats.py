@@ -22,7 +22,7 @@ def custom_eigh(L):
         EigVals: Eigenvalues
         EigVecs: Eigenvectors
     """
-    if L.shape[0] > 1000:
+    if L.shape[0] > 5000:
         # Use scipy's eigh for large matrices
         EigVals, EigVecs = np.linalg.eigh(L.cpu().numpy())
         return torch.from_numpy(EigVals).to(L.device), torch.from_numpy(EigVecs).to(L.device)
