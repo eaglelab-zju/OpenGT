@@ -5,8 +5,9 @@ dataset:
   edge_encoder_name: DummyEdge
   format: Critical
   name: chameleon
-  node_encoder: false
+  node_encoder: true
   node_encoder_bn: false
+  node_encoder_name: LinearNode+WLSE
   split_mode: standard
   task: node
   task_type: classification
@@ -24,26 +25,25 @@ gnn:
 graphormer:
   use_graph_token: false
 gt:
-  alpha: 0.5
+  aggregate: add
   attn_dropout: 0.5
   batch_norm: false
   dim_hidden: 96
-  dropout: 0.5
+  dropout: 0.2
   graph_weight: 0.2
-  kernel: simple
   layer_norm: false
   layer_type: GCN+Transformer
-  layers: 2
-  n_heads: 2
+  layers: 4
+  n_heads: 3
+  use_act: true
   use_graph: true
   use_residual: true
-  use_source: true
   use_weight: true
 metric_best: accuracy
 model:
   edge_decoding: dot
   loss_fun: cross_entropy
-  type: DIFFormer
+  type: SGFormer
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
@@ -77,6 +77,10 @@ posenc_RWSE:
     times_func: range(1,17)
   model: Linear
   raw_norm_type: BatchNorm
+posenc_WLSE:
+  dim_pe: 16
+  enable: true
+  iterations: 3
 train:
   enable_ckpt: false
   eval_period: 1

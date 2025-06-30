@@ -5,8 +5,9 @@ dataset:
   edge_encoder_name: DummyEdge
   format: Critical
   name: chameleon
-  node_encoder: false
+  node_encoder: true
   node_encoder_bn: false
+  node_encoder_name: LinearNode+GraphormerBias
   split_mode: standard
   task: node
   task_type: classification
@@ -54,7 +55,7 @@ optim:
   weight_decay: 5e-4
 out_dir: results
 posenc_GraphormerBias:
-  enable: false
+  enable: true
   node_degrees_only: true
   num_in_degrees: 729
   num_out_degrees: 89

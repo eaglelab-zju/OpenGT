@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-MODEL=GPS
-CONFIG=wn-chameleon-GPS
-GRID=layer
+MODEL=SGFormer
+CONFIG=chameleon-new-SGFormer
+GRID=wn-chameleon-SGFormer
 REPEAT=3
 MAX_JOBS=4
 

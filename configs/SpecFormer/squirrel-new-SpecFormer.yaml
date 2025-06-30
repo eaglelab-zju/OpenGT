@@ -4,7 +4,7 @@ dataset:
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
   format: Critical
-  name: chameleon
+  name: squirrel
   node_encoder: false
   node_encoder_bn: false
   split_mode: standard
@@ -24,34 +24,27 @@ gnn:
 graphormer:
   use_graph_token: false
 gt:
-  alpha: 0.5
   attn_dropout: 0.5
   batch_norm: false
   dim_hidden: 96
   dropout: 0.5
-  graph_weight: 0.2
-  kernel: simple
   layer_norm: false
   layer_type: GCN+Transformer
   layers: 2
-  n_heads: 2
-  use_graph: true
-  use_residual: true
-  use_source: true
-  use_weight: true
+  n_heads: 3
 metric_best: accuracy
 model:
   edge_decoding: dot
   loss_fun: cross_entropy
-  type: DIFFormer
+  type: SpecFormer
 optim:
-  base_lr: 0.0005
+  base_lr: 0.001
   clip_grad_norm: true
   max_epoch: 400
   num_warmup_epochs: 20
   optimizer: adamW
   scheduler: cosine_with_warmup
-  weight_decay: 5e-4
+  weight_decay: 1e-5
 out_dir: results
 posenc_GraphormerBias:
   enable: false
@@ -70,6 +63,11 @@ posenc_LapPE:
   model: DeepSet
   n_heads: 4
   raw_norm_type: none
+posenc_LapRaw:
+  dim_pe: 16
+  enable: true
+  model: None
+  raw_norm_type: none
 posenc_RWSE:
   dim_pe: 16
   enable: false
@@ -83,5 +81,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: chameleon-new
+  project: squirrel-new
   use: false

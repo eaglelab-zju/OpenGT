@@ -5,8 +5,9 @@ dataset:
   edge_encoder_name: DummyEdge
   format: Critical
   name: chameleon
-  node_encoder: false
+  node_encoder: true
   node_encoder_bn: false
+  node_encoder_name: LinearNode+RWSE
   split_mode: standard
   task: node
   task_type: classification
@@ -72,7 +73,7 @@ posenc_LapPE:
   raw_norm_type: none
 posenc_RWSE:
   dim_pe: 16
-  enable: false
+  enable: true
   kernel:
     times_func: range(1,17)
   model: Linear

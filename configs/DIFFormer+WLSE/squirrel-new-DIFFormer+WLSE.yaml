@@ -4,9 +4,10 @@ dataset:
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
   format: Critical
-  name: chameleon
-  node_encoder: false
+  name: squirrel
+  node_encoder: true
   node_encoder_bn: false
+  node_encoder_name: LinearNode+WLSE
   split_mode: standard
   task: node
   task_type: classification
@@ -77,11 +78,15 @@ posenc_RWSE:
     times_func: range(1,17)
   model: Linear
   raw_norm_type: BatchNorm
+posenc_WLSE:
+  dim_pe: 16
+  enable: true
+  iterations: 3
 train:
   enable_ckpt: false
   eval_period: 1
   mode: custom
   sampler: full_batch
 wandb:
-  project: chameleon-new
+  project: squirrel-new
   use: false

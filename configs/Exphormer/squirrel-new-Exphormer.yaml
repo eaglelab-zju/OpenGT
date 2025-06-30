@@ -1,87 +1,73 @@
 accelerator: cuda:3
 dataset:
-  edge_encoder: false
+  edge_encoder: true
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
   format: Critical
   name: squirrel
-  node_encoder: false
+  node_encoder: true
   node_encoder_bn: false
+  node_encoder_name: LinearNode
   split_mode: standard
   task: node
   task_type: classification
   transductive: true
 gnn:
-  act: gelu
+  act: relu
   agg: mean
   batchnorm: true
   dim_inner: 96
-  dropout: 0.2
+  dropout: 0.4
   head: node
   layers_post_mp: 1
-  layers_pre_mp: 0
+  layers_pre_mp: 1
   normalize_adj: false
-graphormer:
-  use_graph_token: false
 gt:
-  alpha: 0.5
-  attn_dropout: 0.5
-  batch_norm: false
+  attn_dropout: 0.6
+  batch_norm: true
   dim_hidden: 96
-  dropout: 0.5
-  graph_weight: 0.2
-  kernel: simple
+  dropout: 0.4
   layer_norm: false
-  layer_type: GCN+Transformer
-  layers: 2
-  n_heads: 2
-  use_graph: true
-  use_residual: true
-  use_source: true
-  use_weight: true
+  layer_type: GCN+Exphormer
+  layers: 1
+  n_heads: 3
 metric_best: accuracy
 model:
   edge_decoding: dot
+  graph_pooling: add
   loss_fun: cross_entropy
-  type: DIFFormer
+  type: MultiModel
 optim:
-  base_lr: 0.0005
+  base_lr: 0.003
   clip_grad_norm: true
-  max_epoch: 400
-  num_warmup_epochs: 20
+  max_epoch: 200
+  num_warmup_epochs: 10
   optimizer: adamW
   scheduler: cosine_with_warmup
-  weight_decay: 5e-4
+  weight_decay: 3e-5
 out_dir: results
-posenc_GraphormerBias:
-  enable: false
-  node_degrees_only: true
-  num_in_degrees: 729
-  num_out_degrees: 89
-  num_spatial_types: 20
 posenc_LapPE:
-  dim_pe: 4
+  dim_pe: 8
   eigen:
     eigvec_norm: L2
     laplacian_norm: none
-    max_freqs: 4
+    max_freqs: 8
   enable: false
   layers: 2
   model: DeepSet
   n_heads: 4
   raw_norm_type: none
-posenc_RWSE:
-  dim_pe: 16
-  enable: false
-  kernel:
-    times_func: range(1,17)
-  model: Linear
-  raw_norm_type: BatchNorm
+prep:
+  add_edge_index: true
+  exp: true
+  exp_deg: 3
+  num_virt_node: 0
 train:
+  batch_size: 32
   enable_ckpt: false
   eval_period: 1
   mode: custom
-  sampler: full_batch
 wandb:
+  entity: expand-gnns
   project: squirrel-new
   use: false

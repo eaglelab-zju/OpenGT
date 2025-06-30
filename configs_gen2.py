@@ -62,7 +62,10 @@ config_out = copy.deepcopy(config)
 config_out['accelerator'] = args.accelerator
 config_out['wandb']['use'] = False
 config_out['wandb']['project'] = args.dataset
-config_out['dataset']['name'] = args.dataset
+if 'new' in args.dataset:
+    config_out['dataset']['name'] = args.dataset.split('-')[0]
+else:
+    config_out['dataset']['name'] = args.dataset
 
 config_out['dataset']['split_mode'] = 'standard'
 config_out['train']['eval_period'] = 1
@@ -90,6 +93,27 @@ if args.dataset in ['chameleon', 'squirrel']:
     config_out['dataset']['task_type'] = 'classification'
     config_out['model']['loss_fun'] = 'cross_entropy'
     config_out['gnn']['head'] = 'node'
+if args.dataset in ['chameleon-new', 'squirrel-new']:
+    config_out['dataset']['format'] = 'Critical'
+    config_out['dataset']['task'] = 'node'
+    config_out['dataset']['task_type'] = 'classification'
+    config_out['model']['loss_fun'] = 'cross_entropy'
+    config_out['gnn']['head'] = 'node'
+    if 'GPS' in args.model:
+        config_out['gt']['layers'] = 2
+        config_out['gt']['n_heads'] = 2
+        config_out['gt']['dropout'] = 0.2
+        config_out['gt']['attn_dropout'] = 0.2
+    elif 'DIFFormer' in args.model:
+        config_out['gt']['layers'] = 2
+        config_out['gt']['n_heads'] = 2
+        config_out['gt']['dropout'] = 0.5
+        config_out['gt']['graph_weight'] = 0.2
+    elif 'SGFormer' in args.model:
+        config_out['gt']['layers'] = 4
+        config_out['gt']['n_heads'] = 3
+        config_out['gt']['dropout'] = 0.2
+        config_out['gt']['graph_weight'] = 0.2
 if args.dataset in ['cornell', 'texas', 'wisconsin']:
     config_out['dataset']['format'] = 'PyG-WebKB'
     config_out['dataset']['task'] = 'node'

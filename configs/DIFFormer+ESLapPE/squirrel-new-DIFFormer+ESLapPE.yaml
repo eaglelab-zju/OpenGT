@@ -4,9 +4,10 @@ dataset:
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
   format: Critical
-  name: chameleon
-  node_encoder: false
+  name: squirrel
+  node_encoder: true
   node_encoder_bn: false
+  node_encoder_name: LinearNode+EquivStableLapPE
   split_mode: standard
   task: node
   task_type: classification
@@ -53,6 +54,13 @@ optim:
   scheduler: cosine_with_warmup
   weight_decay: 5e-4
 out_dir: results
+posenc_EquivStableLapPE:
+  eigen:
+    eigvec_norm: L2
+    laplacian_norm: none
+    max_freqs: 10
+  enable: true
+  raw_norm_type: none
 posenc_GraphormerBias:
   enable: false
   node_degrees_only: true
@@ -83,5 +91,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: chameleon-new
+  project: squirrel-new
   use: false

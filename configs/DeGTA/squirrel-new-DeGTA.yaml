@@ -4,9 +4,10 @@ dataset:
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
   format: Critical
-  name: chameleon
-  node_encoder: false
+  name: squirrel
+  node_encoder: true
   node_encoder_bn: false
+  node_encoder_name: LinearNode+LapPE+RWSE
   split_mode: standard
   task: node
   task_type: classification
@@ -15,7 +16,7 @@ gnn:
   act: gelu
   agg: mean
   batchnorm: true
-  dim_inner: 96
+  dim_inner: 80
   dropout: 0.2
   head: node
   layers_post_mp: 1
@@ -24,26 +25,20 @@ gnn:
 graphormer:
   use_graph_token: false
 gt:
-  alpha: 0.5
+  K: 4
   attn_dropout: 0.5
   batch_norm: false
-  dim_hidden: 96
-  dropout: 0.5
-  graph_weight: 0.2
-  kernel: simple
-  layer_norm: false
+  dim_hidden: 80
+  dropout: 0.2
+  layer_norm: true
   layer_type: GCN+Transformer
-  layers: 2
+  layers: 1
   n_heads: 2
-  use_graph: true
-  use_residual: true
-  use_source: true
-  use_weight: true
 metric_best: accuracy
 model:
   edge_decoding: dot
   loss_fun: cross_entropy
-  type: DIFFormer
+  type: DeGTA
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
@@ -60,19 +55,19 @@ posenc_GraphormerBias:
   num_out_degrees: 89
   num_spatial_types: 20
 posenc_LapPE:
-  dim_pe: 4
+  dim_pe: 8
   eigen:
     eigvec_norm: L2
     laplacian_norm: none
     max_freqs: 4
-  enable: false
+  enable: true
   layers: 2
   model: DeepSet
   n_heads: 4
   raw_norm_type: none
 posenc_RWSE:
-  dim_pe: 16
-  enable: false
+  dim_pe: 8
+  enable: true
   kernel:
     times_func: range(1,17)
   model: Linear
@@ -83,5 +78,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: chameleon-new
+  project: squirrel-new
   use: false

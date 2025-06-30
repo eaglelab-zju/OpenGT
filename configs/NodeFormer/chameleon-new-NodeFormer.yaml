@@ -7,6 +7,7 @@ dataset:
   name: chameleon
   node_encoder: false
   node_encoder_bn: false
+  node_encoder_name: None
   split_mode: standard
   task: node
   task_type: classification
@@ -24,26 +25,28 @@ gnn:
 graphormer:
   use_graph_token: false
 gt:
-  alpha: 0.5
   attn_dropout: 0.5
-  batch_norm: false
+  batch_norm: true
   dim_hidden: 96
-  dropout: 0.5
-  graph_weight: 0.2
-  kernel: simple
+  dropout: 0.2
+  edge_loss_weight: 0.1
+  kernel_trans: softmax
   layer_norm: false
   layer_type: GCN+Transformer
-  layers: 2
-  n_heads: 2
-  use_graph: true
+  layers: 3
+  n_heads: 3
+  nb_random_features: 30
+  rb_order: 2
+  rb_trans: sigmoid
+  use_act: true
+  use_edge_loss: true
+  use_gumbel: true
   use_residual: true
-  use_source: true
-  use_weight: true
 metric_best: accuracy
 model:
   edge_decoding: dot
   loss_fun: cross_entropy
-  type: DIFFormer
+  type: NodeFormer
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
@@ -77,6 +80,8 @@ posenc_RWSE:
     times_func: range(1,17)
   model: Linear
   raw_norm_type: BatchNorm
+prep:
+  rb_order: 2
 train:
   enable_ckpt: false
   eval_period: 1

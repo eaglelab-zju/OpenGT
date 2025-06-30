@@ -4,7 +4,7 @@ dataset:
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
   format: Critical
-  name: chameleon
+  name: squirrel
   node_encoder: false
   node_encoder_bn: false
   split_mode: standard
@@ -24,26 +24,25 @@ gnn:
 graphormer:
   use_graph_token: false
 gt:
-  alpha: 0.5
+  aggregate: add
   attn_dropout: 0.5
   batch_norm: false
   dim_hidden: 96
-  dropout: 0.5
+  dropout: 0.2
   graph_weight: 0.2
-  kernel: simple
   layer_norm: false
   layer_type: GCN+Transformer
-  layers: 2
-  n_heads: 2
+  layers: 4
+  n_heads: 3
+  use_act: true
   use_graph: true
   use_residual: true
-  use_source: true
   use_weight: true
 metric_best: accuracy
 model:
   edge_decoding: dot
   loss_fun: cross_entropy
-  type: DIFFormer
+  type: SGFormer
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
@@ -83,5 +82,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: chameleon-new
+  project: squirrel-new
   use: false

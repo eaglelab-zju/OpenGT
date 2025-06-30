@@ -5,8 +5,9 @@ dataset:
   edge_encoder_name: DummyEdge
   format: Critical
   name: chameleon
-  node_encoder: false
+  node_encoder: true
   node_encoder_bn: false
+  node_encoder_name: LinearNode
   split_mode: standard
   task: node
   task_type: classification
@@ -24,34 +25,27 @@ gnn:
 graphormer:
   use_graph_token: false
 gt:
-  alpha: 0.5
-  attn_dropout: 0.5
+  attn_dropout: 0.2
   batch_norm: false
   dim_hidden: 96
-  dropout: 0.5
-  graph_weight: 0.2
-  kernel: simple
+  dropout: 0.2
   layer_norm: false
   layer_type: GCN+Transformer
   layers: 2
   n_heads: 2
-  use_graph: true
-  use_residual: true
-  use_source: true
-  use_weight: true
 metric_best: accuracy
 model:
   edge_decoding: dot
   loss_fun: cross_entropy
-  type: DIFFormer
+  type: GPSModel
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
-  max_epoch: 400
-  num_warmup_epochs: 20
+  max_epoch: 200
+  num_warmup_epochs: 10
   optimizer: adamW
   scheduler: cosine_with_warmup
-  weight_decay: 5e-4
+  weight_decay: 1e-5
 out_dir: results
 posenc_GraphormerBias:
   enable: false
