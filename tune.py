@@ -213,4 +213,4 @@ if __name__ == '__main__':
     load_cfg(cfg, args)
     custom_set_out_dir(cfg, args.cfg_file, cfg.name_tag)
     study = optuna.create_study(study_name=f"my_study_{cfg.model.type}+{cfg.dataset.node_encoder_name}",storage="sqlite:///my_study.db",direction=('minimize' if cfg.metric_agg == 'argmin' else 'maximize'),load_if_exists=True)
-    study.optimize(objective, n_trials=1)
+    study.optimize(objective, n_trials=100)
