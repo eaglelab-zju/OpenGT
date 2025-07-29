@@ -1,4 +1,4 @@
-accelerator: cuda:1
+accelerator: cuda:4
 dataset:
   edge_encoder: false
   edge_encoder_bn: false
@@ -28,11 +28,11 @@ gt:
   attn_dropout: 0.5
   batch_norm: false
   dim_hidden: 96
-  dropout: 0.8
+  dropout: 0.5
   graph_weight: 0.8
   layer_norm: false
   layer_type: GCN+Transformer
-  layers: 2
+  layers: 3
   n_heads: 1
   use_act: true
   use_graph: true

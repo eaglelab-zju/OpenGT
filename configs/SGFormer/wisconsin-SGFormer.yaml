@@ -1,4 +1,4 @@
-accelerator: cuda:1
+accelerator: cuda:4
 dataset:
   edge_encoder: false
   edge_encoder_bn: false

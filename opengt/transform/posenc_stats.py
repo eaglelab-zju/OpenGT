@@ -77,12 +77,15 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
     # Eigen values and vectors.
     evals, evects = None, None
     if 'LapPE' in pe_types or 'EquivStableLapPE' in pe_types:
-        # Eigen-decomposition with numpy, can be reused for Heat kernels.
+        # Eigen-decomposition with torch, can be reused for Heat kernels.
         L = to_scipy_sparse_matrix(
             *get_laplacian(undir_edge_index, normalization=laplacian_norm_type,
-                           num_nodes=N)
+                   num_nodes=N)
         )
-        evals, evects = np.linalg.eigh(L.toarray())
+        L_tensor = torch.from_numpy(L.toarray()).float()
+        evals, evects = torch.linalg.eigh(L_tensor)
+        evals = evals.cpu().numpy()
+        evects = evects.cpu().numpy()
         
         if 'LapPE' in pe_types:
             max_freqs=cfg.posenc_LapPE.eigen.max_freqs
@@ -103,9 +106,12 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
             norm_type = None
         L = to_scipy_sparse_matrix(
             *get_laplacian(undir_edge_index, normalization=norm_type,
-                           num_nodes=N)
+                   num_nodes=N)
         )
-        evals_sn, evects_sn = np.linalg.eigh(L.toarray())
+        L_tensor = torch.from_numpy(L.toarray()).float()
+        evals_sn, evects_sn = torch.linalg.eigh(L_tensor)
+        evals_sn = evals_sn.cpu().numpy()
+        evects_sn = evects_sn.cpu().numpy()
         data.eigvals_sn, data.eigvecs_sn = get_lap_decomp_stats(
             evals=evals_sn, evects=evects_sn,
             max_freqs=cfg.posenc_SignNet.eigen.max_freqs,
@@ -126,10 +132,14 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
         # Get the eigenvalues and eigenvectors of the regular Laplacian,
         # if they have not yet been computed for 'eigen'.
         if laplacian_norm_type is not None or evals is None or evects is None:
-            L_heat = to_scipy_sparse_matrix(
-                *get_laplacian(undir_edge_index, normalization=None, num_nodes=N)
+            L = to_scipy_sparse_matrix(
+                *get_laplacian(undir_edge_index, normalization=None,
+                   num_nodes=N)
             )
-            evals_heat, evects_heat = np.linalg.eigh(L_heat.toarray())
+            L_tensor = torch.from_numpy(L.toarray()).float()
+            evals_heat, evects_heat = torch.linalg.eigh(L_tensor)
+            evals_heat = evals_heat.cpu().numpy()
+            evects_heat = evects_heat.cpu().numpy()
         else:
             evals_heat, evects_heat = evals, evects
         evals_heat = torch.from_numpy(evals_heat)

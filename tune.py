@@ -98,7 +98,8 @@ def run_loop_settings():
     if len(cfg.run_multiple_splits) == 0:
         # 'multi-seed' run mode
         num_iterations = args.repeat
-        seeds = [cfg.seed + x for x in range(num_iterations)]
+        #seeds = [cfg.seed + x for x in range(num_iterations)]
+        seeds = [x for x in range(num_iterations)] # use seeds starting from 0 when tuning
         split_indices = [cfg.dataset.split_index] * num_iterations
         run_ids = seeds
     else:
@@ -115,7 +116,10 @@ def run_loop_settings():
 import optuna
 
 def objective(trial):
-    global cfg, args
+    global cfg, args, out_dir_base
+    
+    cfg.out_dir = os.path.join(out_dir_base, "trial_"+str(trial.number))
+
     # Modify config based on the trial
     cfg.optim.base_lr = trial.suggest_float('base_lr', 1e-5, 1e-2, log=True)
     cfg.optim.weight_decay = trial.suggest_float('weight_decay', 1e-6, 1e-3, log=True)
@@ -212,5 +216,12 @@ if __name__ == '__main__':
     set_cfg(cfg)
     load_cfg(cfg, args)
     custom_set_out_dir(cfg, args.cfg_file, cfg.name_tag)
-    study = optuna.create_study(study_name=f"my_study_{cfg.model.type}+{cfg.dataset.node_encoder_name}",storage="sqlite:///my_study.db",direction=('minimize' if cfg.metric_agg == 'argmin' else 'maximize'),load_if_exists=True)
+    out_dir_base = cfg.out_dir
+    node_encoder_name = cfg.dataset.node_encoder_name
+    if not cfg.dataset.node_encoder:
+        node_encoder_name = 'none'
+    study = optuna.create_study(study_name=f"my_study_{cfg.model.type}+{node_encoder_name}_{cfg.dataset.name}",
+                                storage="sqlite:///my_study.db",
+                                direction=('minimize' if cfg.metric_agg == 'argmin' else 'maximize'),
+                                load_if_exists=True)
     study.optimize(objective, n_trials=100)
