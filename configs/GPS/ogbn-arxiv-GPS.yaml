@@ -1,10 +1,10 @@
-accelerator: cuda:1
+accelerator: cuda:0
 dataset:
   edge_encoder: false
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
-  format: Critical
-  name: chameleon
+  format: OGB
+  name: ogbn-arxiv
   node_encoder: true
   node_encoder_bn: false
   node_encoder_name: LapPE
@@ -47,6 +47,8 @@ optim:
   scheduler: cosine_with_warmup
   weight_decay: 1e-5
 out_dir: results
+prep:
+  add_self_loops: true
 posenc_GraphormerBias:
   enable: false
   node_degrees_only: true
@@ -77,5 +79,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: chameleon-new
+  project: ogbn-arxiv
   use: false

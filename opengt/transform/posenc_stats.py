@@ -22,7 +22,7 @@ def custom_eigh(L):
         EigVals: Eigenvalues
         EigVecs: Eigenvectors
     """
-    if L.shape[0] > 5000:
+    if L.shape[0] > 25000:
         # Use scipy's eigh for large matrices
         EigVals, EigVecs = np.linalg.eigh(L.cpu().numpy())
         return torch.from_numpy(EigVals).to(L.device), torch.from_numpy(EigVecs).to(L.device)
@@ -73,19 +73,11 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
         undir_edge_index = data.edge_index
     else:
         undir_edge_index = to_undirected(data.edge_index)
+    undir_edge_index.to(cfg.accelerator)
 
     # Eigen values and vectors.
     evals, evects = None, None
     if 'LapPE' in pe_types or 'EquivStableLapPE' in pe_types:
-        # Eigen-decomposition with torch, can be reused for Heat kernels.
-        L = to_scipy_sparse_matrix(
-            *get_laplacian(undir_edge_index, normalization=laplacian_norm_type,
-                   num_nodes=N)
-        )
-        L_tensor = torch.from_numpy(L.toarray()).float()
-        evals, evects = torch.linalg.eigh(L_tensor)
-        evals = evals.cpu().numpy()
-        evects = evects.cpu().numpy()
         
         if 'LapPE' in pe_types:
             max_freqs=cfg.posenc_LapPE.eigen.max_freqs
@@ -94,6 +86,16 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
             max_freqs=cfg.posenc_EquivStableLapPE.eigen.max_freqs
             eigvec_norm=cfg.posenc_EquivStableLapPE.eigen.eigvec_norm
         
+        # Eigen-decomposition with torch, can be reused for Heat kernels.
+        L_tensor = torch.sparse_coo_tensor(
+            *get_laplacian(undir_edge_index, normalization=laplacian_norm_type,
+                   num_nodes=N), (N,N), device=cfg.accelerator
+        )
+        if N <= 10000:
+            evals, evects = torch.linalg.eigh(L_tensor.to_dense())
+        else:
+            evals, evects = torch.lobpcg(L_tensor, k=min(max_freqs, N), largest=False)
+
         data.EigVals, data.EigVecs = get_lap_decomp_stats(
             evals=evals, evects=evects,
             max_freqs=max_freqs,
@@ -104,14 +106,15 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
         norm_type = cfg.posenc_SignNet.eigen.laplacian_norm.lower()
         if norm_type == 'none':
             norm_type = None
-        L = to_scipy_sparse_matrix(
+        L_tensor = torch.sparse_coo_tensor(
             *get_laplacian(undir_edge_index, normalization=norm_type,
-                   num_nodes=N)
+                   num_nodes=N), (N,N), device=cfg.accelerator
         )
-        L_tensor = torch.from_numpy(L.toarray()).float()
-        evals_sn, evects_sn = torch.linalg.eigh(L_tensor)
-        evals_sn = evals_sn.cpu().numpy()
-        evects_sn = evects_sn.cpu().numpy()
+        
+        if N <= 10000:
+            evals_sn, evects_sn = torch.linalg.eigh(L_tensor.to_dense())
+        else:
+            evals_sn, evects_sn = torch.lobpcg(L_tensor, k=min(cfg.posenc_SignNet.eigen.max_freqs, N), largest=False)
         data.eigvals_sn, data.eigvecs_sn = get_lap_decomp_stats(
             evals=evals_sn, evects=evects_sn,
             max_freqs=cfg.posenc_SignNet.eigen.max_freqs,
@@ -132,18 +135,18 @@ def compute_posenc_stats(data, pe_types, is_undirected, cfg):
         # Get the eigenvalues and eigenvectors of the regular Laplacian,
         # if they have not yet been computed for 'eigen'.
         if laplacian_norm_type is not None or evals is None or evects is None:
-            L = to_scipy_sparse_matrix(
+            #TODO: skip scipy
+            L_tensor = torch.sparse_coo_tensor(
                 *get_laplacian(undir_edge_index, normalization=None,
-                   num_nodes=N)
-            )
-            L_tensor = torch.from_numpy(L.toarray()).float()
+                    num_nodes=N), (N,N)
+            ).to_dense()
             evals_heat, evects_heat = torch.linalg.eigh(L_tensor)
-            evals_heat = evals_heat.cpu().numpy()
-            evects_heat = evects_heat.cpu().numpy()
         else:
             evals_heat, evects_heat = evals, evects
-        evals_heat = torch.from_numpy(evals_heat)
-        evects_heat = torch.from_numpy(evects_heat)
+        if not isinstance(evals_heat,torch.Tensor):
+            evals_heat = torch.from_numpy(evals_heat)
+        if not isinstance(evects_heat,torch.Tensor):
+            evects_heat = torch.from_numpy(evects_heat)
 
         # Get the full heat kernels.
         if 'HKfullPE' in pe_types:
@@ -247,15 +250,15 @@ def get_lap_decomp_stats(evals, evects, max_freqs, eigvec_norm='L2'):
         Tensor (num_nodes, max_freqs, 1) eigenvalues repeated for each node
         Tensor (num_nodes, max_freqs) of eigenvector values per node
     """
-    N = len(evals)  # Number of nodes, including disconnected nodes.
+    N = evects.shape[0]  # Number of nodes, including disconnected nodes.
 
     # Keep up to the maximum desired number of frequencies.
     idx = evals.argsort()[:max_freqs]
-    evals, evects = evals[idx], np.real(evects[:, idx])
-    evals = torch.from_numpy(np.real(evals)).clamp_min(0)
+    evals, evects = evals[idx], evects[:, idx]
+    evals = evals.clamp_min(0)
 
     # Normalize and pad eigen vectors.
-    evects = torch.from_numpy(evects).float()
+    evects = evects.float()
     evects = eigvec_normalizer(evects, evals, normalization=eigvec_norm)
     if N < max_freqs:
         EigVecs = F.pad(evects, (0, max_freqs - N), value=float('nan'))
@@ -269,7 +272,7 @@ def get_lap_decomp_stats(evals, evects, max_freqs, eigvec_norm='L2'):
         EigVals = evals.unsqueeze(0)
     EigVals = EigVals.repeat(N, 1).unsqueeze(2)
 
-    return EigVals, EigVecs
+    return EigVals.to('cpu'), EigVecs.to('cpu')
 
 
 def get_rw_landing_probs(ksteps, edge_index, edge_weight=None,

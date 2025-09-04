@@ -170,6 +170,8 @@ def set_dataset_splits(dataset, splits):
     Raises:
         ValueError: If any pair of splits has intersecting indices
     """
+    if isinstance(splits, dict):
+        splits = [splits['train'], splits['val'], splits['test']]
     # First check whether splits intersect and raise error if so.
     for i in range(len(splits) - 1):
         for j in range(i + 1, len(splits)):

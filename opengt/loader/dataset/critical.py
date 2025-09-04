@@ -9,7 +9,7 @@ from torch_geometric.data import Data, InMemoryDataset, download_url
 
 class Critical(InMemoryDataset):
 
-    url = 'https://github.com/yandex-research/heterophilous-graphs/raw/refs/heads/main/data/' # /NAME_filtered.npz
+    url = 'https://github.com/yandex-research/heterophilous-graphs/raw/refs/heads/main/data/' # /NAME_filtered.npz for squirrel and chameleon, /NAME.npz for others
 
     def __init__(
         self,
@@ -20,7 +20,7 @@ class Critical(InMemoryDataset):
         force_reload: bool = False,
     ) -> None:
         self.name = name.lower()
-        assert self.name in ['squirrel', 'chameleon']
+        assert self.name in ['squirrel', 'chameleon', 'roman_empire', 'amazon_ratings', 'minesweeper', 'questions', 'tolokers']
         super().__init__(root, transform, pre_transform,
                          force_reload=force_reload)
         self.load(self.processed_paths[0])
@@ -35,7 +35,10 @@ class Critical(InMemoryDataset):
 
     @property
     def raw_file_names(self) -> str:
-        return self.name+'_filtered.npz'
+        if self.name in ['squirrel', 'chameleon']:
+            return self.name+'_filtered.npz'
+        else:
+            return self.name+'.npz'
 
     @property
     def processed_file_names(self) -> str:
