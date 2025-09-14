@@ -41,7 +41,7 @@ model:
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
-  max_epoch: 400
+  max_epoch: 600
   num_warmup_epochs: 20
   optimizer: adamW
   scheduler: cosine_with_warmup
@@ -77,7 +77,15 @@ train:
   enable_ckpt: false
   eval_period: 1
   mode: custom
-  sampler: full_batch
+  sampler: neighbor # full_batch
+  neighbor_sizes: [10,5]
+  sample_node: True
+  node_per_graph: 1024
+  batch_size: 128
+val:
+  sampler: neighbor
+  sample_node: True
+  node_per_graph: 1024
 wandb:
   project: ogbn-arxiv
   use: false
