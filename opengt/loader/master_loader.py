@@ -166,7 +166,7 @@ def load_dataset_master(format, name, dataset_dir):
             dataset = preformat_ZINC(dataset_dir, name)
             
         elif pyg_dataset_id == 'AQSOL':
-            dataset = preformat_AQSOL(dataset_dir, name)
+            dataset = preformat_AQSOL(dataset_dir)
 
         else:
             raise ValueError(f"Unexpected PyG Dataset identifier: {format}")
@@ -414,8 +414,8 @@ def preformat_GNNBenchmarkDataset(dataset_dir, name):
         tf_list = [concat_x_and_pos]  # concat pixel value and pos. coordinate
         tf_list.append(partial(typecast_x, type_str='float'))
     else:
-        ValueError(f"Loading dataset '{name}' from "
-                   f"GNNBenchmarkDataset is not supported.")
+        raise ValueError(f"Loading dataset '{name}' from "
+                         f"GNNBenchmarkDataset is not supported.")
 
     dataset = join_dataset_splits(
         [GNNBenchmarkDataset(root=dataset_dir, name=name, split=split)
@@ -652,7 +652,7 @@ def preformat_TUDataset(dataset_dir, name):
     elif name.startswith('IMDB-') or name == "COLLAB":
         func = T.Constant()
     else:
-        ValueError(f"Loading dataset '{name}' from TUDataset is not supported.")
+        raise ValueError(f"Loading dataset '{name}' from TUDataset is not supported.")
     dataset = TUDataset(dataset_dir, name, pre_transform=func)
     return dataset
 
@@ -685,7 +685,7 @@ def preformat_ogbn(dataset_dir, name):
 
      # return dataset
   else:
-     ValueError(f"Unknown ogbn dataset '{name}'.")
+     raise ValueError(f"Unknown ogbn dataset '{name}'.")
 
 def preformat_ZINC(dataset_dir, name):
     """Load and preformat ZINC datasets.

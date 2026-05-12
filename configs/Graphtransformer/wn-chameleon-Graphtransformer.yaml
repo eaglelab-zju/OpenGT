@@ -57,7 +57,7 @@ model:
   loss_fun: cross_entropy
   edge_decoding: dot
 gt:
-  layer_type: GCN+Transformer
+  layer_type: Transformer
   layers: 2
   n_heads: 2
   dim_hidden: 96  # `gt.dim_hidden` must match `gnn.dim_inner`

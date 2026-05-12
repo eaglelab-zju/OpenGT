@@ -32,7 +32,7 @@ gt:
   dim_hidden: 96
   dropout: 0.5
   layer_norm: false
-  layer_type: GCN+Transformer
+  layer_type: Transformer
   layers: 4
   n_heads: 4
 metric_agg: argmax

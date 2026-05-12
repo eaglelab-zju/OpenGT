@@ -61,7 +61,25 @@ class CoBFormer(torch.nn.Module):
         
         z1 = batch1.x
         z2 = batch2.x
-        extra_loss = (F.cross_entropy(z1*self.tau, F.softmax(z2*self.tau, dim=1)) + F.cross_entropy(z2*self.tau, F.softmax(z1*self.tau, dim=1)))*(1-self.alpha)/self.alpha
+        total_loss = z1.new_tensor(0.0)
+        if hasattr(batch, 'y') and hasattr(batch, 'split') and hasattr(batch, f'{batch.split}_mask'):
+            mask = batch[f'{batch.split}_mask']
+            # Supervised branch losses from both GNN and BGA outputs.
+            l1 = F.cross_entropy(z1[mask], batch.y[mask])
+            l2 = F.cross_entropy(z2[mask], batch.y[mask])
+
+            # Distillation on the complementary node set, consistent with upstream.
+            inv_mask = ~mask
+            if inv_mask.any():
+                z1_t = z1 * self.tau
+                z2_t = z2 * self.tau
+                l3 = F.cross_entropy(z1_t[inv_mask], F.softmax(z2_t, dim=1)[inv_mask])
+                l4 = F.cross_entropy(z2_t[inv_mask], F.softmax(z1_t, dim=1)[inv_mask])
+            else:
+                l3 = z1.new_tensor(0.0)
+                l4 = z1.new_tensor(0.0)
+
+            total_loss = self.alpha * (l1 + l2) + (1 - self.alpha) * (l3 + l4)
 
         pred, true = self._apply_index(batch2)
-        return pred, true, extra_loss
+        return pred, true, total_loss

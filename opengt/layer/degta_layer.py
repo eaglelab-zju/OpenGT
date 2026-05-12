@@ -129,14 +129,15 @@ class DeGTAConv(torch.nn.Module):
         sample_attn = torch.where(adj > 0, zero_vec, sample_attn)
 
         # hard sampling
-        values, indices = sample_attn.topk(K, dim=1, largest=True, sorted=True)
-        mask = torch.zeros_like(sample_attn).scatter_(1, indices, torch.ones_like(values))
+        k = min(K, sample_attn.size(-1))
+        values, indices = sample_attn.topk(k, dim=-1, largest=True, sorted=True)
+        mask = torch.zeros_like(sample_attn).scatter_(-1, indices, torch.ones_like(values))
         sample_attn_masked = sample_attn * mask
         aeattn = aeattn * mask
 
         global_attn = (0.5 * self.a_g + 0.5 * self.b_g) * sample_attn_masked + self.c_g * aeattn
-        column_means = torch.sum(global_attn, dim=1)
-        global_attn = global_attn / column_means
+        row_sums = torch.sum(global_attn, dim=-1, keepdim=True).clamp(min=1e-12)
+        global_attn = global_attn / row_sums
         #         y_soft = sample_attn
         #         index = y_soft.max(dim=-1, keepdim=True)[1]
         #         y_hard = torch.zeros_like(sample_attn, memory_format=torch.legacy_contiguous_format).scatter_(-1, index, 1.0)

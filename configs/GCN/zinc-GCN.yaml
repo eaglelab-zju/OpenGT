@@ -41,7 +41,7 @@ model:
   edge_decoding: dot
   graph_pooling: add
   loss_fun: l1
-  type: Graphtransformer
+  type: PureGNN
 optim:
   base_lr: 0.0005
   clip_grad_norm: true

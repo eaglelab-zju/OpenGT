@@ -257,7 +257,7 @@ def create_cv_splits(dataset, cv_type, k, file_name):
         kf = KFold(n_splits=k, shuffle=True, random_state=123)
         kf_split = kf.split(np.zeros(n_samples))
     else:
-        ValueError(f"Unexpected cross-validation type: {cv_type}")
+        raise ValueError(f"Unexpected cross-validation type: {cv_type}")
 
     splits = {'n_samples': n_samples,
               'n_splits': k,

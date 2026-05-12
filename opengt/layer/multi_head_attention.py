@@ -25,11 +25,21 @@ class MultiHeadAttention(nn.Module):
             dim_hidden,
             n_heads,
             dropout,
+            batch_first=True,
         )
 
     def forward(self, batch):
         if isinstance(batch, torch.Tensor):
-            batch = self.model(batch, batch, batch, need_weights=False)[0]
+            if batch.dim() == 2:
+                batch = batch.unsqueeze(0)
+                batch = self.model(batch, batch, batch, need_weights=False)[0].squeeze(0)
+            else:
+                batch = self.model(batch, batch, batch, need_weights=False)[0]
         else:
-            batch.x = self.model(batch.x, batch.x, batch.x, need_weights=False)[0]
+            x = batch.x
+            if x.dim() == 2:
+                x = x.unsqueeze(0)
+                batch.x = self.model(x, x, x, need_weights=False)[0].squeeze(0)
+            else:
+                batch.x = self.model(x, x, x, need_weights=False)[0]
         return batch

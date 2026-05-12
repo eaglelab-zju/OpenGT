@@ -14,33 +14,36 @@ BIG_CONSTANT = 1e8
 def create_projection_matrix(m, d, seed=0, scaling=0, struct_mode=False):
     nb_full_blocks = int(m/d)
     block_list = []
-    current_seed = seed
+    current_seed = int(seed)
     for _ in range(nb_full_blocks):
-        torch.manual_seed(current_seed)
+        g = torch.Generator(device='cpu')
+        g.manual_seed(current_seed)
         if struct_mode:
             q = create_products_of_givens_rotations(d, current_seed)
         else:
-            unstructured_block = torch.randn((d, d))
-            q, _ = torch.qr(unstructured_block)
+            unstructured_block = torch.randn((d, d), generator=g)
+            q, _ = torch.linalg.qr(unstructured_block)
             q = torch.t(q)
         block_list.append(q)
         current_seed += 1
     remaining_rows = m - nb_full_blocks * d
     if remaining_rows > 0:
-        torch.manual_seed(current_seed)
+        g = torch.Generator(device='cpu')
+        g.manual_seed(current_seed)
         if struct_mode:
             q = create_products_of_givens_rotations(d, current_seed)
         else:
-            unstructured_block = torch.randn((d, d))
+            unstructured_block = torch.randn((d, d), generator=g)
             q, _ = torch.linalg.qr(unstructured_block)
             q = torch.t(q)
         block_list.append(q[0:remaining_rows])
     final_matrix = torch.vstack(block_list)
 
     current_seed += 1
-    torch.manual_seed(current_seed)
+    g = torch.Generator(device='cpu')
+    g.manual_seed(current_seed)
     if scaling == 0:
-        multiplier = torch.norm(torch.randn((m, d)), dim=1)
+        multiplier = torch.norm(torch.randn((m, d), generator=g), dim=1)
     elif scaling == 1:
         multiplier = torch.sqrt(torch.tensor(float(d))) * torch.ones(m)
     else:
@@ -51,15 +54,15 @@ def create_projection_matrix(m, d, seed=0, scaling=0, struct_mode=False):
 def create_products_of_givens_rotations(dim, seed):
     nb_givens_rotations = dim * int(math.ceil(math.log(float(dim))))
     q = np.eye(dim, dim)
-    np.random.seed(seed)
+    rng = np.random.default_rng(seed)
     for _ in range(nb_givens_rotations):
-        random_angle = math.pi * np.random.uniform()
-        random_indices = np.random.choice(dim, 2)
+        random_angle = math.pi * rng.uniform()
+        random_indices = rng.choice(dim, 2, replace=False)
         index_i = min(random_indices[0], random_indices[1])
         index_j = max(random_indices[0], random_indices[1])
         slice_i = q[index_i]
         slice_j = q[index_j]
-        new_slice_i = math.cos(random_angle) * slice_i + math.cos(random_angle) * slice_j
+        new_slice_i = math.cos(random_angle) * slice_i + math.sin(random_angle) * slice_j
         new_slice_j = -math.sin(random_angle) * slice_i + math.cos(random_angle) * slice_j
         q[index_i] = new_slice_i
         q[index_j] = new_slice_j
@@ -317,7 +320,7 @@ class NodeFormerConv(nn.Module):
             projection_matrix = None
         else:
             dim = query.shape[-1]
-            seed = torch.ceil(torch.abs(torch.sum(query) * BIG_CONSTANT)).to(torch.int32)
+            seed = int(torch.ceil(torch.abs(torch.sum(query) * BIG_CONSTANT)).item())
             projection_matrix = create_projection_matrix(
                 self.nb_random_features, dim, seed=seed).to(query.device)
 

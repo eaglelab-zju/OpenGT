@@ -91,6 +91,7 @@ def agg_runs(dir, metric_best='auto'):
     '''
     results = {'train': None, 'val': None, 'test': None}
     results_best = {'train': None, 'val': None, 'test': None}
+    selected_metric = metric_best
     for seed in os.listdir(dir):
         if is_seed(seed):
             dir_seed = os.path.join(dir, seed)
@@ -104,6 +105,7 @@ def agg_runs(dir, metric_best='auto'):
                     metric = 'auc' if 'auc' in stats_list[0] else 'accuracy'
                 else:
                     metric = metric_best
+                selected_metric = metric
                 performance_np = np.array(  # noqa
                     [stats[metric] for stats in stats_list])
                 best_epoch = \
@@ -160,4 +162,4 @@ def agg_runs(dir, metric_best='auto'):
         dict_to_json(value, fname)
     logging.info('Results aggregated across runs saved in {}'.format(
         os.path.join(dir, 'agg')))
-    return results_best['test'][metric_best]
+    return results_best['test'][selected_metric]

@@ -37,7 +37,7 @@ metric_best: accuracy
 model:
   edge_decoding: dot
   loss_fun: cross_entropy
-  type: Graphtransformer
+  type: PureGNN
 optim:
   base_lr: 0.0005
   clip_grad_norm: true

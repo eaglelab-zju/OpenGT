@@ -53,7 +53,7 @@ train:
   enable_ckpt: False
 #  ckpt_period: 100
 model:
-  type: Graphtransformer
+  type: PureGNN
   loss_fun: cross_entropy
   edge_decoding: dot
 gt:
