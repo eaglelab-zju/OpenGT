@@ -360,8 +360,8 @@ def load_dataset_master(format, name, dataset_dir):
 
     # This could not be done earlier because the training wants 'train_mask' etc.
     # Now after using gnn.head: inductive_node this is ok.
-    if name == 'ogbn-arxiv' or name == 'ogbn-proteins':
-      return dataset
+    # if name == 'ogbn-arxiv' or name == 'ogbn-proteins':
+    #     return dataset
     # Set standard dataset train/val/test splits
     if hasattr(dataset, 'split_idxs'):
         set_dataset_splits(dataset, dataset.split_idxs)
@@ -657,31 +657,31 @@ def preformat_TUDataset(dataset_dir, name):
     return dataset
 
 def preformat_ogbn(dataset_dir, name):
-  if name == 'ogbn-arxiv' or name == 'ogbn-proteins':
-    dataset = PygNodePropPredDataset(name=name)
-    if name == 'ogbn-arxiv':
-      pre_transform_in_memory(dataset, partial(add_reverse_edges))
-      if cfg.prep.add_self_loops:
-        pre_transform_in_memory(dataset, partial(add_self_loops))
-    if name == 'ogbn-proteins':
-      pre_transform_in_memory(dataset, partial(move_node_feat_to_x))
-      pre_transform_in_memory(dataset, partial(typecast_x, type_str='float'))
-    split_dict = dataset.get_idx_split()
-    split_dict['val'] = split_dict.pop('valid')
-    dataset.split_idx = split_dict
-    return dataset
+    if name == 'ogbn-arxiv' or name == 'ogbn-proteins':
+        dataset = PygNodePropPredDataset(root=dataset_dir, name=name)
+        if name == 'ogbn-arxiv':
+            pre_transform_in_memory(dataset, partial(add_reverse_edges))
+            if cfg.prep.add_self_loops:
+                pre_transform_in_memory(dataset, partial(add_self_loops))
+        if name == 'ogbn-proteins':
+            pre_transform_in_memory(dataset, partial(move_node_feat_to_x))
+            pre_transform_in_memory(dataset, partial(typecast_x, type_str='float'))
+        split_dict = dataset.get_idx_split()
+        split_dict['val'] = split_dict.pop('valid')
+        dataset.split_idxs = split_dict
+        return dataset
 
 
-     #  We do not need to store  these separately.
-     # storing separatelymight simplify the duplicated logger code in main.py
-     # s_dict = dataset.get_idx_split()
-     # dataset.split_idxs = [s_dict[s] for s in ['train', 'valid', 'test']]
-     # convert the adjacency list to an edge_index list.
-     # data = dataset[0]
-     # coo = data.adj_t.coo()
-     # data is only a deep copy.  Need to write to the dataset object itself.
-     # dataset[0].edge_index = torch.stack(coo[:2])
-     # del dataset[0]['adj_t'] # remove the adjacency list after the edge_index is created.
+        #  We do not need to store  these separately.
+        # storing separatelymight simplify the duplicated logger code in main.py
+        # s_dict = dataset.get_idx_split()
+        # dataset.split_idxs = [s_dict[s] for s in ['train', 'valid', 'test']]
+        # convert the adjacency list to an edge_index list.
+        # data = dataset[0]
+        # coo = data.adj_t.coo()
+        # data is only a deep copy.  Need to write to the dataset object itself.
+        # dataset[0].edge_index = torch.stack(coo[:2])
+        # del dataset[0]['adj_t'] # remove the adjacency list after the edge_index is created.
 
      # return dataset
   else:

@@ -30,10 +30,11 @@ gt:
   batch_norm: false
   dim_hidden: 96
   dropout: 0.5
+  graph_weight: 0.8
   layer_norm: false
   layer_type: GCN+Transformer
-  layers: 2
-  n_heads: 2
+  layers: 3
+  n_heads: 1
   tau: 0.3
   use_patch_attn: true
 metis:

@@ -12,6 +12,7 @@ datasets=("cornell" "texas" "wisconsin" "chameleon-new" "squirrel-new" "cora" "c
 #datasets=("cora" "citeseer" "pubmed")
 #datasets=("peptides-func" "peptides-struct")
 #datasets=("chameleon-new" "squirrel-new")
+#datasets=("chameleon-new" "squirrel-new")
 
 # Loop through each model and dataset
 for model in "${models[@]}"; do

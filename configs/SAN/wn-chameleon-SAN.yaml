@@ -1,4 +1,4 @@
-accelerator: cuda:4
+accelerator: cuda:3
 out_dir: results
 metric_best: accuracy
 wandb:
@@ -59,11 +59,10 @@ gnn:
   agg: mean
   normalize_adj: False
 optim:
-  optimizer: adam
+  clip_grad_norm: True
+  optimizer: adamW
   weight_decay: 0.0
   base_lr: 0.0007
-  max_epoch: 1000
-  scheduler: reduce_on_plateau
-  reduce_factor: 0.5
-  schedule_patience: 25
-  min_lr: 1e-6
+  max_epoch: 400
+  scheduler: cosine_with_warmup
+  num_warmup_epochs: 20

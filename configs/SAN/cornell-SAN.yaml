@@ -1,4 +1,4 @@
-accelerator: cuda:5
+accelerator: cuda:3
 dataset:
   edge_encoder: true
   edge_encoder_bn: false
@@ -40,12 +40,11 @@ model:
   type: SANTransformer
 optim:
   base_lr: 0.0007
-  max_epoch: 1000
-  min_lr: 1e-6
-  optimizer: adam
-  reduce_factor: 0.5
-  schedule_patience: 25
-  scheduler: reduce_on_plateau
+  clip_grad_norm: true
+  max_epoch: 400
+  num_warmup_epochs: 20
+  optimizer: adamW
+  scheduler: cosine_with_warmup
   weight_decay: 0.0
 out_dir: results
 posenc_LapPE:
