@@ -18,3 +18,5 @@ ogb
 wandb
 pymetis
 opt-einsum
+# Optional: GT-SNT SNT module (uncomment if using GTSNT)
+# spikingjelly==0.0.0.0.14

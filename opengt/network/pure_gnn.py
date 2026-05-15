@@ -22,23 +22,23 @@ class PureGNN(torch.nn.Module):
                 dim_in, cfg.gnn.dim_inner, cfg.gnn.layers_pre_mp)
             dim_in = cfg.gnn.dim_inner
 
-        if not cfg.gt.dim_hidden == cfg.gnn.dim_inner == dim_in:
+        if cfg.gt.dim_hidden != cfg.gnn.dim_inner:
             raise ValueError(
-                f"The inner and hidden dims must match: "
-                f"dim_hidden={cfg.gt.dim_hidden} dim_inner={cfg.gnn.dim_inner} "
-                f"dim_in={dim_in}"
+                f"The hidden and inner dims must match: "
+                f"dim_hidden={cfg.gt.dim_hidden} dim_inner={cfg.gnn.dim_inner}"
             )
 
         layer_name = f"{cfg.gt.layer_type.lower()}conv"
         layers = []
-        for _ in range(cfg.gt.layers):
+        layer_dims = [dim_in] + [cfg.gt.dim_hidden] * cfg.gt.layers
+        for i in range(cfg.gt.layers):
             layers.append(GeneralLayer(
                 layer_name,
                 new_layer_config(
-                    dim_in=cfg.gt.dim_hidden,
+                    dim_in=layer_dims[i],
                     dim_out=cfg.gt.dim_hidden,
                     has_bias=True,
-                    has_act=False,
+                    has_act=True,
                     num_layers=1,
                     cfg=cfg,
                 ),

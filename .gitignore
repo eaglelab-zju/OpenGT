@@ -1,5 +1,7 @@
 # CUSTOM
 .vscode/
+.cursor/
+.cursor-server/
 scripts/pcqm4m/**/*.zip
 scripts/pcqm4m/**/*.sdf
 scripts/pcqm4m/**/*.xyz
@@ -13,6 +15,8 @@ datasets/
 grids/
 pretrained/
 results/
+result*/
+backups/
 vocprep/benchmark_RELEASE/
 vocprep/voc_viz_files/
 vocprep/VOC/benchmark_RELEASE/
@@ -165,5 +169,3 @@ dmypy.json
 
 # vim edit buffer
 *.swp
-
-

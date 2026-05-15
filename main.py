@@ -2,6 +2,7 @@ import datetime
 import os
 import torch
 import logging
+import time
 
 import opengt  # noqa, register custom modules
 from opengt.agg_runs import agg_runs
@@ -140,9 +141,26 @@ if __name__ == '__main__':
         logging.info(f"    Starting now: {datetime.datetime.now()}")
         # Set machine learning pipeline
         logging.info(f"   Create Loader: {datetime.datetime.now()}")
+        preprocess_start = time.perf_counter()
         loaders = create_loader()
+        # Single-graph transductive node count (used by GTSNT SNT codebooks, etc.).
+        try:
+            ds = loaders[0].dataset
+            d0 = ds[0] if hasattr(ds, '__len__') and len(ds) > 0 else ds._data
+            if getattr(d0, 'num_nodes', None) is not None:
+                cfg.share.num_nodes = int(d0.num_nodes)
+            elif hasattr(d0, 'x') and d0.x is not None:
+                cfg.share.num_nodes = int(d0.x.size(0))
+        except Exception:
+            pass
+        preprocess_time_s = time.perf_counter() - preprocess_start
+        logging.info(f"   Preprocess+Loader time: {preprocess_time_s:.2f}s")
         logging.info(f"   Create Logger: {datetime.datetime.now()}")
         loggers = create_logger()
+        for logger in loggers:
+            if hasattr(logger, 'set_runtime_stats'):
+                logger.set_runtime_stats(
+                    preprocess_time_s=round(preprocess_time_s, cfg.round))
         logging.info(f"   Create Model: {datetime.datetime.now()}")
         model = create_model()
         if cfg.pretrained.dir:

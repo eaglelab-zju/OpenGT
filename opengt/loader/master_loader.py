@@ -209,6 +209,10 @@ def load_dataset_master(format, name, dataset_dir):
     elif format == 'Critical':
         dataset_dir = osp.join(dataset_dir, 'Critical')
         dataset = Critical(dataset_dir, name)
+        if cfg.prep.add_reverse_edges:
+            pre_transform_in_memory(dataset, partial(add_reverse_edges))
+        if cfg.prep.add_self_loops:
+            pre_transform_in_memory(dataset, partial(add_self_loops))
         
     else:
         raise ValueError(f"Unknown data format: {format}")
@@ -682,10 +686,9 @@ def preformat_ogbn(dataset_dir, name):
         # data is only a deep copy.  Need to write to the dataset object itself.
         # dataset[0].edge_index = torch.stack(coo[:2])
         # del dataset[0]['adj_t'] # remove the adjacency list after the edge_index is created.
-
-     # return dataset
-  else:
-     raise ValueError(f"Unknown ogbn dataset '{name}'.")
+        # return dataset
+    else:
+        raise ValueError(f"Unknown ogbn dataset '{name}'.")
 
 def preformat_ZINC(dataset_dir, name):
     """Load and preformat ZINC datasets.

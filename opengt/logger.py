@@ -46,6 +46,12 @@ class CustomLogger(Logger):
         super().__init__(*args, **kwargs)
         # Whether to run comparison tests of alternative score implementations.
         self.test_scores = False
+        # Run-level metrics shared across splits, updated by training loop.
+        self._runtime_stats = {}
+
+    def set_runtime_stats(self, **kwargs):
+        """Set run-level stats that should be emitted with each epoch."""
+        self._runtime_stats.update(kwargs)
 
     # basic properties
     def basic(self):
@@ -258,6 +264,7 @@ class CustomLogger(Logger):
         eta_stats = {'eta': round(self.eta(cur_epoch), cfg.round),
                      'eta_hours': round(self.eta(cur_epoch) / 3600, cfg.round)}
         custom_stats = self.custom()
+        runtime_stats = self._runtime_stats
 
         if self.name == 'train':
             stats = {
@@ -265,14 +272,16 @@ class CustomLogger(Logger):
                 **eta_stats,
                 **basic_stats,
                 **task_stats,
-                **custom_stats
+                **custom_stats,
+                **runtime_stats,
             }
         else:
             stats = {
                 **epoch_stats,
                 **basic_stats,
                 **task_stats,
-                **custom_stats
+                **custom_stats,
+                **runtime_stats,
             }
 
         # print

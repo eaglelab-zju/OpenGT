@@ -1,5 +1,7 @@
 import logging
+import os
 import time
+import json
 
 import numpy as np
 import torch
@@ -11,6 +13,15 @@ from torch_geometric.graphgym.utils.epoch import is_eval_epoch, is_ckpt_epoch
 
 from opengt.loss.subtoken_prediction_loss import subtoken_cross_entropy
 from opengt.utils import cfg_to_dict, flatten_dict, make_wandb_name
+
+
+def _get_peak_gpu_memory_mb():
+    if not torch.cuda.is_available():
+        return 0.0
+    device = torch.device(cfg.accelerator)
+    if device.type != 'cuda':
+        return 0.0
+    return torch.cuda.max_memory_allocated(device=device) / (1024 ** 2)
 
 
 def train_epoch(logger, loader, model, optimizer, scheduler, batch_accumulation):
@@ -142,8 +153,34 @@ def custom_train(loggers, loaders, model, optimizer, scheduler):
     split_names = ['val', 'test']
     full_epoch_times = []
     perf = [[] for _ in range(num_splits)]
+    best_epoch_so_far = 0
+    preprocess_time_s = 0.0
+    if hasattr(loggers[0], '_runtime_stats'):
+        preprocess_time_s = float(loggers[0]._runtime_stats.get(
+            'preprocess_time_s', 0.0))
+
+    if torch.cuda.is_available() and str(cfg.accelerator).startswith('cuda'):
+        try:
+            torch.cuda.reset_peak_memory_stats(torch.device(cfg.accelerator))
+        except Exception:
+            logging.warning("Unable to reset peak memory stats on %s",
+                            cfg.accelerator)
+
     for cur_epoch in range(start_epoch, cfg.optim.max_epoch):
         start_time = time.perf_counter()
+        for logger in loggers:
+            if hasattr(logger, 'set_runtime_stats'):
+                logger.set_runtime_stats(
+                    preprocess_time_s=round(preprocess_time_s, cfg.round),
+                    avg_epoch_time_s=round(
+                        float(np.mean(full_epoch_times)) if full_epoch_times else 0.0,
+                        cfg.round),
+                    peak_gpu_memory_mb=round(_get_peak_gpu_memory_mb(), cfg.round),
+                    training_time_before_best_epoch_s=round(
+                        float(np.sum(full_epoch_times[:best_epoch_so_far + 1]))
+                        if full_epoch_times else 0.0,
+                        cfg.round),
+                )
         train_epoch(loggers[0], loaders[0], model, optimizer, scheduler,
                     cfg.optim.batch_accumulation)
         perf[0].append(loggers[0].write_epoch(cur_epoch))
@@ -203,6 +240,7 @@ def custom_train(loggers, loaders, model, optimizer, scheduler):
                     run.log(bstats, step=cur_epoch)
                     run.summary["full_epoch_time_avg"] = np.mean(full_epoch_times)
                     run.summary["full_epoch_time_sum"] = np.sum(full_epoch_times)
+            best_epoch_so_far = int(best_epoch)
             # Checkpoint the best epoch params (if enabled).
             if cfg.train.enable_ckpt and cfg.train.ckpt_best and \
                     best_epoch == cur_epoch:
@@ -226,6 +264,21 @@ def custom_train(loggers, loaders, model, optimizer, scheduler):
                                      f"gamma={gtl.attention.gamma.item()}")
     logging.info(f"Avg time per epoch: {np.mean(full_epoch_times):.2f}s")
     logging.info(f"Total train loop time: {np.sum(full_epoch_times) / 3600:.2f}h")
+
+    run_summary = {
+        'avg_epoch_time_s': round(
+            float(np.mean(full_epoch_times)) if full_epoch_times else 0.0, cfg.round),
+        'peak_gpu_memory_mb': round(_get_peak_gpu_memory_mb(), cfg.round),
+        'training_time_before_best_epoch_s': round(
+            float(np.sum(full_epoch_times[:best_epoch_so_far + 1]))
+            if full_epoch_times else 0.0, cfg.round),
+        'preprocess_time_s': round(preprocess_time_s, cfg.round),
+        'best_epoch': int(best_epoch_so_far),
+    }
+    with open(os.path.join(cfg.run_dir, 'run_summary.json'), 'w',
+              encoding='utf-8') as f:
+        json.dump(run_summary, f, indent=2)
+
     for logger in loggers:
         logger.close()
     if cfg.train.ckpt_clean:

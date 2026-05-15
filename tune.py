@@ -2,6 +2,10 @@ import datetime
 import os
 import torch
 import logging
+import argparse
+import json
+import sys
+import time
 
 import opengt  # noqa, register custom modules
 from opengt.agg_runs import agg_runs
@@ -115,15 +119,50 @@ def run_loop_settings():
 
 import optuna
 
+
+def parse_tune_cli():
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument('--optuna_n_trials', type=int, default=20)
+    parser.add_argument('--optuna_storage', type=str,
+                        default='sqlite:///my_study.db')
+    parser.add_argument('--optuna_study_suffix', type=str, default='')
+    parser.add_argument('--optuna_sampler_seed', type=int, default=0)
+    parser.add_argument('--tune_mode', type=str, default='auto',
+                        choices=['auto', 'legacy', 'puregnn'])
+    return parser.parse_known_args()
+
+
 def objective(trial):
-    global cfg, args, out_dir_base
+    global cfg, args, out_dir_base, tune_args
     
     cfg.out_dir = os.path.join(out_dir_base, "trial_"+str(trial.number))
 
     # Modify config based on the trial
     cfg.optim.base_lr = trial.suggest_float('base_lr', 1e-5, 1e-2, log=True)
-    cfg.optim.weight_decay = trial.suggest_float('weight_decay', 1e-6, 1e-3, log=True)
-    if 'Graphormer' in cfg.model.type:
+    cfg.optim.weight_decay = trial.suggest_float('weight_decay', 1e-6, 1e-2, log=True)
+
+    tune_mode = tune_args.tune_mode
+    if tune_mode == 'auto':
+        tune_mode = 'puregnn' if cfg.model.type == 'PureGNN' else 'legacy'
+
+    if tune_mode == 'puregnn':
+        cfg.gt.layers = trial.suggest_int('num_layers', 2, 8)
+        cfg.gt.dim_hidden = trial.suggest_categorical(
+            'dim_hidden', [64, 96, 128, 192, 256, 384, 512]
+        )
+        cfg.gnn.dim_inner = cfg.gt.dim_hidden
+        cfg.gnn.dropout = trial.suggest_float('dropout', 0.0, 0.8, step=0.1)
+        cfg.gnn.act = trial.suggest_categorical('act', ['relu', 'gelu'])
+        cfg.gnn.batchnorm = trial.suggest_categorical('batchnorm', [True, False])
+        cfg.optim.optimizer = trial.suggest_categorical('optimizer', ['adam', 'adamW'])
+        cfg.optim.scheduler = trial.suggest_categorical(
+            'scheduler', ['none', 'cosine_with_warmup']
+        )
+        if cfg.optim.scheduler == 'cosine_with_warmup':
+            cfg.optim.num_warmup_epochs = trial.suggest_int('num_warmup_epochs', 5, 40, step=5)
+        else:
+            cfg.optim.num_warmup_epochs = 0
+    elif 'Graphormer' in cfg.model.type:
         cfg.graphormer.num_layers = trial.suggest_int('num_layers', 1, 8)
         cfg.graphormer.embed_dim  = trial.suggest_int('dim_hidden', 24, 144, step=24)
         cfg.gnn.dim_inner = cfg.graphormer.embed_dim
@@ -165,9 +204,16 @@ def objective(trial):
         logging.info(f"    Starting now: {datetime.datetime.now()}")
         # Set machine learning pipeline
         logging.info(f"   Create Loader: {datetime.datetime.now()}")
+        preprocess_start = time.perf_counter()
         loaders = create_loader()
+        preprocess_time_s = time.perf_counter() - preprocess_start
+        logging.info(f"   Preprocess+Loader time: {preprocess_time_s:.2f}s")
         logging.info(f"   Create Logger: {datetime.datetime.now()}")
         loggers = create_logger()
+        for logger in loggers:
+            if hasattr(logger, 'set_runtime_stats'):
+                logger.set_runtime_stats(
+                    preprocess_time_s=round(preprocess_time_s, cfg.round))
         logging.info(f"   Create Model: {datetime.datetime.now()}")
         model = create_model()
         if cfg.pretrained.dir:
@@ -209,6 +255,8 @@ def objective(trial):
 
 
 if __name__ == '__main__':
+    tune_args, remaining_argv = parse_tune_cli()
+    sys.argv = [sys.argv[0]] + remaining_argv
     
     # Load cmd line args
     args = parse_args()
@@ -220,8 +268,27 @@ if __name__ == '__main__':
     node_encoder_name = cfg.dataset.node_encoder_name
     if not cfg.dataset.node_encoder:
         node_encoder_name = 'none'
-    study = optuna.create_study(study_name=f"my_study_{cfg.model.type}+{node_encoder_name}_{cfg.dataset.name}",
-                                storage="sqlite:///my_study.db",
+    layer_name = getattr(cfg.gt, 'layer_type', 'none')
+    suffix = f"_{tune_args.optuna_study_suffix}" if tune_args.optuna_study_suffix else ""
+    study_name = (
+        f"my_study_{cfg.model.type}+{node_encoder_name}_{cfg.dataset.name}_{layer_name}{suffix}"
+    )
+    study = optuna.create_study(study_name=study_name,
+                                storage=tune_args.optuna_storage,
                                 direction=('minimize' if cfg.metric_agg == 'argmin' else 'maximize'),
-                                load_if_exists=True)
-    study.optimize(objective, n_trials=100)
+                                load_if_exists=True,
+                                sampler=optuna.samplers.TPESampler(seed=tune_args.optuna_sampler_seed))
+    study.optimize(objective, n_trials=tune_args.optuna_n_trials)
+
+    best_summary = {
+        "study_name": study_name,
+        "best_value": study.best_value,
+        "best_trial_number": study.best_trial.number,
+        "best_params": study.best_params,
+        "dataset": cfg.dataset.name,
+        "model_type": cfg.model.type,
+        "layer_type": layer_name,
+    }
+    os.makedirs(out_dir_base, exist_ok=True)
+    with open(os.path.join(out_dir_base, "optuna_best.json"), "w", encoding="utf-8") as f:
+        json.dump(best_summary, f, indent=2, ensure_ascii=False)

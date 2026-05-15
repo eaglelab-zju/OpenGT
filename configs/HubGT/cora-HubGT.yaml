@@ -1,0 +1,52 @@
+accelerator: cuda:0
+dataset:
+  edge_encoder: false
+  edge_encoder_bn: false
+  edge_encoder_name: DummyEdge
+  format: PyG-Planetoid
+  name: cora
+  node_encoder: true
+  node_encoder_bn: false
+  node_encoder_name: LinearNode
+  split_mode: standard
+  task: node
+  task_type: classification
+  transductive: true
+gnn:
+  act: gelu
+  agg: mean
+  batchnorm: true
+  dim_inner: 96
+  dropout: 0.1
+  head: node
+  layers_post_mp: 1
+  layers_pre_mp: 0
+  normalize_adj: false
+gt:
+  attn_dropout: 0.1
+  dim_hidden: 96
+  dropout: 0.1
+  layers: 2
+  n_heads: 8
+metric_best: accuracy
+model:
+  edge_decoding: dot
+  loss_fun: cross_entropy
+  type: HubGT
+optim:
+  base_lr: 0.001
+  clip_grad_norm: true
+  max_epoch: 300
+  num_warmup_epochs: 10
+  optimizer: adamW
+  scheduler: cosine_with_warmup
+  weight_decay: 1e-4
+out_dir: results
+train:
+  enable_ckpt: false
+  eval_period: 1
+  mode: custom
+  sampler: full_batch
+wandb:
+  project: cora
+  use: false
