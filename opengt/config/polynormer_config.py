@@ -9,17 +9,19 @@ def set_cfg_polynormer(cfg):
     """
     cfg.polynormer = CN()
 
-    # Global transformer depth when ``use_global`` is True (PyG default-style).
+    # Cornell reference defaults use the local GAT branch only.
     cfg.polynormer.global_layers = 2
-    cfg.polynormer.use_global = True
+    cfg.polynormer.use_global = False
+    cfg.polynormer.two_stage = True
+    cfg.polynormer.local_epochs = 100
+    cfg.polynormer.global_epochs = 200
 
     cfg.polynormer.in_dropout = 0.15
-    cfg.polynormer.dropout = 0.2
-    cfg.polynormer.global_dropout = 0.2
+    cfg.polynormer.dropout = 0.5
+    cfg.polynormer.global_dropout = 0.5
     cfg.polynormer.heads = 1
     cfg.polynormer.beta = 0.9
     cfg.polynormer.qk_shared = False
     cfg.polynormer.pre_ln = False
-    cfg.polynormer.post_bn = True
-    cfg.polynormer.local_attn = False
-
+    cfg.polynormer.post_bn = False
+    cfg.polynormer.local_attn = True

@@ -36,6 +36,8 @@ def train_epoch(logger, loader, model, optimizer, scheduler, batch_accumulation)
             pred, true, extra_loss = model(batch)
         elif cfg.model.type == 'CoBFormer':
             pred, true, total_loss = model(batch)
+        elif cfg.model.type == 'M3Dphormer' and cfg.m3dphormer.use_global_aux_loss:
+            pred, true, global_aux_loss = model(batch)
         else:
             pred, true = model(batch)
         if cfg.dataset.name == 'ogbg-code2':
@@ -53,6 +55,8 @@ def train_epoch(logger, loader, model, optimizer, scheduler, batch_accumulation)
             # CoBFormer returns the full training objective including
             # both branch supervision and distillation terms.
             loss = total_loss
+        elif cfg.model.type == 'M3Dphormer' and cfg.m3dphormer.use_global_aux_loss:
+            loss += global_aux_loss
         loss.backward()
         # Parameters update after accumulating gradients for given num. batches.
         if ((iter + 1) % batch_accumulation == 0) or (iter + 1 == len(loader)):

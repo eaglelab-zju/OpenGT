@@ -5,8 +5,39 @@ import torch_geometric.graphgym.register as register
 from torch_geometric.graphgym.config import cfg
 from torch_geometric.graphgym.models.gnn import GNNPreMP
 from torch_geometric.graphgym.register import register_network
-from torch_geometric.nn import TransformerConv
+from torch_geometric.utils import scatter
 from opengt.encoder.feature_encoder import FeatureEncoder
+
+
+class MultiHeadGraphAttention(nn.Module):
+    """Sparse graph multi-head attention from the original Graph Transformer."""
+
+    def __init__(self, dim_h, num_heads, use_bias=False):
+        super().__init__()
+        self.dim_h = dim_h
+        self.num_heads = num_heads
+        self.head_dim = dim_h // num_heads
+
+        self.Q = nn.Linear(dim_h, dim_h, bias=use_bias)
+        self.K = nn.Linear(dim_h, dim_h, bias=use_bias)
+        self.V = nn.Linear(dim_h, dim_h, bias=use_bias)
+
+    def forward(self, h, edge_index):
+        src, dst = edge_index
+        num_nodes = h.size(0)
+
+        q = self.Q(h).view(num_nodes, self.num_heads, self.head_dim)
+        k = self.K(h).view(num_nodes, self.num_heads, self.head_dim)
+        v = self.V(h).view(num_nodes, self.num_heads, self.head_dim)
+
+        score = (k[src] * q[dst]).sum(dim=-1, keepdim=True)
+        score = torch.exp((score / (self.head_dim ** 0.5)).clamp(-5, 5))
+
+        weighted_v = v[src] * score
+        h_out = scatter(weighted_v, dst, dim=0, dim_size=num_nodes, reduce='sum')
+        z = scatter(score, dst, dim=0, dim_size=num_nodes, reduce='sum')
+        h_out = h_out / z.clamp_min(1e-6)
+        return h_out.reshape(num_nodes, self.dim_h)
 
 
 class GraphTransformerBlock(nn.Module):
@@ -17,13 +48,10 @@ class GraphTransformerBlock(nn.Module):
         if dim_h % num_heads != 0:
             raise ValueError(f"dim_hidden={dim_h} must be divisible by n_heads={num_heads}")
 
-        edge_dim = getattr(cfg.gnn, 'dim_edge', None) if cfg.dataset.edge_encoder else None
-        self.attn = TransformerConv(
-            in_channels=dim_h,
-            out_channels=dim_h // num_heads,
-            heads=num_heads,
-            dropout=dropout,
-            edge_dim=edge_dim,
+        self.attn = MultiHeadGraphAttention(
+            dim_h=dim_h,
+            num_heads=num_heads,
+            use_bias=bool(cfg.gt.attn.use_bias),
         )
         self.proj = nn.Linear(dim_h, dim_h)
 
@@ -46,8 +74,7 @@ class GraphTransformerBlock(nn.Module):
         h = batch.x
         h_in1 = h
 
-        edge_attr = batch.edge_attr if hasattr(batch, 'edge_attr') else None
-        h = self.attn(h, batch.edge_index, edge_attr=edge_attr)
+        h = self.attn(h, batch.edge_index)
         h = F.dropout(h, self.dropout, training=self.training)
         h = self.proj(h)
 

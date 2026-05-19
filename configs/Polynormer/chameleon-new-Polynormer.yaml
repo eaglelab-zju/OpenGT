@@ -30,6 +30,10 @@ model:
   edge_decoding: dot
   loss_fun: cross_entropy
   type: Polynormer
+polynormer:
+  two_stage: true
+  local_epochs: 100
+  global_epochs: 200
 optim:
   base_lr: 0.0005
   clip_grad_norm: true

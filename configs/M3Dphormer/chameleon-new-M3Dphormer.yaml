@@ -3,8 +3,8 @@ dataset:
   edge_encoder: false
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
-  format: PyG-Planetoid
-  name: cora
+  format: Critical
+  name: chameleon
   node_encoder: true
   node_encoder_bn: false
   node_encoder_name: LinearNode
@@ -23,17 +23,27 @@ gnn:
   layers_pre_mp: 0
   normalize_adj: false
 gt:
+  attn_dropout: 0.3
   dim_hidden: 96
+  dropout: 0.5
   layers: 3
+  n_heads: 2
 metric_best: accuracy
 model:
   edge_decoding: dot
   loss_fun: cross_entropy
-  type: Polynormer
-polynormer:
-  two_stage: true
-  local_epochs: 100
-  global_epochs: 200
+  type: M3Dphormer
+m3dphormer:
+  global_nodes_per_class: 1
+  learn_global: false
+  local_type: GAT
+  norm_pos: pre
+  norm_type: rms
+  num_clusters: 128
+  use_global_aux_loss: true
+  global_aux_loss_weight: 1.0
+  use_cache: false
+  use_res: true
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
@@ -41,7 +51,7 @@ optim:
   num_warmup_epochs: 20
   optimizer: adamW
   scheduler: cosine_with_warmup
-  weight_decay: 5e-4
+  weight_decay: 0.0005
 out_dir: results
 train:
   enable_ckpt: false
@@ -49,5 +59,5 @@ train:
   mode: custom
   sampler: full_batch
 wandb:
-  project: cora
+  project: chameleon-new
   use: false

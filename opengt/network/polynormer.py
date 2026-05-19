@@ -5,7 +5,8 @@
 # OpenGT changes vs upstream:
 # - Removed pred_local / pred_global and final log_softmax; logits come from GraphGym
 #   ``post_mp`` like other networks here.
-# - Replaced private self._global with cfg.polynormer.use_global.
+# - Two-stage local -> global schedule is handled inside ``train()`` to keep the
+#   GraphGym training loop model-agnostic.
 # - Dropped unused ``lin_in`` (present in upstream but never referenced in forward).
 # - Global attention class is ``opengt.layer.polynormer_attention`` (register_layer).
 from typing import Optional
@@ -40,7 +41,12 @@ class Polynormer(torch.nn.Module):
             )
 
         heads = int(cfg.polynormer.heads)
-        self._use_global = bool(getattr(cfg.polynormer, "use_global", True))
+        self._two_stage = bool(getattr(cfg.polynormer, "two_stage", False))
+        self._local_epochs = int(getattr(cfg.polynormer, "local_epochs", 0))
+        self._global_epochs = int(getattr(cfg.polynormer, "global_epochs", 0))
+        self._default_use_global = bool(getattr(cfg.polynormer, "use_global", True))
+        self._stage_epoch = -1
+        self._use_global = False if self._two_stage else self._default_use_global
         self.in_drop = cfg.polynormer.in_dropout
         self.dropout = cfg.polynormer.dropout
         self.pre_ln = cfg.polynormer.pre_ln
@@ -115,6 +121,16 @@ class Polynormer(torch.nn.Module):
 
         self.reset_parameters()
 
+    def train(self, mode: bool = True):
+        super().train(mode)
+        if mode:
+            if self._two_stage:
+                self._stage_epoch += 1
+                self._use_global = self._stage_epoch >= self._local_epochs
+            else:
+                self._use_global = self._default_use_global
+        return self
+
     def reset_parameters(self) -> None:
         for local_conv in self.local_convs:
             local_conv.reset_parameters()
@@ -135,6 +151,8 @@ class Polynormer(torch.nn.Module):
         self.ln.reset_parameters()
         if hasattr(self.post_mp, 'reset_parameters'):
             self.post_mp.reset_parameters()
+        self._stage_epoch = -1
+        self._use_global = False if self._two_stage else self._default_use_global
 
     def _polynormer_stack(
         self,
