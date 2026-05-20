@@ -1,13 +1,13 @@
-accelerator: cuda:0
+accelerator: cuda:1
 dataset:
   edge_encoder: false
   edge_encoder_bn: false
   edge_encoder_name: DummyEdge
-  format: OGB
-  name: ogbn-arxiv
+  format: PyG-Planetoid
+  name: cora
   node_encoder: true
   node_encoder_bn: false
-  node_encoder_name: LapPE
+  node_encoder_name: LinearNode
   split_mode: standard
   task: node
   task_type: classification
@@ -15,9 +15,9 @@ dataset:
 gnn:
   act: gelu
   agg: mean
-  batchnorm: true
-  dim_inner: 96
-  dropout: 0.2
+  batchnorm: false
+  dim_inner: 256
+  dropout: 0.7
   head: node
   layers_post_mp: 1
   layers_pre_mp: 0
@@ -25,30 +25,28 @@ gnn:
 graphormer:
   use_graph_token: false
 gt:
-  attn_dropout: 0.2
+  attn_dropout: 0.5
   batch_norm: false
-  dim_hidden: 96
-  dropout: 0.2
-  layer_norm: true
-  layer_type: GCN+Transformer
-  layers: 2
+  dim_hidden: 256
+  dropout: 0.7
+  layer_norm: false
+  layer_type: SAGE
+  layers: 3
   n_heads: 2
 metric_best: accuracy
 model:
   edge_decoding: dot
   loss_fun: cross_entropy
-  type: GPSModel
+  type: Graphtransformer
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
-  max_epoch: 600
+  max_epoch: 400
   num_warmup_epochs: 20
   optimizer: adamW
   scheduler: cosine_with_warmup
-  weight_decay: 1e-5
+  weight_decay: 5e-4
 out_dir: results
-prep:
-  add_self_loops: true
 posenc_GraphormerBias:
   enable: false
   node_degrees_only: true
@@ -61,7 +59,7 @@ posenc_LapPE:
     eigvec_norm: L2
     laplacian_norm: none
     max_freqs: 4
-  enable: true
+  enable: false
   layers: 2
   model: DeepSet
   n_heads: 4
@@ -75,17 +73,9 @@ posenc_RWSE:
   raw_norm_type: BatchNorm
 train:
   enable_ckpt: false
-  eval_period: 1
+  eval_period: 5
   mode: custom
-  sampler: neighbor # full_batch
-  neighbor_sizes: [20,10]
-  sample_node: True
-  node_per_graph: 1024
-  batch_size: 128
-val:
-  sampler: neighbor
-  sample_node: True
-  node_per_graph: 1024
+  sampler: full_batch
 wandb:
-  project: ogbn-arxiv
+  project: cora
   use: false

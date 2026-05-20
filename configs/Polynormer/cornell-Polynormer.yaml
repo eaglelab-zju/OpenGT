@@ -1,0 +1,49 @@
+accelerator: cuda:0
+dataset:
+  edge_encoder: false
+  edge_encoder_bn: false
+  edge_encoder_name: DummyEdge
+  format: PyG-WebKB
+  name: cornell
+  node_encoder: true
+  node_encoder_bn: false
+  node_encoder_name: LinearNode
+  split_mode: standard
+  task: node
+  task_type: classification
+  transductive: true
+gnn:
+  act: gelu
+  agg: mean
+  batchnorm: true
+  dim_inner: 96
+  dropout: 0.2
+  head: node
+  layers_post_mp: 1
+  layers_pre_mp: 0
+  normalize_adj: false
+gt:
+  dim_hidden: 96
+  layers: 3
+metric_best: accuracy
+model:
+  edge_decoding: dot
+  loss_fun: cross_entropy
+  type: Polynormer
+optim:
+  base_lr: 0.0005
+  clip_grad_norm: true
+  max_epoch: 300
+  num_warmup_epochs: 20
+  optimizer: adamW
+  scheduler: cosine_with_warmup
+  weight_decay: 5e-4
+out_dir: results
+train:
+  enable_ckpt: false
+  eval_period: 1
+  mode: custom
+  sampler: full_batch
+wandb:
+  project: cornell
+  use: false

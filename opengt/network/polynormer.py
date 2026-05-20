@@ -104,11 +104,13 @@ class Polynormer(torch.nn.Module):
 
         self.ln = torch.nn.LayerNorm(inner_channels)
 
+        # Global stack runs on ``to_dense_batch`` output: last dim is ``inner_channels``,
+        # not ``hidden`` (local stack output is heads * hidden).
         self.global_attn = torch.nn.ModuleList()
         for _ in range(cfg.polynormer.global_layers):
             self.global_attn.append(
                 PolynormerAttention(
-                    channels=hidden,
+                    channels=inner_channels,
                     heads=heads,
                     head_channels=hidden,
                     beta=cfg.polynormer.beta,

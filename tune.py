@@ -120,15 +120,35 @@ def run_loop_settings():
 import optuna
 
 
+def _default_optuna_storage_url() -> str:
+    """默认使用 ``optuna_runs/studies_merged.db``，便于 ``merge_optuna_dbs.py`` 合并多库后与 ``load_if_exists`` 中断续跑。
+
+    多进程长时间并发写同一 sqlite 仍可能锁等待；需要隔离时可显式传入 ``--optuna_storage`` 指向按进程区分的文件。
+    """
+    root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "optuna_runs")
+    os.makedirs(root, exist_ok=True)
+    db = os.path.join(root, "studies_merged.db")
+    return "sqlite:///" + db.replace(os.sep, "/") + "?timeout=300"
+
+
 def parse_tune_cli():
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('--optuna_n_trials', type=int, default=20)
-    parser.add_argument('--optuna_storage', type=str,
-                        default='sqlite:///my_study.db')
+    parser.add_argument(
+        '--optuna_storage',
+        type=str,
+        default=_default_optuna_storage_url(),
+    )
     parser.add_argument('--optuna_study_suffix', type=str, default='')
     parser.add_argument('--optuna_sampler_seed', type=int, default=0)
     parser.add_argument('--tune_mode', type=str, default='auto',
                         choices=['auto', 'legacy', 'puregnn'])
+    parser.add_argument(
+        '--override_accelerator',
+        type=str,
+        default='',
+        help='非空时在加载 yaml 后强制覆盖 cfg.accelerator（多进程/多卡队列常用）',
+    )
     return parser.parse_known_args()
 
 
@@ -136,6 +156,11 @@ def objective(trial):
     global cfg, args, out_dir_base, tune_args
     
     cfg.out_dir = os.path.join(out_dir_base, "trial_"+str(trial.number))
+    if torch.cuda.is_available():
+        try:
+            torch.cuda.reset_peak_memory_stats()
+        except Exception:
+            pass
 
     # Modify config based on the trial
     cfg.optim.base_lr = trial.suggest_float('base_lr', 1e-5, 1e-2, log=True)
@@ -173,7 +198,10 @@ def objective(trial):
         cfg.gt.dim_hidden = trial.suggest_int('dim_hidden', 24, 144, step=24)
         cfg.gnn.dim_inner = cfg.gt.dim_hidden
         cfg.gt.dropout = trial.suggest_float('dropout', 0, 0.8, step=0.1)
-        cfg.gt.n_heads = trial.suggest_int('n_heads', 1, 4)
+        if cfg.model.type == 'HubGT':
+            cfg.gt.n_heads = trial.suggest_categorical('n_heads', [1, 2, 4, 8])
+        else:
+            cfg.gt.n_heads = trial.suggest_int('n_heads', 1, 4)
         cfg.gt.attn_dropout = trial.suggest_float('attn_dropout', 0, 0.8, step=0.1)
     if 'DIF' in cfg.model.type:
         cfg.gt.graph_weight = trial.suggest_float('graph_weight', 0.1, 0.9, step=0.1)
@@ -183,6 +211,36 @@ def objective(trial):
     if 'DeGTA' in cfg.model.type:
         cfg.gt.K = trial.suggest_categorical('K', [2, 4, 8])
 
+    if cfg.model.type == 'GTSNT':
+        nh = int(cfg.gt.n_heads)
+        dh = int(cfg.gt.dim_hidden)
+        if nh > 0 and dh % nh != 0:
+            dh = ((dh // nh) + 1) * nh
+            cfg.gt.dim_hidden = dh
+            cfg.gnn.dim_inner = dh
+        cfg.gtsnt.cb_channels = trial.suggest_categorical('gtsnt_cb_channels', [4, 8, 16])
+        cfg.gtsnt.T = trial.suggest_int('gtsnt_T', 2, 6)
+        cfg.gtsnt.v_threshold = trial.suggest_float('gtsnt_v_threshold', 0.5, 2.0, step=0.1)
+        cfg.gtsnt.init_beta = trial.suggest_float('gtsnt_init_beta', 0.1, 0.5, step=0.05)
+        cfg.gtsnt.neuron = trial.suggest_categorical('gtsnt_neuron', ['PLIF', 'LIF', 'IF'])
+
+    if cfg.model.type == 'HubGT':
+        cfg.hubgt.dp_input = trial.suggest_float('hubgt_dp_input', 0.0, 0.35, step=0.05)
+        cfg.hubgt.ffn_ratio = trial.suggest_categorical('hubgt_ffn_ratio', [2.0, 4.0, 8.0])
+
+    if cfg.model.type == 'Polynormer':
+        cfg.polynormer.heads = trial.suggest_int('poly_heads', 1, 4)
+        cfg.polynormer.in_dropout = trial.suggest_float('poly_in_dropout', 0.0, 0.45, step=0.05)
+        cfg.polynormer.dropout = trial.suggest_float('poly_dropout', 0.0, 0.45, step=0.05)
+        cfg.polynormer.global_dropout = trial.suggest_float('poly_global_dropout', 0.0, 0.45, step=0.05)
+        cfg.polynormer.beta = trial.suggest_float('poly_beta', 0.5, 0.99)
+        cfg.polynormer.global_layers = trial.suggest_int('poly_global_layers', 1, 4)
+        cfg.polynormer.use_global = trial.suggest_categorical('poly_use_global', [True, False])
+
+    if cfg.model.type == 'CoBFormer':
+        cfg.gnn.layers = trial.suggest_int('cob_gnn_layers', 2, 8)
+        cfg.gt.alpha = trial.suggest_float('cob_alpha', 0.05, 0.95, step=0.05)
+        cfg.gt.tau = trial.suggest_float('cob_tau', 0.05, 1.0, log=True)
 
     dump_cfg(cfg)
     # Set Pytorch environment
@@ -206,6 +264,21 @@ def objective(trial):
         logging.info(f"   Create Loader: {datetime.datetime.now()}")
         preprocess_start = time.perf_counter()
         loaders = create_loader()
+        # Mirror main.py: single-graph node count for models that need it (e.g. GTSNT codebooks).
+        try:
+            ds = loaders[0].dataset
+            d0 = (
+                ds[0]
+                if hasattr(ds, '__len__') and len(ds) > 0
+                else getattr(ds, '_data', None)
+            )
+            if d0 is not None:
+                if getattr(d0, 'num_nodes', None) is not None:
+                    cfg.share.num_nodes = int(d0.num_nodes)
+                elif hasattr(d0, 'x') and d0.x is not None:
+                    cfg.share.num_nodes = int(d0.x.size(0))
+        except Exception:
+            pass
         preprocess_time_s = time.perf_counter() - preprocess_start
         logging.info(f"   Preprocess+Loader time: {preprocess_time_s:.2f}s")
         logging.info(f"   Create Logger: {datetime.datetime.now()}")
@@ -251,6 +324,19 @@ def objective(trial):
         os.rename(args.cfg_file, f'{args.cfg_file}_done')
     logging.info(f"[*] All done: {datetime.datetime.now()}")
 
+    peak_cuda_mb = None
+    if torch.cuda.is_available():
+        try:
+            peak_cuda_mb = float(torch.cuda.max_memory_allocated() / (1024 ** 2))
+        except Exception:
+            peak_cuda_mb = None
+    try:
+        with open(os.path.join(cfg.out_dir, 'runtime_stats.json'),
+                  'w', encoding='utf-8') as rf:
+            json.dump({'peak_cuda_memory_mb': peak_cuda_mb}, rf, indent=2)
+    except OSError as e:
+        logging.info('Could not write runtime_stats.json: %s', e)
+
     return res
 
 
@@ -263,22 +349,46 @@ if __name__ == '__main__':
     # Load config file
     set_cfg(cfg)
     load_cfg(cfg, args)
+    oa = (tune_args.override_accelerator or '').strip()
+    if oa:
+        prev = getattr(cfg, 'accelerator', None)
+        cfg.accelerator = oa
+        print(f'[tune] override_accelerator: {prev!r} -> {cfg.accelerator!r}', flush=True)
     custom_set_out_dir(cfg, args.cfg_file, cfg.name_tag)
     out_dir_base = cfg.out_dir
     node_encoder_name = cfg.dataset.node_encoder_name
     if not cfg.dataset.node_encoder:
         node_encoder_name = 'none'
+    model_name = cfg.model.type
+    if cfg.dataset.node_encoder==True:
+        model_name += '+'+node_encoder_name
+    if cfg.model.type!="Graphormer":
+        model_name += '+'+cfg.gt.layer_type
+        
     layer_name = getattr(cfg.gt, 'layer_type', 'none')
     suffix = f"_{tune_args.optuna_study_suffix}" if tune_args.optuna_study_suffix else ""
     study_name = (
-        f"my_study_{cfg.model.type}+{node_encoder_name}_{cfg.dataset.name}_{layer_name}{suffix}"
+        f"my_study_{model_name}_{cfg.dataset.name}_{layer_name}{suffix}"
     )
     study = optuna.create_study(study_name=study_name,
                                 storage=tune_args.optuna_storage,
                                 direction=('minimize' if cfg.metric_agg == 'argmin' else 'maximize'),
                                 load_if_exists=True,
                                 sampler=optuna.samplers.TPESampler(seed=tune_args.optuna_sampler_seed))
-    study.optimize(objective, n_trials=tune_args.optuna_n_trials)
+    def _optuna_progress(study, trial):
+        n_trials = tune_args.optuna_n_trials
+        val = trial.value
+        st = trial.state.name if hasattr(trial.state, 'name') else str(trial.state)
+        print(
+            f'[Optuna] trial {trial.number + 1}/{n_trials}  state={st}  value={val}',
+            flush=True,
+        )
+
+    study.optimize(
+        objective,
+        n_trials=tune_args.optuna_n_trials,
+        callbacks=[_optuna_progress],
+    )
 
     best_summary = {
         "study_name": study_name,

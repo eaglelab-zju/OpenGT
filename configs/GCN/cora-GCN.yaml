@@ -1,4 +1,4 @@
-accelerator: cuda:0
+accelerator: cuda:1
 dataset:
   edge_encoder: false
   edge_encoder_bn: false
@@ -15,9 +15,9 @@ dataset:
 gnn:
   act: gelu
   agg: mean
-  batchnorm: true
-  dim_inner: 96
-  dropout: 0.2
+  batchnorm: false
+  dim_inner: 512
+  dropout: 0.7
   head: node
   layers_post_mp: 1
   layers_pre_mp: 0
@@ -27,11 +27,11 @@ graphormer:
 gt:
   attn_dropout: 0.5
   batch_norm: false
-  dim_hidden: 96
-  dropout: 0.5
+  dim_hidden: 512
+  dropout: 0.7
   layer_norm: false
   layer_type: GCN
-  layers: 2
+  layers: 3
   n_heads: 2
 metric_best: accuracy
 model:
@@ -39,7 +39,7 @@ model:
   loss_fun: cross_entropy
   type: PureGNN
 optim:
-  base_lr: 0.0005
+  base_lr: 0.001
   clip_grad_norm: true
   max_epoch: 400
   num_warmup_epochs: 20

@@ -1,54 +1,66 @@
 accelerator: cuda:0
 dataset:
-  edge_encoder: false
+  edge_encoder: true
   edge_encoder_bn: false
-  edge_encoder_name: DummyEdge
+  edge_encoder_name: Bond
+  edge_encoder_num_types: 4
   format: OGB
-  name: ogbn-arxiv
+  name: peptides-functional
   node_encoder: true
   node_encoder_bn: false
-  node_encoder_name: LapPE
+  node_encoder_name: Atom
+  node_encoder_num_types: 20
   split_mode: standard
-  task: node
-  task_type: classification
-  transductive: true
+  task: graph
+  task_type: classification_multilabel
+  transductive: false
 gnn:
   act: gelu
   agg: mean
   batchnorm: true
   dim_inner: 96
   dropout: 0.2
-  head: node
+  head: default
   layers_post_mp: 1
   layers_pre_mp: 0
   normalize_adj: false
 graphormer:
   use_graph_token: false
 gt:
-  attn_dropout: 0.2
-  batch_norm: false
+  attn_dropout: 0.5
+  batch_norm: true
   dim_hidden: 96
-  dropout: 0.2
-  layer_norm: true
+  dropout: 0.5
+  edge_loss_weight: 0.1
+  graph_weight: 0.8
+  kernel_trans: softmax
+  layer_norm: false
   layer_type: GCN+Transformer
-  layers: 2
-  n_heads: 2
-metric_best: accuracy
+  layers: 4
+  n_heads: 4
+  nb_random_features: 30
+  rb_order: 2
+  rb_trans: sigmoid
+  use_act: true
+  use_edge_loss: true
+  use_gumbel: true
+  use_residual: true
+metric_agg: argmax
+metric_best: ap
 model:
   edge_decoding: dot
+  graph_pooling: mean
   loss_fun: cross_entropy
-  type: GPSModel
+  type: NodeFormer
 optim:
   base_lr: 0.0005
   clip_grad_norm: true
-  max_epoch: 600
-  num_warmup_epochs: 20
+  max_epoch: 200
+  num_warmup_epochs: 10
   optimizer: adamW
   scheduler: cosine_with_warmup
-  weight_decay: 1e-5
+  weight_decay: 5e-4
 out_dir: results
-prep:
-  add_self_loops: true
 posenc_GraphormerBias:
   enable: false
   node_degrees_only: true
@@ -61,7 +73,7 @@ posenc_LapPE:
     eigvec_norm: L2
     laplacian_norm: none
     max_freqs: 4
-  enable: true
+  enable: false
   layers: 2
   model: DeepSet
   n_heads: 4
@@ -73,19 +85,15 @@ posenc_RWSE:
     times_func: range(1,17)
   model: Linear
   raw_norm_type: BatchNorm
+prep:
+  rb_order: 2
 train:
+  batch_size: 128
+  ckpt_period: 100
   enable_ckpt: false
   eval_period: 1
   mode: custom
-  sampler: neighbor # full_batch
-  neighbor_sizes: [20,10]
-  sample_node: True
-  node_per_graph: 1024
-  batch_size: 128
-val:
-  sampler: neighbor
-  sample_node: True
-  node_per_graph: 1024
+  sampler: full_batch
 wandb:
-  project: ogbn-arxiv
+  project: peptides-func
   use: false

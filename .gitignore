@@ -36,6 +36,10 @@ results*.csv
 *.html
 docs/build/
 *.db
+logs/*
+*.lock
+experiment_tasks.csv
+experiment_results.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

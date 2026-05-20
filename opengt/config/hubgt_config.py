@@ -13,4 +13,5 @@ def set_cfg_hubgt(cfg):
     cfg.hubgt.dp_bias = 0.0
     cfg.hubgt.ffn_ratio = 4.0
     cfg.hubgt.num_global_node = 0
-    cfg.hubgt.max_nodes = 8192
+    # Dense hop-bias is O(N^2); default must cover PubMed/Actor (~20k nodes) used in benchmarks.
+    cfg.hubgt.max_nodes = 65536
